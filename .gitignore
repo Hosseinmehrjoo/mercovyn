@@ -1,0 +1,112 @@
+
+# ==========================================
+# Environment & Sensitive Configuration
+# ==========================================
+
+.env
+.env.*
+!.env.example
+
+/backend/config.php
+
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ==========================================
+# User Uploads - Keep on Server
+# ==========================================
+
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+
+/assets/images/uploads/*
+!/assets/images/uploads/.gitkeep
+
+# ==========================================
+# Runtime Data
+# ==========================================
+
+/data/*
+!/data/.gitkeep
+
+*.log
+/logs/
+/cache/
+/tmp/
+/temp/
+
+# ==========================================
+# Server-specific Configuration
+# ==========================================
+
+/.user.ini
+/backend/.user.ini
+
+# Keep project .htaccess files tracked
+
+# ==========================================
+# Dependencies
+# ==========================================
+
+/node_modules/
+/vendor/
+
+# Keep package-lock.json tracked
+
+# ==========================================
+# Build & Cache
+# ==========================================
+
+/dist/
+/build/
+/coverage/
+.phpunit.cache/
+
+# ==========================================
+# IDE
+# ==========================================
+
+.idea/
+.vscode/
+*.code-workspace
+
+# ==========================================
+# Operating System
+# ==========================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Temporary & Backup Files
+# ==========================================
+
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Database Backups
+# ==========================================
+
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.sql.zip
+
+# ==========================================
+# Git
+# ==========================================
+
+.git/
