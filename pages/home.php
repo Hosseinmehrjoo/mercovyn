@@ -446,7 +446,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="owl-carousel testimonial-carousel owl-theme" data-autoplay="true" data-loop="true" data-items="1" data-dots="true" data-nav="false">
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
-                        <img src="img/testimonial-1.jpg" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
+                        <img src="<?= root_asset('img/testimonial-1.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
                     <p class="fs-5 text-muted mb-4">"Mercovyn's baler twine is the most consistent we've used. Runs clean through our presses, no snags, no breaks. Reliable supply every season."</p>
                     <h5 class="mb-1">Armen Petrosyan</h5>
@@ -454,7 +454,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
-                        <img src="img/testimonial-2.jpg" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
+                        <img src="<?= root_asset('img/testimonial-2.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
                     <p class="fs-5 text-muted mb-4">"We've been distributing Mercovyn twine for 3 years. Quality is steady, packaging is export-ready, and the team communicates clearly. A solid partner."</p>
                     <h5 class="mb-1">Dmitri Volkov</h5>
@@ -462,7 +462,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
-                        <img src="img/testimonial-3.jpg" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
+                        <img src="<?= root_asset('img/testimonial-3.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
                     <p class="fs-5 text-muted mb-4">"Custom color order came out exactly as requested. The rose twine is highly visible in the field — our operators love it. Will order again."</p>
                     <h5 class="mb-1">Bahrom Nazarov</h5>

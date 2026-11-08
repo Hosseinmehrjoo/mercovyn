@@ -82,14 +82,14 @@ require_once __DIR__ . '/../router.php';
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="<?= root_asset('lib/owlcarousel/owl.carousel.min.js') ?>"></script>
+    <script src="<?= root_asset('lib/wow/wow.min.js') ?>"></script>
+    <script src="<?= root_asset('lib/easing/easing.min.js') ?>"></script>
+    <script src="<?= root_asset('lib/waypoints/waypoints.min.js') ?>"></script>
+    <script src="<?= root_asset('lib/counterup/counterup.min.js') ?>"></script>
 
     <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+    <script src="<?= htmlspecialchars(asset_url('js/main.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
     <script src="<?= htmlspecialchars(asset_url('js/floating-contact.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 </body>
 

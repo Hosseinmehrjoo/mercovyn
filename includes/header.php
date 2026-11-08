@@ -75,7 +75,7 @@ foreach ($hreflangUrls as $lang => $url) {
     
     <!-- Preload Critical Resources -->
     <link rel="preload" as="image" href="<?= $logoUrl ?>" type="image/webp">
-    <link rel="preload" as="style" href="css/bootstrap.min.css">
+    <link rel="preload" as="style" href="<?= root_asset('css/bootstrap.min.css') ?>">
     <link rel="preload" as="style" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>">
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVQUwaA.woff2">
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2">
@@ -92,14 +92,14 @@ foreach ($hreflangUrls as $lang => $url) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
 
     <!-- Libraries Stylesheet -->
-    <link rel="preload" as="style" href="lib/animate/animate.min.css">
-    <link rel="preload" as="style" href="lib/owlcarousel/assets/owl.carousel.min.css">
-    <link href="lib/animate/animate.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="preload" as="style" href="<?= root_asset('lib/animate/animate.min.css') ?>">
+    <link rel="preload" as="style" href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>">
+    <link href="<?= root_asset('lib/animate/animate.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link rel="preload" as="style" href="css/bootstrap.min.css">
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="preload" as="style" href="<?= root_asset('css/bootstrap.min.css') ?>">
+    <link href="<?= root_asset('css/bootstrap.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
 
     <!-- Template Stylesheet -->
     <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>">

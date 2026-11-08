@@ -64,31 +64,21 @@ function detectLanguageFromPath(): string
 }
 
 /**
- * Get current language (from URL, cookie, or default)
+ * Get current language from URL prefix only (SEO + switcher must match the address bar).
+ * / = en, /ru/ = ru, /hy/ = hy, /en/ = en
  */
 function getCurrentLanguage(): string
 {
-    // 1. Check URL path first (highest priority for SEO)
-    $langFromUrl = detectLanguageFromPath();
-    if ($langFromUrl !== DEFAULT_LANGUAGE || str_starts_with($_SERVER['REQUEST_URI'], '/' . DEFAULT_LANGUAGE . '/')) {
-        // If URL explicitly contains language, use it
-        setLanguageCookie($langFromUrl);
-        return $langFromUrl;
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+    $path = trim($path, '/');
+    $first = explode('/', $path)[0] ?? '';
+
+    if (in_array($first, SUPPORTED_LANGUAGES, true)) {
+        setLanguageCookie($first);
+        return $first;
     }
-    
-    // 2. Check cookie
-    if (isset($_COOKIE[LANG_COOKIE]) && in_array($_COOKIE[LANG_COOKIE], SUPPORTED_LANGUAGES, true)) {
-        return $_COOKIE[LANG_COOKIE];
-    }
-    
-    // 3. Check Accept-Language header (fallback)
-    $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
-    foreach (SUPPORTED_LANGUAGES as $lang) {
-        if (stripos($acceptLang, $lang) !== false) {
-            return $lang;
-        }
-    }
-    
+
+    setLanguageCookie(DEFAULT_LANGUAGE);
     return DEFAULT_LANGUAGE;
 }
 
@@ -220,4 +210,10 @@ function asset_url(string $path): string
     $full = __DIR__ . '/' . $path;
     $v = is_file($full) ? (string) filemtime($full) : '0';
     return '/' . $path . '?v=' . $v;
+}
+
+/** Root-absolute path for static assets (works on /ru/ and /hy/ pages). */
+function root_asset(string $path): string
+{
+    return '/' . ltrim($path, '/');
 }
