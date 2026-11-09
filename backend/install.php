@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     'upload_url_prefix' => 'assets/images/uploads/',
                     'upload_dir' => $uploadDir . '/',
                     'site_name' => $siteName,
-                    'timezone' => 'Asia/Tehran',
+                    'timezone' => 'Asia/Yerevan',
                 ];
 
                 $configContent = "<?php\n/**\n * تولیدشده توسط نصب‌گر — این فایل را در Git قرار ندهید.\n */\nreturn " . var_export($config, true) . ";\n";

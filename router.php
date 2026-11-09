@@ -217,3 +217,23 @@ function root_asset(string $path): string
 {
     return '/' . ltrim($path, '/');
 }
+
+/** Short HTML cache for CDN (dynamic PHP pages). */
+function ad_send_html_cache_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header('Cache-Control: public, max-age=3600, stale-while-revalidate=86400');
+}
+
+/** Long cache + Last-Modified for static files served via index.php. */
+function ad_send_static_file_headers(string $absolutePath): void
+{
+    if (headers_sent() || !is_file($absolutePath)) {
+        return;
+    }
+    header('Cache-Control: public, max-age=31536000, immutable');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($absolutePath)) . ' GMT');
+    header('ETag: "' . dechex(filesize($absolutePath)) . '-' . dechex(filemtime($absolutePath)) . '"');
+}

@@ -56,6 +56,8 @@ function getField(array $row, string $field, string $lang): string
 $pageTitle = __("brand") . ' - ' . __("tagline");
 $metaDescription = __("meta_description_default");
 $currentPath = '';
+$preloadHeroImage = 'assets/images/other/hero-bg.webp';
+$loadOwlCarousel = true;
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -220,7 +222,7 @@ include __DIR__ . '/../includes/header.php';
                             ?>
                             <div class="team-img position-relative overflow-hidden">
                                 <?php if (!empty($photo)): ?>
-                                    <img src="<?= htmlspecialchars($photo) ?>" class="img-fluid w-100" alt="<?= htmlspecialchars(getField($member, 'name', $currentLang)) ?>">
+                                    <img src="<?= htmlspecialchars($photo) ?>" class="img-fluid w-100" alt="<?= htmlspecialchars(getField($member, 'name', $currentLang)) ?>" loading="lazy" decoding="async">
                                 <?php else: ?>
                                     <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
                                         <i class="fas fa-user fa-3x text-white"></i>
@@ -264,7 +266,7 @@ include __DIR__ . '/../includes/header.php';
                             ?>
                             <div class="portfolio-img position-relative overflow-hidden">
                                 <?php if (!empty($cover)): ?>
-                                    <img src="<?= htmlspecialchars($cover) ?>" class="img-fluid w-100" alt="<?= htmlspecialchars(getField($item, 'title', $currentLang)) ?>">
+                                    <img src="<?= htmlspecialchars($cover) ?>" class="img-fluid w-100" alt="<?= htmlspecialchars(getField($item, 'title', $currentLang)) ?>" loading="lazy" decoding="async">
                                 <?php else: ?>
                                     <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
                                         <i class="fas fa-image fa-3x text-white"></i>
@@ -362,14 +364,14 @@ include __DIR__ . '/../includes/header.php';
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-flag fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_made_in") ?></h5>
-                        <p class="text-muted small">Iran</p>
+                        <p class="text-muted small"><?= __("product_made_in_country") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.8s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_imported_to") ?></h5>
-                        <p class="text-muted small">Armenia</p>
+                        <p class="text-muted small"><?= __("export_armenia") ?></p>
                     </div>
                 </div>
             </div>

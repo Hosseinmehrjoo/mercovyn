@@ -74,41 +74,30 @@ foreach ($hreflangUrls as $lang => $url) {
     <?php endif; ?>
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" as="image" href="<?= $logoUrl ?>" type="image/webp">
-    <link rel="preload" as="style" href="<?= root_asset('css/bootstrap.min.css') ?>">
-    <link rel="preload" as="style" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>">
-    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVQUwaA.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/poppins/v21/pxiEyp8kv8JHgFVrJJfecg.woff2">
-    
-    <!-- Google Web Fonts -->
+    <link rel="preload" as="image" href="<?= $logoUrl ?>" type="image/webp" fetchpriority="high">
+    <?php if (!empty($preloadHeroImage)): ?>
+    <link rel="preload" as="image" href="<?= htmlspecialchars(root_asset($preloadHeroImage), ENT_QUOTES, 'UTF-8') ?>" type="image/webp">
+    <?php endif; ?>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="preconnect" href="https://code.jquery.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://use.fontawesome.com">
 
-    <!-- Icon Font Stylesheet -->
-    <link rel="preload" as="style" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
-    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" media="print" onload="this.media='all'">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
-
-    <!-- Libraries Stylesheet -->
-    <link rel="preload" as="style" href="<?= root_asset('lib/animate/animate.min.css') ?>">
-    <link rel="preload" as="style" href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>">
-    <link href="<?= root_asset('lib/animate/animate.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
-    <link href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link rel="preload" as="style" href="<?= root_asset('css/bootstrap.min.css') ?>">
-    <link href="<?= root_asset('css/bootstrap.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
-
-    <!-- Template Stylesheet -->
+    <!-- Critical CSS (render-blocking) -->
+    <link href="<?= root_asset('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-    <!-- DNS Prefetch for External Domains -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="dns-prefetch" href="https://use.fontawesome.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <!-- Non-critical CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" media="print" onload="this.media='all'">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <?php if (!empty($loadOwlCarousel)): ?>
+    <link href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <?php endif; ?>
+    <link href="<?= root_asset('lib/animate/animate.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
 </head>
 
 <body>
@@ -162,14 +151,28 @@ foreach ($hreflangUrls as $lang => $url) {
                 <span class="fa fa-bars"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto py-0">
+                <div class="navbar-nav ms-lg-auto py-0 text-center text-lg-start">
                     <a href="<?= url('') ?>" class="nav-item nav-link"><?= __("home") ?></a>
                     <a href="<?= url('about') ?>" class="nav-item nav-link"><?= __("about") ?></a>
                     <a href="<?= url('products') ?>" class="nav-item nav-link"><?= __("services") ?></a>
                     <a href="<?= url('contact') ?>" class="nav-item nav-link"><?= __("contact") ?></a>
                 </div>
-                <button class="btn btn-primary btn-md-square border-secondary mb-3 mb-md-3 mb-lg-0 me-3" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button>
-                <a href="<?= url('contact') ?>" class="btn btn-primary border-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0"><?= __("get_quote") ?></a>
+                <div class="d-lg-none navbar-mobile-tools w-100 pt-3 mt-2 border-top">
+                    <p class="small text-muted text-center mb-2"><?= __("language") ?></p>
+                    <div class="d-flex justify-content-center mb-3">
+                        <?php $langSwitcherVariant = 'navbar'; include __DIR__ . '/lang-switcher.php'; unset($langSwitcherVariant); ?>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center px-1">
+                        <button type="button" class="btn btn-primary border-secondary flex-sm-fill" data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search me-2"></i><?= __("search") ?>
+                        </button>
+                        <a href="<?= url('contact') ?>" class="btn btn-primary border-secondary rounded-pill flex-sm-fill text-center"><?= __("get_quote") ?></a>
+                    </div>
+                </div>
+                <div class="d-none d-lg-flex align-items-center flex-shrink-0 ms-lg-2">
+                    <button type="button" class="btn btn-primary btn-md-square border-secondary me-3" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="<?= htmlspecialchars(__('search'), ENT_QUOTES, 'UTF-8') ?>"><i class="fas fa-search"></i></button>
+                    <a href="<?= url('contact') ?>" class="btn btn-primary border-secondary rounded-pill py-2 px-4"><?= __("get_quote") ?></a>
+                </div>
             </div>
         </nav>
     </div>

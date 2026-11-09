@@ -4,6 +4,9 @@
  */
 
 require_once __DIR__ . '/../router.php';
+
+$loadOwlCarousel = $loadOwlCarousel ?? false;
+$loadCounterUp = $loadCounterUp ?? false;
 ?>
     <!-- Newsletter Start -->
     <div class="container-fluid newsletter py-5">
@@ -81,16 +84,21 @@ require_once __DIR__ . '/../router.php';
     <?php include __DIR__ . '/floating-contact.php'; ?>
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="<?= root_asset('lib/owlcarousel/owl.carousel.min.js') ?>"></script>
-    <script src="<?= root_asset('lib/wow/wow.min.js') ?>"></script>
-    <script src="<?= root_asset('lib/easing/easing.min.js') ?>"></script>
-    <script src="<?= root_asset('lib/waypoints/waypoints.min.js') ?>"></script>
-    <script src="<?= root_asset('lib/counterup/counterup.min.js') ?>"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="<?= root_asset('lib/wow/wow.min.js') ?>" defer></script>
+    <script src="<?= root_asset('lib/easing/easing.min.js') ?>" defer></script>
+    <?php if ($loadCounterUp): ?>
+    <script src="<?= root_asset('lib/waypoints/waypoints.min.js') ?>" defer></script>
+    <script src="<?= root_asset('lib/counterup/counterup.min.js') ?>" defer></script>
+    <?php endif; ?>
+    <?php if ($loadOwlCarousel): ?>
+    <script src="<?= root_asset('lib/owlcarousel/owl.carousel.min.js') ?>" defer></script>
+    <?php endif; ?>
 
     <!-- Template Javascript -->
-    <script src="<?= htmlspecialchars(asset_url('js/main.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-    <script src="<?= htmlspecialchars(asset_url('js/floating-contact.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+    <script src="<?= htmlspecialchars(asset_url('js/main.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('js/floating-contact.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
 </body>
 
 </html>

@@ -10,6 +10,11 @@ $currentLang = $langInfo['current'];
 $currentPath = $currentPath ?? '';
 $hreflangUrls = getHreflangUrls($currentPath);
 
+$langSwitcherVariant = $langSwitcherVariant ?? 'topbar';
+$switcherRootClass = $langSwitcherVariant === 'navbar'
+    ? 'language-switcher language-switcher--navbar'
+    : 'language-switcher';
+
 $languageLabels = [
     'en' => ['label' => 'EN', 'name' => 'English', 'flag' => '🇺🇸'],
     'ru' => ['label' => 'RU', 'name' => 'Русский', 'flag' => '🇷🇺'],
@@ -17,7 +22,7 @@ $languageLabels = [
 ];
 ?>
 
-<nav class="language-switcher" aria-label="<?= htmlspecialchars(__('language'), ENT_QUOTES, 'UTF-8') ?>">
+<nav class="<?= htmlspecialchars($switcherRootClass, ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(__('language'), ENT_QUOTES, 'UTF-8') ?>">
     <ul class="language-switcher__list list-unstyled mb-0 d-inline-flex align-items-center">
         <?php foreach ($languageLabels as $code => $info): ?>
             <li>

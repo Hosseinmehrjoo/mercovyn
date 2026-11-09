@@ -20,5 +20,5 @@ return [
     // آدرس عمومی سایت بدون اسلش پایانی (برای sitemap و robots)
     // مثال: https://ana-developer.ir
     'site_url' => '',
-    'timezone' => 'Asia/Tehran',
+    'timezone' => 'Asia/Yerevan',
 ];

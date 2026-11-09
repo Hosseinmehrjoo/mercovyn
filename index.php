@@ -88,8 +88,7 @@ if ($pageFile === null) {
             'eot' => 'application/vnd.ms-fontobject',
         ];
         header('Content-Type: ' . ($mimes[$ext] ?? 'application/octet-stream'));
-        // Cache static assets for 1 year
-        header('Cache-Control: public, max-age=31536000, immutable');
+        ad_send_static_file_headers($staticFile);
         readfile($staticFile);
         exit;
     }
@@ -104,6 +103,8 @@ $lang = $currentLang;
 $langPrefix = $langInfo['prefix'];
 $hreflangUrls = getHreflangUrls($cleanPath);
 $translations = $translations;
+
+ad_send_html_cache_headers();
 
 // Include the page
 include __DIR__ . '/' . $pageFile;

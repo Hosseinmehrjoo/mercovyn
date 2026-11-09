@@ -12,8 +12,9 @@
     spinner(0);
     
     
-    // Initiate the wowjs
-    new WOW().init();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && typeof WOW !== 'undefined') {
+        new WOW().init();
+    }
 
 
     // Sticky Navbar
@@ -38,8 +39,6 @@
         $('.btn-play').click(function () {
             $videoSrc = $(this).data("src");
         });
-        console.log($videoSrc);
-
         $('#videoModal').on('shown.bs.modal', function (e) {
             $("#video").attr('src', $videoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
         })
@@ -50,7 +49,7 @@
     });
 
 
-    // Testimonial-carousel
+    if ($(".testimonial-carousel").length && typeof $.fn.owlCarousel === 'function') {
     $(".testimonial-carousel").owlCarousel({
         autoplay: true,
         smartSpeed: 2000,
@@ -82,8 +81,7 @@
             }
         }
     });
-
-    
+    }
 
 })(jQuery);
 
