@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  var CHUNK_BYTES = 3 * 1024 * 1024;
+  var CHUNK_BYTES = 1024 * 1024;
+  var MAX_VIDEO_BYTES = 200 * 1024 * 1024;
 
   function ready(fn) {
     if (document.readyState === "loading") {
@@ -54,7 +55,8 @@
         try {
           data = JSON.parse(xhr.responseText || "{}");
         } catch (err) {
-          reject(new Error(uploadStatusMessage(xhr)));
+          var snippet = (xhr.responseText || "").trim().slice(0, 200);
+          reject(new Error(uploadStatusMessage(xhr) + (snippet ? " — " + snippet : ""));
           return;
         }
         if (!data.ok) {
@@ -148,6 +150,17 @@
       if (!file) {
         if (statusEl) statusEl.textContent = "ابتدا یک فایل ویدیو انتخاب کنید.";
         fileInput.focus();
+        return;
+      }
+      if (file.size > MAX_VIDEO_BYTES) {
+        if (statusEl) {
+          statusEl.textContent =
+            "حجم فایل بیش از ۲۰۰ مگابایت است. فایل کوچک‌تر انتخاب کنید.";
+        }
+        return;
+      }
+      if (file.size < 1) {
+        if (statusEl) statusEl.textContent = "فایل خالی است.";
         return;
       }
 

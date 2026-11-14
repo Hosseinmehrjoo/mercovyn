@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+@ini_set('max_execution_time', '900');
+@ini_set('max_input_time', '900');
+@ini_set('memory_limit', '512M');
+
 require_once __DIR__ . '/_init.php';
 require_once dirname(__DIR__) . '/lib/media.php';
 
@@ -34,6 +38,17 @@ function ad_video_chunk_base_dir(): string
     return $dir;
 }
 
+function ad_video_upload_err_message(int $code): string
+{
+    return match ($code) {
+        UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'حجم تکه از حد PHP (upload_max_filesize / post_max_size) بیشتر است. روی سرور limit را بالا ببرید یا تکه‌های کوچک‌تر (۱MB) فعال است.',
+        UPLOAD_ERR_PARTIAL => 'تکه ناقص رسید؛ دوباره تلاش کنید.',
+        UPLOAD_ERR_NO_FILE => 'فایلی ارسال نشد.',
+        UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION => 'خطای سرور هنگام ذخیره موقت فایل.',
+        default => 'خطای آپلود (کد ' . $code . ').',
+    };
+}
+
 function ad_video_chunk_cleanup(string $uploadId): void
 {
     $base = ad_video_chunk_base_dir() . '/' . $uploadId;
@@ -59,15 +74,19 @@ function ad_video_handle_chunk_upload(string $title): array
     if (!preg_match('/^[a-f0-9]{32}$/', $uploadId)) {
         throw new RuntimeException('شناسه آپلود نامعتبر است.');
     }
-    if ($totalChunks < 1 || $totalChunks > 80 || $chunkIndex < 0 || $chunkIndex >= $totalChunks) {
-        throw new RuntimeException('پارامترهای تکه‌آپلود نامعتبر است.');
+    if ($totalChunks < 1 || $totalChunks > 220 || $chunkIndex < 0 || $chunkIndex >= $totalChunks) {
+        throw new RuntimeException('پارامترهای تکه‌آپلود نامعتبر است (حداکثر حدود ۲۲۰MB با تکه‌های ۱MB).');
     }
-    if (empty($_FILES['video_file']['tmp_name']) || ($_FILES['video_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('دریافت تکه فایل ناموفق بود.');
+    $fileErr = (int) ($_FILES['video_file']['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($fileErr !== UPLOAD_ERR_OK) {
+        throw new RuntimeException(ad_video_upload_err_message($fileErr));
+    }
+    if (empty($_FILES['video_file']['tmp_name'])) {
+        throw new RuntimeException('دریافت تکه فایل ناموفق بود (پوشه موقت PHP).');
     }
     $partSize = (int) ($_FILES['video_file']['size'] ?? 0);
-    if ($partSize <= 0 || $partSize > 6 * 1024 * 1024) {
-        throw new RuntimeException('اندازه تکه فایل نامعتبر است.');
+    if ($partSize <= 0 || $partSize > 3 * 1024 * 1024) {
+        throw new RuntimeException('اندازه تکه فایل نامعتبر است (حداکثر ۳MB هر درخواست).');
     }
 
     $chunkDir = ad_video_chunk_base_dir() . '/' . $uploadId;
@@ -87,6 +106,8 @@ function ad_video_handle_chunk_upload(string $title): array
             'message' => 'تکه ' . ($chunkIndex + 1) . ' از ' . $totalChunks,
         ];
     }
+
+    @set_time_limit(900);
 
     $merged = $chunkDir . '/merged.bin';
     $out = fopen($merged, 'wb');

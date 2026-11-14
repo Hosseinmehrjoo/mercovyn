@@ -334,5 +334,5 @@ require __DIR__ . '/_layout_top.php';
     </table>
   <?php endif; ?>
 </div>
-<script src="videos-upload.js?ver=20261114" defer></script>
+<script src="videos-upload.js?ver=20261114b" defer></script>
 <?php require __DIR__ . '/_layout_bottom.php'; ?>

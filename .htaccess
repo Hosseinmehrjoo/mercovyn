@@ -121,10 +121,10 @@ AddDefaultCharset UTF-8
 
 # PHP settings for performance
 <IfModule mod_php.c>
-    php_value max_execution_time 30
-    php_value memory_limit 256M
-    php_value post_max_size 20M
-    php_value upload_max_filesize 20M
+    php_value max_execution_time 900
+    php_value memory_limit 512M
+    php_value post_max_size 14M
+    php_value upload_max_filesize 12M
     php_value opcache.enable 1
     php_value opcache.memory_consumption 128
     php_value opcache.interned_strings_buffer 8
