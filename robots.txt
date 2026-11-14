@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /backend/
+Disallow: /backend/admin/
 
 Sitemap: https://mercovyn.com/sitemap.xml

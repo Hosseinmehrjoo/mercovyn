@@ -45,6 +45,8 @@ function ad_read_json_body(): array
     return is_array($data) ? $data : [];
 }
 
+const AD_PANEL_NAME = 'hossein mehrjoo panel';
+
 function ad_e(?string $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

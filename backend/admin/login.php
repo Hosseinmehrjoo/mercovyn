@@ -37,7 +37,7 @@ $pageTitle = 'ورود';
 require __DIR__ . '/_layout_top.php';
 ?>
 <div class="login-wrap">
-  <h1>آنا دولوپر</h1>
+  <h1><?= ad_e(AD_PANEL_NAME) ?></h1>
   <div class="login-box">
     <?php if ($error): ?><div class="flash flash-err"><?= ad_e($error) ?></div><?php endif; ?>
     <form method="post" autocomplete="off">

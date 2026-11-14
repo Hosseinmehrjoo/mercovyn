@@ -116,3 +116,25 @@ function ad_service_public_url(array $row, string $lang = ''): string
 {
     return url('product/' . ad_service_localized_slug($row, $lang), $lang);
 }
+
+function ad_service_unique_slug(string $slug, int $excludeId = 0): string
+{
+    ad_services_ensure_schema();
+    $base = ad_slugify($slug);
+    $candidate = $base;
+    $n = 0;
+    $db = ad_db();
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM services WHERE slug = ? LIMIT 1');
+        $stmt->execute([$candidate]);
+        $row = $stmt->fetch();
+        if (!$row || (int) $row['id'] === $excludeId) {
+            return $candidate;
+        }
+        $n++;
+        $candidate = $base . '-' . $n;
+        if (mb_strlen($candidate) > 200) {
+            $candidate = mb_substr($base, 0, 190, 'UTF-8') . '-' . $n;
+        }
+    }
+}

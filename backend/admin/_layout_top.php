@@ -13,7 +13,7 @@ $allMenuItems = [
     ['href' => 'media.php', 'label' => 'رسانه', 'icon' => '⧉', 'match' => ['media.php'], 'cap' => 'media'],
     ['href' => 'team.php', 'label' => 'تیم', 'icon' => '◎', 'match' => ['team.php'], 'cap' => 'team', 'roles' => ['admin']],
     ['href' => 'portfolio.php', 'label' => 'نمونه‌کارها', 'icon' => '▣', 'match' => ['portfolio.php'], 'cap' => 'portfolio', 'roles' => ['admin']],
-    ['href' => 'services.php', 'label' => 'خدمات', 'icon' => '◇', 'match' => ['services.php'], 'cap' => 'services', 'roles' => ['admin']],
+    ['href' => 'services.php', 'label' => 'محصولات', 'icon' => '◇', 'match' => ['services.php'], 'cap' => 'services', 'roles' => ['admin']],
     [
         'href' => 'blog.php',
         'label' => 'نوشته‌ها',
@@ -50,7 +50,7 @@ foreach ($allMenuItems as $item) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><?= ad_e($pageTitle ?? 'پنل ادمین') ?> ‹ آنا دولوپر</title>
+  <title><?= ad_e($pageTitle ?? 'پنل ادمین') ?> ‹ <?= ad_e(AD_PANEL_NAME) ?></title>
   <link rel="stylesheet" href="/backend/admin/wp-admin.css?ver=20261017users" />
   <style>
     /* critical fallback if cached CSS fails */
@@ -86,9 +86,9 @@ foreach ($allMenuItems as $item) {
 <body class="<?= $isLogin ? 'login-page' : 'wp-admin' ?>">
 <?php if ($user && !$isLogin): ?>
 <div class="wpadminbar" role="navigation" aria-label="نوار بالای مدیریت">
-  <a class="wpadminbar__brand" href="index.php">آنا دولوپر</a>
+  <a class="wpadminbar__brand" href="index.php"><?= ad_e(AD_PANEL_NAME) ?></a>
   <div class="wpadminbar__end">
-    <a href="../../index.html" target="_blank" rel="noopener">مشاهده سایت</a>
+    <a href="/" target="_blank" rel="noopener">مشاهده سایت</a>
     <a class="wpadminbar__user" href="logout.php">سلام، <?= ad_e($user['display_name'] ?: $user['username']) ?> · <?= ad_e($user['role_label']) ?> ▾</a>
   </div>
 </div>

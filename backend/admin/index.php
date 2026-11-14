@@ -37,7 +37,7 @@ require __DIR__ . '/_layout_top.php';
 <h1>پیشخوان</h1>
 
 <div class="welcome-panel">
-  <h2>به پنل آنا دولوپر خوش آمدید</h2>
+  <h2>به <?= ad_e(AD_PANEL_NAME) ?> خوش آمدید</h2>
   <p>از اینجا می‌توانید محتوا، نمونه‌کارها، پیام‌ها و تنظیمات کوکی را مدیریت کنید — ظاهر شبیه پیشخوان وردپرس، مخصوص سایت شما.</p>
   <div class="actions">
     <a class="btn" href="portfolio.php">افزودن نمونه‌کار</a>
@@ -137,7 +137,7 @@ require __DIR__ . '/_layout_top.php';
   <div class="postbox">
     <div class="postbox-header"><h2>وضعیت سایت</h2></div>
     <div class="inside">
-      <p><strong>عنوان سایت:</strong> آنا دولوپر</p>
+      <p><strong>عنوان سایت:</strong> <?= ad_e((string) (ad_config()['site_name'] ?? 'Mercovyn LLC')) ?></p>
       <p class="muted">نسخه پنل: ساده · PHP + MySQL</p>
       <p class="muted">برای افزودن محتوا از منوی سمت راست استفاده کنید.</p>
       <div class="actions">

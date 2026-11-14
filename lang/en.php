@@ -100,7 +100,7 @@ return [
     'upcoming_training' => 'Factory Gallery',
     
     // SEO
-    'meta_description_default' => 'Mercovyn LLC — premium polypropylene baler twine manufacturer and importer based in Armenia. Export to 6 countries. Custom colors available.',
+    'meta_description_default' => 'Mercovyn LLC — premium polypropylene baler twine from Armenia, Yerevan. Global sales and export worldwide. Custom colors available.',
     'meta_keywords_default' => 'baler twine, polypropylene twine, agricultural twine, Mercovyn, Armenia, Gyumri, export, farming supplies',
     
     // Language
@@ -132,7 +132,10 @@ return [
     // Homepage
     'home_hero_title' => 'Premium Baler Twine Manufacturer & Importer',
     'hero_title' => 'Twine Built to Hold the Harvest Together',
-    'hero_subtitle' => 'Mercovyn LLC supplies heavy-duty polypropylene baler twine from Armenia for farms, distributors, and agricultural businesses across the region.',
+    'hero_subtitle' => 'Mercovyn LLC supplies heavy-duty polypropylene baler twine from Armenia, Yerevan — with global sales and export to markets worldwide.',
+    'hero_stat_spool_label' => 'kg per spool pair (approx.)',
+    'hero_stat_pp_label' => 'Made from PP (polypropylene)',
+    'global_export_tagline' => 'Worldwide export — we ship to customers across the globe.',
     'services_subtitle' => 'Strong, clean, consistent polypropylene twine built for smooth baler performance',
     'features_subtitle' => 'Why farmers and distributors choose Mercovyn for their baler twine needs',
     'cost_effective_desc' => 'Two decades of manufacturing expertise producing reliable, high-quality baler twine',
@@ -143,7 +146,7 @@ return [
     'portfolio_subtitle' => 'See our product in the field, factory, and packaging',
     'cta_title' => 'Ready to Place an Order?',
     'cta_subtitle' => 'Contact us today for pricing, custom colors, and delivery options.',
-    'countries_subtitle' => 'Our twine travels to farms across six countries and growing',
+    'countries_subtitle' => 'Global export from Armenia, Yerevan — serving farms and distributors worldwide.',
     
     // Blog/News
     'blog_meta_desc' => 'Latest updates from Mercovyn - product news, export announcements, and agricultural insights.',
@@ -151,7 +154,7 @@ return [
     'no_posts_desc' => 'No articles published yet. Check back soon!',
     'prev' => 'Previous',
     'next' => 'Next',
-    'footer_desc' => 'Mercovyn LLC — manufacturer and importer of premium polypropylene baler twine based in Armenia. Exported worldwide.',
+    'footer_desc' => 'Mercovyn LLC — manufacturer and importer of premium polypropylene baler twine. Based in Armenia, Yerevan. Global export worldwide.',
     
     // Product specific
     'product_material' => 'Polypropylene (PP)',
@@ -175,7 +178,7 @@ return [
     // Contact
     'company_name' => 'Mercovyn LLC',
     'company_name_am' => 'ՄԵՐԿՈՎԻՆ ՍՊԸ',
-    'address' => 'Armenia, Gyumri, Yeghishe Charents',
+    'address' => 'Armenia — Yerevan',
     'phone_number' => '+374 91 551 987',
     'email_address' => 'mercovyn@gmail.com',
     'whatsapp_link' => 'https://wa.me/37491551987',

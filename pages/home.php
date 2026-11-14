@@ -80,7 +80,8 @@ include __DIR__ . '/../includes/header.php';
             <div class="row align-items-center">
                 <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
                     <h1 class="display-4 mb-4"><?= __("hero_title") ?></h1>
-                    <p class="lead mb-4"><?= __("hero_subtitle") ?></p>
+                    <p class="lead mb-2"><?= __("hero_subtitle") ?></p>
+                    <p class="text-muted mb-4"><?= __("global_export_tagline") ?></p>
                     <div class="d-flex flex-wrap gap-3">
                         <a href="<?= url('contact') ?>" class="btn btn-primary btn-lg rounded-pill px-4"><?= __("get_quote") ?></a>
                         <a href="<?= url('products') ?>" class="btn btn-outline-primary btn-lg rounded-pill px-4"><?= __("our_services") ?></a>
@@ -90,14 +91,14 @@ include __DIR__ . '/../includes/header.php';
                     <div class="hero-stats row g-3 text-center">
                         <div class="col-6">
                             <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1 counter" data-target="6">6</h2>
-                                <p class="mb-0 text-muted"><?= __("happy_clients") ?></p>
+                                <h2 class="text-primary mb-1 fs-3">6–6.5</h2>
+                                <p class="mb-0 text-muted small"><?= __("hero_stat_spool_label") ?></p>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1 counter" data-target="20">20</h2>
-                                <p class="mb-0 text-muted"><?= __("projects_done") ?></p>
+                                <h2 class="text-primary mb-1">PP</h2>
+                                <p class="mb-0 text-muted small"><?= __("hero_stat_pp_label") ?></p>
                             </div>
                         </div>
                         <div class="col-6">

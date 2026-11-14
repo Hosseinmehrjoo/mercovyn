@@ -49,6 +49,19 @@ if (in_array($segments[0] ?? '', SUPPORTED_LANGUAGES, true)) {
 $cleanPath = implode('/', $segments);
 $cleanPath = trim($cleanPath, '/');
 
+if (in_array($cleanPath, ['sitemap.xml', 'robots.txt', 'llms.txt'], true)) {
+    require_once __DIR__ . '/backend/lib/seo.php';
+    if ($cleanPath === 'sitemap.xml') {
+        ad_seo_output_sitemap();
+    } elseif ($cleanPath === 'llms.txt') {
+        ad_seo_output_llms();
+    } else {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo ad_seo_read_robots();
+        exit;
+    }
+}
+
 // Single product: /product/{slug}/
 if (count($segments) >= 2 && $segments[0] === 'product' && $segments[1] !== '') {
     $_GET['slug'] = $segments[1];

@@ -41,7 +41,7 @@ function ad_seo_robots_path(): string
 function ad_seo_default_robots(): string
 {
     $sitemap = ad_seo_absolute_url('sitemap.xml');
-    return "User-agent: *\nAllow: /\n\nSitemap: {$sitemap}\n";
+    return "User-agent: *\nAllow: /\nDisallow: /backend/\nDisallow: /backend/admin/\n\nSitemap: {$sitemap}\n";
 }
 
 function ad_seo_read_robots(): string
@@ -341,31 +341,69 @@ function ad_redirects_apply_request(): void
 function ad_seo_static_pages(): array
 {
     $pages = [
-        ['path' => 'index.html', 'title' => 'صفحه اصلی', 'changefreq' => 'weekly', 'priority' => '1.0'],
-        ['path' => 'about.html', 'title' => 'درباره ما', 'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => 'services.html', 'title' => 'خدمات', 'changefreq' => 'weekly', 'priority' => '0.8'],
-        ['path' => 'portfolio.html', 'title' => 'نمونه‌کارها', 'changefreq' => 'weekly', 'priority' => '0.8'],
-        ['path' => 'team.html', 'title' => 'تیم', 'changefreq' => 'monthly', 'priority' => '0.6'],
-        ['path' => 'blog.html', 'title' => 'وبلاگ', 'changefreq' => 'daily', 'priority' => '0.9'],
-        ['path' => 'contact.html', 'title' => 'تماس با ما', 'changefreq' => 'monthly', 'priority' => '0.7'],
-        ['path' => 'pricing.html', 'title' => 'قیمت‌گذاری', 'changefreq' => 'monthly', 'priority' => '0.6'],
-        ['path' => 'process.html', 'title' => 'نحوه انجام کار', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['path' => 'faq.html', 'title' => 'سوالات متداول', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['path' => '', 'title' => 'Home', 'changefreq' => 'weekly', 'priority' => '1.0'],
+        ['path' => 'about/', 'title' => 'About', 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['path' => 'products/', 'title' => 'Products', 'changefreq' => 'weekly', 'priority' => '0.9'],
+        ['path' => 'contact/', 'title' => 'Contact', 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['path' => 'blog/', 'title' => 'News', 'changefreq' => 'weekly', 'priority' => '0.7'],
+        ['path' => 'feature/', 'title' => 'Advantages', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['path' => 'countries/', 'title' => 'Export markets', 'changefreq' => 'monthly', 'priority' => '0.6'],
     ];
-    $out = [];
     $root = ad_seo_site_root();
+    $out = [];
     foreach ($pages as $p) {
-        $file = $root . '/' . $p['path'];
-        if (!is_file($file)) {
-            continue;
+        $mtime = null;
+        if ($p['path'] === '') {
+            $candidates = [$root . '/pages/home.php', $root . '/index.php'];
+        } else {
+            $bare = trim($p['path'], '/');
+            $candidates = [$root . '/pages/' . $bare . '.php', $root . '/' . $bare . '.html'];
         }
-        $mtime = filemtime($file) ?: null;
+        foreach ($candidates as $file) {
+            if (is_file($file)) {
+                $mtime = filemtime($file) ?: null;
+                break;
+            }
+        }
         $out[] = [
             'loc' => ad_seo_absolute_url($p['path']),
             'lastmod' => $mtime ? gmdate('Y-m-d', $mtime) : null,
             'changefreq' => $p['changefreq'],
             'priority' => $p['priority'],
             'title' => $p['title'],
+        ];
+    }
+    return $out;
+}
+
+/**
+ * @return list<array{loc:string,lastmod:?string,changefreq:string,priority:string,title:string,excerpt:string}>
+ */
+function ad_seo_service_urls(): array
+{
+    try {
+        require_once __DIR__ . '/services.php';
+        ad_services_ensure_schema();
+        $rows = ad_db()->query(
+            'SELECT title, slug, summary, updated_at, created_at FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
+        )->fetchAll();
+    } catch (Throwable $e) {
+        return [];
+    }
+    $out = [];
+    foreach ($rows as $row) {
+        $slug = trim((string) ($row['slug'] ?? ''));
+        if ($slug === '') {
+            continue;
+        }
+        $last = (string) ($row['updated_at'] ?? $row['created_at'] ?? '');
+        $out[] = [
+            'loc' => ad_seo_absolute_url('product/' . rawurlencode($slug) . '/'),
+            'lastmod' => $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null,
+            'changefreq' => 'weekly',
+            'priority' => '0.8',
+            'title' => (string) ($row['title'] ?? $slug),
+            'excerpt' => trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['summary'] ?? ''))) ?? ''),
         ];
     }
     return $out;
@@ -397,7 +435,7 @@ function ad_seo_blog_urls(): array
         $last = (string) ($row['updated_at'] ?? $row['published_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
         $out[] = [
-            'loc' => ad_seo_absolute_url('blog-post.html?slug=' . rawurlencode($slug)),
+            'loc' => ad_seo_absolute_url('blog-single/' . rawurlencode($slug) . '/'),
             'lastmod' => $lastmod,
             'changefreq' => 'weekly',
             'priority' => '0.7',
@@ -497,6 +535,7 @@ function ad_seo_build_sitemap_xml(): string
 {
     $urls = array_merge(
         ad_seo_static_pages(),
+        ad_seo_service_urls(),
         ad_seo_blog_urls(),
         ad_seo_portfolio_urls(),
         ad_seo_team_urls()
@@ -520,56 +559,47 @@ function ad_seo_build_sitemap_xml(): string
 function ad_seo_build_llms_txt(): string
 {
     $config = ad_config();
-    $siteName = (string) ($config['site_name'] ?? 'آنا دولوپر');
+    $siteName = (string) ($config['site_name'] ?? 'Mercovyn LLC');
     $base = ad_seo_site_base_url();
     $lines = [
         '# ' . $siteName,
-        '> وب‌سایت رسمی ' . $siteName . ' — خدمات توسعه نرم‌افزار، وب و اپلیکیشن.',
+        '> Manufacturer and importer of premium polypropylene baler twine — based in Armenia, Yerevan. Global export worldwide.',
         '',
         'Site: ' . $base,
         'Sitemap: ' . ad_seo_absolute_url('sitemap.xml'),
+        'Contact: mercovyn@gmail.com',
         '',
-        '## صفحات اصلی',
+        '## Main pages',
     ];
     foreach (ad_seo_static_pages() as $p) {
         $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')';
     }
+    $products = ad_seo_service_urls();
+    $lines[] = '';
+    $lines[] = '## Products';
+    if (!$products) {
+        $lines[] = '- See the products archive for the full catalog.';
+        $lines[] = '- [' . 'Products' . '](' . ad_seo_absolute_url('products/') . ')';
+    } else {
+        foreach ($products as $p) {
+            $extra = $p['excerpt'] !== '' ? ': ' . mb_substr($p['excerpt'], 0, 160) : '';
+            $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')' . $extra;
+        }
+    }
     $posts = ad_seo_blog_urls();
     $lines[] = '';
-    $lines[] = '## مقالات وبلاگ';
+    $lines[] = '## News';
     if (!$posts) {
-        $lines[] = '- هنوز مقاله‌ای منتشر نشده است.';
+        $lines[] = '- No published articles yet.';
     } else {
         foreach ($posts as $p) {
             $extra = $p['excerpt'] !== '' ? ': ' . mb_substr($p['excerpt'], 0, 160) : '';
             $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')' . $extra;
         }
     }
-    $works = ad_seo_portfolio_urls();
     $lines[] = '';
-    $lines[] = '## نمونه‌کارها';
-    if (!$works) {
-        $lines[] = '- هنوز نمونه‌کاری ثبت نشده است.';
-    } else {
-        foreach ($works as $p) {
-            $extra = $p['excerpt'] !== '' ? ': ' . mb_substr($p['excerpt'], 0, 160) : '';
-            $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')' . $extra;
-        }
-    }
-    $members = ad_seo_team_urls();
-    $lines[] = '';
-    $lines[] = '## اعضای تیم';
-    if (!$members) {
-        $lines[] = '- هنوز عضوی ثبت نشده است.';
-    } else {
-        foreach ($members as $p) {
-            $extra = $p['excerpt'] !== '' ? ': ' . mb_substr($p['excerpt'], 0, 160) : '';
-            $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')' . $extra;
-        }
-    }
-    $lines[] = '';
-    $lines[] = '## توجه';
-    $lines[] = 'این فایل به‌صورت خودکار از محتوای منتشرشده سایت تولید می‌شود.';
+    $lines[] = '## Note';
+    $lines[] = 'Auto-generated from published site content.';
     return implode("\n", $lines) . "\n";
 }
 

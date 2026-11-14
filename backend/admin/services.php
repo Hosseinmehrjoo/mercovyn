@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'delete') {
             $id = (int) ($_POST['id'] ?? 0);
             $db->prepare('DELETE FROM services WHERE id = ?')->execute([$id]);
-            ad_flash_set('ok', 'خدمت حذف شد.');
+            ad_flash_set('ok', 'محصول حذف شد.');
             header('Location: services.php');
             exit;
         }
@@ -61,6 +61,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $slug = ad_slugify($slug);
         }
+        $slug = ad_service_unique_slug($slug, $id);
+        if ($slugRu === '') {
+            $slugRu = ad_slugify($titleRu !== '' ? $titleRu : $title);
+        } else {
+            $slugRu = ad_slugify($slugRu);
+        }
+        if ($slugHy === '') {
+            $slugHy = ad_slugify($titleHy !== '' ? $titleHy : $title);
+        } else {
+            $slugHy = ad_slugify($slugHy);
+        }
 
         if (!empty($_FILES['cover']['name'])) {
             $uploaded = ad_media_upload($_FILES['cover'], 'services', $coverAlt);
@@ -76,13 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'UPDATE services SET title=?, title_ru=?, title_hy=?, slug=?, slug_ru=?, slug_hy=?, summary=?, summary_ru=?, summary_hy=?, content=?, content_ru=?, content_hy=?, cover=?, sort_order=?, is_active=? WHERE id=?'
             );
             $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active, $id]);
-            ad_flash_set('ok', 'خدمت به‌روزرسانی شد.');
+            ad_flash_set('ok', 'محصول به‌روزرسانی شد.');
         } else {
             $stmt = $db->prepare(
                 'INSERT INTO services (title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, summary_ru, summary_hy, content, content_ru, content_hy, cover, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active]);
-            ad_flash_set('ok', 'خدمت افزوده شد.');
+            ad_flash_set('ok', 'محصول افزوده شد.');
         }
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());
@@ -92,24 +103,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $rows = $db->query('SELECT * FROM services ORDER BY sort_order ASC, id ASC')->fetchAll();
-$pageTitle = 'خدمات';
+$pageTitle = 'محصولات';
 require __DIR__ . '/_layout_top.php';
 ?>
-<h1>مدیریت خدمات</h1>
-<p class="muted"><a href="../../products/" target="_blank" rel="noopener">آرشیو محصولات</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="../../product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?></p>
+<h1>مدیریت محصولات</h1>
+<p class="muted"><a href="/products/" target="_blank" rel="noopener">آرشیو محصولات (سایت)</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="/product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?></p>
 
 <div class="card">
-  <h2><?= $edit ? 'ویرایش خدمت' : 'افزودن خدمت' ?></h2>
+  <h2><?= $edit ? 'ویرایش محصول' : 'افزودن محصول' ?></h2>
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?= ad_e(ad_csrf_token()) ?>" />
     <input type="hidden" name="action" value="save" />
     <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>" />
 
     <div class="form-section">
-      <h3 class="form-section__title">اطلاعات خدمت</h3>
+      <h3 class="form-section__title">اطلاعات محصول</h3>
       <div class="form-grid">
         <div class="field field--span-2">
-          <label>عنوان (فارسی)</label>
+          <label>عنوان پیش‌فرض / انگلیسی (الزامی — در EN نمایش داده می‌شود)</label>
           <input type="text" name="title" required value="<?= ad_e($edit['title'] ?? '') ?>" />
         </div>
         <div class="field field--span-2">
@@ -121,7 +132,7 @@ require __DIR__ . '/_layout_top.php';
           <input type="text" name="title_hy" value="<?= ad_e($edit['title_hy'] ?? '') ?>" />
         </div>
         <div class="field">
-          <label>اسلاگ (فارسی)</label>
+          <label>اسلاگ انگلیسی (خالی = خودکار)</label>
           <input type="text" name="slug" value="<?= ad_e($edit['slug'] ?? '') ?>" />
         </div>
         <div class="field">
@@ -133,7 +144,7 @@ require __DIR__ . '/_layout_top.php';
           <input type="text" name="slug_hy" value="<?= ad_e($edit['slug_hy'] ?? '') ?>" />
         </div>
         <div class="field field--span-3">
-          <label>خلاصه (فارسی)</label>
+          <label>خلاصه (انگلیسی)</label>
           <textarea name="summary" rows="3"><?= ad_e($edit['summary'] ?? '') ?></textarea>
         </div>
         <div class="field field--span-3">
@@ -145,7 +156,7 @@ require __DIR__ . '/_layout_top.php';
           <textarea name="summary_hy" rows="3"><?= ad_e($edit['summary_hy'] ?? '') ?></textarea>
         </div>
         <div class="field field--span-3">
-          <label>محتوا (فارسی)</label>
+          <label>محتوا (انگلیسی)</label>
           <textarea name="content" style="min-height:180px"><?= ad_e($edit['content'] ?? '') ?></textarea>
         </div>
         <div class="field field--span-3">
@@ -195,14 +206,14 @@ require __DIR__ . '/_layout_top.php';
 </div>
 
 <div class="card">
-  <h2>لیست خدمات</h2>
+  <h2>لیست محصولات</h2>
   <table>
     <thead><tr><th>عنوان</th><th>اسلاگ</th><th>ترتیب</th><th>وضعیت</th><th></th></tr></thead>
     <tbody>
     <?php foreach ($rows as $row): ?>
       <tr>
         <td><?= ad_e($row['title']) ?></td>
-        <td><a href="../../product/<?= ad_e(rawurlencode((string) $row['slug'])) ?>/" target="_blank" rel="noopener"><?= ad_e($row['slug']) ?></a></td>
+        <td><a href="/product/<?= ad_e(rawurlencode((string) $row['slug'])) ?>/" target="_blank" rel="noopener"><?= ad_e($row['slug']) ?></a></td>
         <td><?= (int) $row['sort_order'] ?></td>
         <td><?= $row['is_active'] ? 'فعال' : 'غیرفعال' ?></td>
         <td class="row-actions">

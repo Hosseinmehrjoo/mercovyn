@@ -16,7 +16,7 @@ return [
     'upload_url_prefix' => 'assets/images/uploads/',
     'upload_dir' => dirname(__DIR__) . '/assets/images/uploads/',
 
-    'site_name' => 'آنا دولوپر',
+    'site_name' => 'Mercovyn LLC',
     // آدرس عمومی سایت بدون اسلش پایانی (برای sitemap و robots)
     // مثال: https://ana-developer.ir
     'site_url' => '',

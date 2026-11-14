@@ -35,6 +35,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <h1 class="display-5 mb-4"><?= __("enabling_immigration") ?></h1>
                 <p class="mb-0"><?= __("services_subtitle") ?></p>
+                <p class="mb-0 text-muted small mt-2"><?= __("global_export_tagline") ?></p>
             </div>
 
             <?php if ($products === []): ?>
