@@ -217,6 +217,39 @@
     var speeds = [1, 1.25, 1.5, 0.75];
     var speedIdx = 0;
     var waitingTimer = null;
+    var controlsIdleTimer = null;
+    var controlsHideMs = 3000;
+
+    function clearControlsIdleTimer() {
+      if (controlsIdleTimer) {
+        clearTimeout(controlsIdleTimer);
+        controlsIdleTimer = null;
+      }
+    }
+
+    function scheduleControlsHide() {
+      clearControlsIdleTimer();
+      if (!slide.classList.contains('is-playing') || video.paused || video.ended) {
+        shell.classList.remove('is-controls-idle');
+        return;
+      }
+      controlsIdleTimer = window.setTimeout(function () {
+        shell.classList.add('is-controls-idle');
+      }, controlsHideMs);
+    }
+
+    function revealControls() {
+      shell.classList.remove('is-controls-idle');
+      scheduleControlsHide();
+    }
+
+    shell.addEventListener('mousemove', revealControls);
+    shell.addEventListener('touchstart', revealControls, { passive: true });
+    controls.addEventListener('mousedown', revealControls);
+    controls.addEventListener('focusin', revealControls);
+    ['input', 'click'].forEach(function (ev) {
+      progress.addEventListener(ev, revealControls);
+    });
 
     function hideLoading() {
       if (waitingTimer) {
@@ -264,6 +297,7 @@
           var poster = shell.querySelector('.ana-video-poster');
           if (poster) poster.style.opacity = '0';
           hideLoading();
+          revealControls();
         })
         .catch(function (err) {
           hideLoading();
@@ -322,10 +356,13 @@
       playSmall.textContent = '⏸';
       controls.hidden = false;
       hideLoading();
+      revealControls();
     });
     video.addEventListener('pause', function () {
       playSmall.textContent = '▶';
       if (!video.ended) slide.classList.remove('is-playing');
+      clearControlsIdleTimer();
+      shell.classList.remove('is-controls-idle');
     });
     video.addEventListener('ended', function () {
       slide.classList.remove('is-playing');
