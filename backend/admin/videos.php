@@ -189,7 +189,7 @@ require __DIR__ . '/_layout_top.php';
     <?php endif; ?>
     <p>
       <label>آدرس ویدیو (mp4 / webm / mov)<br>
-        <input type="url" name="video_url" id="ana-video-url" class="regular-text" style="width:100%;max-width:640px"
+        <input type="text" name="video_url" id="ana-video-url" class="regular-text" style="width:100%;max-width:640px"
                value="<?= ad_e((string) ($edit['video_url'] ?? '')) ?>" dir="ltr"
                placeholder="/assets/images/uploads/videos/…" />
       </label>
@@ -334,5 +334,5 @@ require __DIR__ . '/_layout_top.php';
     </table>
   <?php endif; ?>
 </div>
-<script src="videos-upload.js?ver=20261114b" defer></script>
+<script src="videos-upload.js?ver=20261114c" defer></script>
 <?php require __DIR__ . '/_layout_bottom.php'; ?>

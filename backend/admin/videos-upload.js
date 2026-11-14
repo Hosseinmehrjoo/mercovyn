@@ -56,7 +56,7 @@
           data = JSON.parse(xhr.responseText || "{}");
         } catch (err) {
           var snippet = (xhr.responseText || "").trim().slice(0, 200);
-          reject(new Error(uploadStatusMessage(xhr) + (snippet ? " — " + snippet : ""));
+          reject(new Error(uploadStatusMessage(xhr) + (snippet ? " — " + snippet : "")));
           return;
         }
         if (!data.ok) {
@@ -75,31 +75,34 @@
   function uploadChunked(file, csrf, title, onProgress) {
     var uploadId = randomUploadId();
     var total = Math.max(1, Math.ceil(file.size / CHUNK_BYTES));
-    var chain = Promise.resolve();
 
-    for (var i = 0; i < total; i++) {
-      chain = chain.then(function (idx) {
-        return function () {
-          var start = idx * CHUNK_BYTES;
-          var end = Math.min(file.size, start + CHUNK_BYTES);
-          var blob = file.slice(start, end);
-          var fd = new FormData();
-          fd.append("csrf", csrf);
-          fd.append("chunk_mode", "1");
-          fd.append("upload_id", uploadId);
-          fd.append("chunk_index", String(idx));
-          fd.append("total_chunks", String(total));
-          fd.append("filename", file.name);
-          fd.append("video_file", blob, file.name);
-          if (title) fd.append("title", title);
-          return postForm(fd).then(function (data) {
-            if (onProgress) onProgress(Math.round(((idx + 1) / total) * 100));
-            return data;
-          });
-        };
-      }(i));
+    function sendChunk(idx) {
+      var start = idx * CHUNK_BYTES;
+      var end = Math.min(file.size, start + CHUNK_BYTES);
+      var blob = file.slice(start, end);
+      var fd = new FormData();
+      fd.append("csrf", csrf);
+      fd.append("chunk_mode", "1");
+      fd.append("upload_id", uploadId);
+      fd.append("chunk_index", String(idx));
+      fd.append("total_chunks", String(total));
+      fd.append("filename", file.name);
+      fd.append("video_file", blob, file.name);
+      if (title) fd.append("title", title);
+      return postForm(fd).then(function (data) {
+        if (onProgress) onProgress(Math.round(((idx + 1) / total) * 100));
+        return data;
+      });
     }
 
+    var chain = Promise.resolve();
+    for (var i = 0; i < total; i++) {
+      (function (idx) {
+        chain = chain.then(function () {
+          return sendChunk(idx);
+        });
+      })(i);
+    }
     return chain;
   }
 
