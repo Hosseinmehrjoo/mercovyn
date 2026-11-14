@@ -34,13 +34,33 @@
 
 <body>
 
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-secondary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
+    <!-- Page skeleton (initial load) -->
+    <div id="page-skeleton" class="page-skeleton show" role="presentation" aria-label="Loading">
+        <div class="page-skeleton__inner">
+            <div class="page-skeleton__topbar skeleton-shimmer d-none d-lg-block"></div>
+            <div class="page-skeleton__nav">
+                <div class="page-skeleton__logo skeleton-shimmer"></div>
+                <div class="page-skeleton__nav-links d-none d-lg-flex">
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                </div>
+                <div class="page-skeleton__nav-toggle skeleton-shimmer d-lg-none"></div>
+            </div>
+            <div class="page-skeleton__hero skeleton-shimmer"></div>
+            <div class="page-skeleton__content container">
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 55%"></div>
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 85%"></div>
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 70%"></div>
+                <div class="page-skeleton__cards">
+                    <div class="page-skeleton__card skeleton-shimmer"></div>
+                    <div class="page-skeleton__card skeleton-shimmer d-none d-md-block"></div>
+                    <div class="page-skeleton__card skeleton-shimmer d-none d-lg-block"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Spinner End -->
 
 
     <!-- Topbar Start -->
@@ -309,7 +329,7 @@
     <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
     
     <!-- Template Javascript -->
-        <script src="/js/spinner-fallback.js"></script>
+        <script src="/js/page-skeleton.js"></script>
     <script src="/js/main.js"></script>
 </body>
 

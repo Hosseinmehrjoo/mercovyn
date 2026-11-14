@@ -1,0 +1,30 @@
+<?php
+$skeletonLabel = $skeletonLabel ?? (__('loading') ?? 'Loading');
+?>
+    <!-- Page skeleton (initial load) -->
+    <div id="page-skeleton" class="page-skeleton show" role="presentation" aria-label="<?= htmlspecialchars($skeletonLabel, ENT_QUOTES, 'UTF-8') ?>">
+        <div class="page-skeleton__inner">
+            <div class="page-skeleton__topbar skeleton-shimmer d-none d-lg-block"></div>
+            <div class="page-skeleton__nav">
+                <div class="page-skeleton__logo skeleton-shimmer"></div>
+                <div class="page-skeleton__nav-links d-none d-lg-flex">
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                    <span class="skeleton-shimmer"></span>
+                </div>
+                <div class="page-skeleton__nav-toggle skeleton-shimmer d-lg-none"></div>
+            </div>
+            <div class="page-skeleton__hero skeleton-shimmer"></div>
+            <div class="page-skeleton__content container">
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 55%"></div>
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 85%"></div>
+                <div class="page-skeleton__line skeleton-shimmer" style="width: 70%"></div>
+                <div class="page-skeleton__cards">
+                    <div class="page-skeleton__card skeleton-shimmer"></div>
+                    <div class="page-skeleton__card skeleton-shimmer d-none d-md-block"></div>
+                    <div class="page-skeleton__card skeleton-shimmer d-none d-lg-block"></div>
+                </div>
+            </div>
+        </div>
+    </div>

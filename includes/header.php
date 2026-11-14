@@ -121,13 +121,7 @@ foreach ($hreflangUrls as $lang => $url) {
 
 <body>
 
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-secondary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only"><?= __("loading") ?></span>
-        </div>
-    </div>
-    <!-- Spinner End -->
+<?php include __DIR__ . '/page-skeleton.php'; ?>
 
     <!-- Topbar Start -->
     <div class="container-fluid bg-primary px-5 d-none d-lg-block">

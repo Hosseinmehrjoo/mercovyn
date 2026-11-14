@@ -1,15 +1,11 @@
 (function ($) {
     "use strict";
 
-    // Spinner
-    var spinner = function () {
-        setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
-            }
-        }, 1);
-    };
-    spinner(0);
+    function hideLoadSkeleton() {
+        $('#page-skeleton, #spinner').removeClass('show');
+    }
+    $(window).on('load', hideLoadSkeleton);
+    setTimeout(hideLoadSkeleton, 150);
     
     
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && typeof WOW !== 'undefined') {
