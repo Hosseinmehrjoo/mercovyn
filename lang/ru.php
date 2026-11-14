@@ -90,6 +90,15 @@ return [
     // Testimonial
     'testimonials' => 'Отзывы',
     'what_clients_say' => 'Что говорят клиенты',
+    'videos_section_kicker' => 'Производство',
+    'videos_section_title' => 'Mercovyn в действии',
+    'videos_section_subtitle' => 'Короткие ролики о производстве и отзывах клиентов.',
+    'video_carousel_prev' => 'Предыдущее видео',
+    'video_carousel_next' => 'Следующее видео',
+    'video_sub_off' => 'Выкл.',
+    'video_sub_lang_en' => 'Английский',
+    'video_sub_lang_ru' => 'Русский',
+    'video_sub_lang_hy' => 'Армянский',
     
     // Countries/Export
     'popular_countries' => 'Рынки сбыта',

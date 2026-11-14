@@ -90,6 +90,15 @@ return [
     // Testimonial
     'testimonials' => 'Testimonials',
     'what_clients_say' => 'What Our Clients Say',
+    'videos_section_kicker' => 'Factory & field',
+    'videos_section_title' => 'See Mercovyn in action',
+    'videos_section_subtitle' => 'Short clips from production and customers worldwide.',
+    'video_carousel_prev' => 'Previous video',
+    'video_carousel_next' => 'Next video',
+    'video_sub_off' => 'Off',
+    'video_sub_lang_en' => 'English',
+    'video_sub_lang_ru' => 'Russian',
+    'video_sub_lang_hy' => 'Armenian',
     
     // Countries/Export
     'popular_countries' => 'Export Markets',

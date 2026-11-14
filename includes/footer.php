@@ -7,6 +7,7 @@ require_once __DIR__ . '/../router.php';
 
 $loadOwlCarousel = $loadOwlCarousel ?? false;
 $loadCounterUp = $loadCounterUp ?? false;
+$loadMercovynVideos = $loadMercovynVideos ?? false;
 ?>
     <!-- Newsletter Start -->
     <div class="container-fluid newsletter py-5">
@@ -92,6 +93,17 @@ $loadCounterUp = $loadCounterUp ?? false;
     <?php if ($loadCounterUp): ?>
     <script src="<?= root_asset('lib/waypoints/waypoints.min.js') ?>" defer></script>
     <script src="<?= root_asset('lib/counterup/counterup.min.js') ?>" defer></script>
+    <?php endif; ?>
+    <?php if ($loadMercovynVideos): ?>
+    <script>
+      window.MercovynVideoSubLabels = {
+        en: <?= json_encode(__('video_sub_lang_en'), JSON_UNESCAPED_UNICODE) ?>,
+        ru: <?= json_encode(__('video_sub_lang_ru'), JSON_UNESCAPED_UNICODE) ?>,
+        hy: <?= json_encode(__('video_sub_lang_hy'), JSON_UNESCAPED_UNICODE) ?>,
+        off: <?= json_encode(__('video_sub_off'), JSON_UNESCAPED_UNICODE) ?>
+      };
+    </script>
+    <script src="<?= htmlspecialchars(asset_url('js/mercovyn-videos.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
     <?php endif; ?>
     <script src="<?= htmlspecialchars(asset_url('js/main.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
     <script src="<?= htmlspecialchars(asset_url('js/floating-contact.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>

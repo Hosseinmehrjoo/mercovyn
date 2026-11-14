@@ -109,6 +109,168 @@ function ad_upload_image(array $file, string $subdir = ''): string
     return $prefix . $name;
 }
 
+function ad_upload_video(array $file, string $subdir = 'videos'): string
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return '';
+    }
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('خطا در آپلود فایل ویدیو.');
+    }
+    $allowed = [
+        'video/mp4' => 'mp4',
+        'video/webm' => 'webm',
+        'video/quicktime' => 'mov',
+        'video/x-m4v' => 'm4v',
+    ];
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+    $origName = (string) ($file['name'] ?? '');
+    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+    if (!is_string($mime) || !isset($allowed[$mime])) {
+        $extMap = ['mp4' => 'mp4', 'webm' => 'webm', 'mov' => 'mov', 'm4v' => 'm4v'];
+        if ($ext !== '' && isset($extMap[$ext]) && in_array($mime, ['application/octet-stream', 'application/mp4', 'binary/octet-stream'], true)) {
+            $mime = $ext === 'webm' ? 'video/webm' : ($ext === 'mov' ? 'video/quicktime' : 'video/mp4');
+        }
+    }
+    if (!is_string($mime) || !isset($allowed[$mime])) {
+        throw new RuntimeException('فرمت ویدیو مجاز نیست (mp4, webm, mov).');
+    }
+    $maxBytes = 200 * 1024 * 1024;
+    if (($file['size'] ?? 0) > $maxBytes) {
+        throw new RuntimeException('حجم ویدیو نباید بیشتر از ۲۰۰ مگابایت باشد.');
+    }
+
+    $config = ad_config();
+    $baseDir = rtrim($config['upload_dir'], '/\\') . '/';
+    if ($subdir !== '') {
+        $baseDir .= trim($subdir, '/\\') . '/';
+    }
+    if (!is_dir($baseDir) && !mkdir($baseDir, 0755, true) && !is_dir($baseDir)) {
+        throw new RuntimeException('ساخت پوشه آپلود ممکن نشد.');
+    }
+
+    $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
+    $dest = $baseDir . $name;
+    if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        throw new RuntimeException('ذخیره فایل ویدیو ممکن نشد.');
+    }
+
+    $prefix = rtrim($config['upload_url_prefix'], '/') . '/';
+    if ($subdir !== '') {
+        $prefix .= trim($subdir, '/') . '/';
+    }
+    return $prefix . $name;
+}
+
+function ad_upload_subtitle_srt(array $file, string $subdir = 'subtitles'): string
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return '';
+    }
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('خطا در آپلود زیرنویس.');
+    }
+    $origName = (string) ($file['name'] ?? '');
+    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+    if ($ext !== 'srt') {
+        throw new RuntimeException('فقط فایل SRT مجاز است.');
+    }
+    if (($file['size'] ?? 0) > 2 * 1024 * 1024) {
+        throw new RuntimeException('حجم فایل زیرنویس حداکثر ۲ مگابایت است.');
+    }
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+    $okMimes = ['text/plain', 'application/octet-stream', 'application/x-subrip'];
+    if (!in_array($mime, $okMimes, true)) {
+        throw new RuntimeException('نوع فایل زیرنویس نامعتبر است.');
+    }
+
+    $config = ad_config();
+    $baseDir = rtrim($config['upload_dir'], '/\\') . '/';
+    if ($subdir !== '') {
+        $baseDir .= trim($subdir, '/\\') . '/';
+    }
+    if (!is_dir($baseDir) && !mkdir($baseDir, 0755, true) && !is_dir($baseDir)) {
+        throw new RuntimeException('ساخت پوشه آپلود ممکن نشد.');
+    }
+
+    $name = bin2hex(random_bytes(8)) . '.srt';
+    $dest = $baseDir . $name;
+    if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        throw new RuntimeException('ذخیره فایل زیرنویس ممکن نشد.');
+    }
+
+    $prefix = rtrim($config['upload_url_prefix'], '/') . '/';
+    if ($subdir !== '') {
+        $prefix .= trim($subdir, '/') . '/';
+    }
+    return $prefix . $name;
+}
+
+function ad_save_video_from_local_path(string $srcPath, string $origName, string $subdir = 'videos'): string
+{
+    if (!is_file($srcPath)) {
+        throw new RuntimeException('فایل ویدیو پیدا نشد.');
+    }
+    $allowed = [
+        'video/mp4' => 'mp4',
+        'video/webm' => 'webm',
+        'video/quicktime' => 'mov',
+        'video/x-m4v' => 'm4v',
+    ];
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($srcPath);
+    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+    if (!is_string($mime) || !isset($allowed[$mime])) {
+        $extMap = ['mp4' => 'mp4', 'webm' => 'webm', 'mov' => 'mov', 'm4v' => 'm4v'];
+        if ($ext !== '' && isset($extMap[$ext]) && in_array($mime, ['application/octet-stream', 'application/mp4', 'binary/octet-stream'], true)) {
+            $mime = $ext === 'webm' ? 'video/webm' : ($ext === 'mov' ? 'video/quicktime' : 'video/mp4');
+        }
+    }
+    if (!is_string($mime) || !isset($allowed[$mime])) {
+        throw new RuntimeException('فرمت ویدیو مجاز نیست (mp4, webm, mov).');
+    }
+    $size = (int) filesize($srcPath);
+    $maxBytes = 200 * 1024 * 1024;
+    if ($size > $maxBytes) {
+        throw new RuntimeException('حجم ویدیو نباید بیشتر از ۲۰۰ مگابایت باشد.');
+    }
+
+    $config = ad_config();
+    $baseDir = rtrim($config['upload_dir'], '/\\') . '/';
+    if ($subdir !== '') {
+        $baseDir .= trim($subdir, '/\\') . '/';
+    }
+    if (!is_dir($baseDir) && !mkdir($baseDir, 0755, true) && !is_dir($baseDir)) {
+        throw new RuntimeException('ساخت پوشه آپلود ممکن نشد.');
+    }
+
+    $name = bin2hex(random_bytes(8)) . '.' . $allowed[$mime];
+    $dest = $baseDir . $name;
+    if (!copy($srcPath, $dest)) {
+        throw new RuntimeException('ذخیره فایل ویدیو ممکن نشد.');
+    }
+
+    $prefix = rtrim($config['upload_url_prefix'], '/') . '/';
+    if ($subdir !== '') {
+        $prefix .= trim($subdir, '/') . '/';
+    }
+    return $prefix . $name;
+}
+
+function ad_public_upload_url(string $path): string
+{
+    $path = trim(str_replace('\\', '/', $path));
+    if ($path === '') {
+        return '';
+    }
+    if (preg_match('#^https?://#i', $path)) {
+        return $path;
+    }
+    return '/' . ltrim($path, '/');
+}
+
 function ad_flash_set(string $type, string $message): void
 {
     if (session_status() !== PHP_SESSION_ACTIVE) {

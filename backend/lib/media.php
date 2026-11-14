@@ -143,6 +143,15 @@ function ad_media_upload(array $file, string $subdir = '', string $alt = ''): st
     return $path;
 }
 
+function ad_media_upload_video(array $file, string $subdir = 'videos', string $alt = ''): string
+{
+    $path = ad_upload_video($file, $subdir);
+    if ($path !== '') {
+        ad_media_register($path, $alt, $file);
+    }
+    return $path;
+}
+
 function ad_media_alt(string $path): string
 {
     $path = trim(str_replace('\\', '/', $path));

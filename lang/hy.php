@@ -90,6 +90,15 @@ return [
     // Testimonial
     'testimonials' => 'Կարծիքներ',
     'what_clients_say' => 'Ինչ են ասում հաճախորդները',
+    'videos_section_kicker' => 'Արտադրություն',
+    'videos_section_title' => 'Mercovyn-ը գործում',
+    'videos_section_subtitle' => 'Կարճ տեսանյութեր արտադրությունից և հաճախորդներից։',
+    'video_carousel_prev' => 'Նախորդ տեսանյութ',
+    'video_carousel_next' => 'Հաջորդ տեսանյութ',
+    'video_sub_off' => 'Անջատ.',
+    'video_sub_lang_en' => 'Անգլերեն',
+    'video_sub_lang_ru' => 'Ռուսերեն',
+    'video_sub_lang_hy' => 'Հայերեն',
 
     // Countries/Export
     'popular_countries' => 'Արտահանման շուկաներ',

@@ -13,6 +13,7 @@ $allMenuItems = [
     ['href' => 'media.php', 'label' => 'رسانه', 'icon' => '⧉', 'match' => ['media.php'], 'cap' => 'media'],
     ['href' => 'team.php', 'label' => 'تیم', 'icon' => '◎', 'match' => ['team.php'], 'cap' => 'team', 'roles' => ['admin']],
     ['href' => 'portfolio.php', 'label' => 'نمونه‌کارها', 'icon' => '▣', 'match' => ['portfolio.php'], 'cap' => 'portfolio', 'roles' => ['admin']],
+    ['href' => 'videos.php', 'label' => 'ویدیوها', 'icon' => '▶', 'match' => ['videos.php'], 'roles' => ['admin']],
     ['href' => 'services.php', 'label' => 'محصولات', 'icon' => '◇', 'match' => ['services.php'], 'cap' => 'services', 'roles' => ['admin']],
     [
         'href' => 'blog.php',

@@ -16,6 +16,7 @@ require_once __DIR__ . '/../router.php';
 $langInfo = getLanguageInfo();
 $currentLang = $langInfo['current'];
 $langPrefix = $langInfo['prefix'];
+$loadMercovynVideos = $loadMercovynVideos ?? false;
 
 // Default SEO values
 $pageTitle = $pageTitle ?? __("brand") . ' - ' . __("tagline");
@@ -115,6 +116,10 @@ foreach ($hreflangUrls as $lang => $url) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" media="print" onload="this.media='all'">
     <?php if (!empty($loadOwlCarousel)): ?>
     <link href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
+    <?php endif; ?>
+    <?php if (!empty($loadMercovynVideos)): ?>
+    <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/mercovyn-videos.css'), ENT_QUOTES, 'UTF-8') ?>" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/mercovyn-videos.css'), ENT_QUOTES, 'UTF-8') ?>"></noscript>
     <?php endif; ?>
 </head>
 

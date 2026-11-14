@@ -1,0 +1,267 @@
+/* ----- Video carousel (satisfaction) ----- */
+.ana-videos-io-anchor {
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.video-carousel {
+  --carousel-width: 1100px;
+  position: relative;
+  width: 100%;
+  max-width: var(--carousel-width);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 40px 0 20px;
+  direction: ltr;
+}
+.video-carousel-track {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  height: clamp(320px, 52vh, 640px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.video-slide {
+  position: absolute;
+  width: min(520px, 46vw);
+  aspect-ratio: var(--video-ar, 16 / 9);
+  max-height: min(300px, 42vh);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1d2327;
+  box-shadow: 0 16px 40px rgba(29, 35, 39, 0.18);
+  transition:
+    transform 0.65s cubic-bezier(.22,.61,.36,1),
+    opacity 0.65s ease,
+    filter 0.65s ease,
+    width 0.35s ease,
+    max-height 0.35s ease,
+    z-index 0s linear 0.2s;
+}
+.video-slide.is-portrait {
+  width: min(220px, 34vw);
+  max-height: min(420px, 58vh);
+}
+.video-slide.is-portrait.center {
+  width: min(300px, 48vw);
+  max-height: min(560px, 68vh);
+}
+.video-slide.is-landscape.center {
+  width: min(720px, 78vw);
+  max-height: min(420px, 52vh);
+}
+.ana-video-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #1d2327;
+}
+.video-slide video,
+.video-slide .ana-video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #1d2327;
+}
+.video-slide .ana-video-poster {
+  object-fit: cover;
+  z-index: 1;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.video-slide video {
+  z-index: 2;
+}
+.video-slide.center {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  filter: blur(0);
+  z-index: 5;
+  cursor: default;
+}
+.video-slide.left {
+  transform: translateX(-62%) scale(.78) rotate(-7deg);
+  opacity: .35;
+  filter: blur(2px);
+  z-index: 2;
+}
+.video-slide.right {
+  transform: translateX(62%) scale(.78) rotate(7deg);
+  opacity: .35;
+  filter: blur(2px);
+  z-index: 2;
+}
+.video-slide.left::after,
+.video-slide.right::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.08);
+  pointer-events: none;
+  z-index: 3;
+}
+.video-carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(29, 35, 39, .82);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .25s ease, transform .25s ease;
+}
+.video-carousel-button:hover { background: rgba(29, 35, 39, .95); }
+.video-carousel-button.prev { left: 15px; }
+.video-carousel-button.next { right: 15px; }
+.video-carousel-button:active { transform: translateY(-50%) scale(.92); }
+.ana-video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 35, 39, 0.22);
+  border: 0;
+  cursor: pointer;
+  z-index: 6;
+  color: #fff;
+}
+.ana-video-play span {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(13, 110, 253, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  padding-inline-start: 4px;
+  box-shadow: 0 8px 20px rgba(29, 35, 39, 0.28);
+}
+.ana-video-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 35, 39, 0.35);
+}
+.ana-video-loading[hidden] {
+  display: none !important;
+}
+.video-slide.is-playing:not(.is-buffering) .ana-video-loading {
+  display: none !important;
+}
+.ana-video-loading::after {
+  content: "";
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: anaVideoSpin 0.75s linear infinite;
+}
+@keyframes anaVideoSpin {
+  to { transform: rotate(360deg); }
+}
+.ana-video-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  padding: 8px 10px 10px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.72));
+  color: #fff;
+  direction: rtl;
+}
+.ana-video-controls__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.ana-video-progress {
+  width: 100%;
+  height: 4px;
+  accent-color: #0d6efd;
+  cursor: pointer;
+}
+.ana-video-time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+  min-width: 88px;
+}
+.ana-video-ctl {
+  border: 0;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-radius: 8px;
+  min-width: 34px;
+  height: 30px;
+  padding: 0 8px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+.ana-video-ctl:hover { background: rgba(255,255,255,.22); }
+.video-slide.is-playing .ana-video-play { display: none; }
+.video-slide.is-playing .ana-video-poster { opacity: 0; }
+.video-carousel-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: #5a6b84;
+}
+@media (max-width: 900px) {
+  .video-carousel { padding: 36px 0 12px; }
+  .video-carousel-track { height: clamp(280px, 48vh, 520px); }
+  .video-slide.is-landscape.center { width: min(620px, 88vw); }
+  .video-slide.left { transform: translateX(-65%) scale(.72) rotate(-6deg); }
+  .video-slide.right { transform: translateX(65%) scale(.72) rotate(6deg); }
+}
+@media (max-width: 600px) {
+  .video-carousel { padding: 28px 0 8px; }
+  .video-carousel-track { min-height: 260px; height: auto; max-height: 72vh; }
+  .video-slide { width: min(78vw, 320px); border-radius: 12px; }
+  .video-slide.is-portrait { width: min(52vw, 220px); }
+  .video-slide.is-portrait.center { width: min(62vw, 260px); }
+  .video-slide.is-landscape.center { width: min(90vw, 360px); }
+  .video-slide.center { transform: translateX(0) scale(1); }
+  .video-slide.left { transform: translateX(-72%) scale(.70) rotate(-6deg); opacity: .25; }
+  .video-slide.right { transform: translateX(72%) scale(.70) rotate(6deg); opacity: .25; }
+  .video-carousel-button { width: 42px; height: 42px; font-size: 21px; }
+  .video-carousel-button.prev { left: 8px; }
+  .video-carousel-button.next { right: 8px; }
+  .ana-video-play span { width: 52px; height: 52px; font-size: 22px; }
+}
+
+.ana-video-subtitles {
+  max-width: 120px;
+  font-size: 12px;
+  padding: 0 6px;
+}
+.ana-video-controls video::cue {
+  background: rgba(0, 0, 0, 0.65);
+  font-size: 1rem;
+  line-height: 1.35;
+}
