@@ -57,10 +57,17 @@
     slide.style.setProperty('--video-ar', w + ' / ' + h);
   }
 
+  function normalizeStreamUrl(url) {
+    if (!url || url.indexOf('uupload.ir') === -1) return url || '';
+    if (/[?&]play(?:=|$)/.test(url)) return url;
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'play';
+  }
+
   function ensureVideoSource(video) {
     if (video.dataset.loaded === '1') return Promise.resolve();
-    var src = video.getAttribute('data-src') || '';
+    var src = normalizeStreamUrl(video.getAttribute('data-src') || '');
     if (!src) return Promise.reject(new Error('no src'));
+    video.setAttribute('data-src', src);
     return new Promise(function (resolve, reject) {
       function onMeta() {
         video.removeEventListener('loadedmetadata', onMeta);
@@ -258,8 +265,9 @@
           if (poster) poster.style.opacity = '0';
           hideLoading();
         })
-        .catch(function () {
+        .catch(function (err) {
           hideLoading();
+          console.warn('Video playback failed:', err || 'unknown');
         });
     }
 

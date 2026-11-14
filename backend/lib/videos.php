@@ -77,6 +77,23 @@ function ad_videos_list_all(): array
     return ad_db()->query('SELECT * FROM site_videos ORDER BY sort_order ASC, id ASC')->fetchAll();
 }
 
+/**
+ * Normalize streaming URL (e.g. uupload ?play for video/mp4).
+ */
+function ad_video_normalize_stream_url(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    if (preg_match('#^https?://#i', $url) && preg_match('#uupload\.ir/#i', $url)) {
+        if (!preg_match('/[?&]play(?:=|$)/', $url)) {
+            $url .= (str_contains($url, '?') ? '&' : '?') . 'play';
+        }
+    }
+    return $url;
+}
+
 function ad_video_localized_title(array $row, string $lang): string
 {
     if ($lang === 'ru') {
@@ -122,7 +139,7 @@ function ad_videos_list_public(string $lang = 'en', string $placement = 'home'):
         $out[] = [
             'id' => $id,
             'title' => ad_video_localized_title($row, $lang),
-            'video_url' => ad_public_upload_url((string) $row['video_url']),
+            'video_url' => ad_video_normalize_stream_url(ad_public_upload_url((string) $row['video_url'])),
             'poster_url' => ad_public_upload_url((string) $row['poster_url']),
             'subtitles' => $subs,
         ];

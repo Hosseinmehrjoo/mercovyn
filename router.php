@@ -28,6 +28,7 @@ function ad_security_headers(): void
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com https://cdn.jsdelivr.net",
         "font-src 'self' data: https://fonts.gstatic.com https://use.fontawesome.com",
         "img-src 'self' data: https:",
+        "media-src 'self' https: blob: data:",
         "connect-src 'self' https://wa.me",
         "frame-src https://www.google.com",
         "frame-ancestors 'none'",
