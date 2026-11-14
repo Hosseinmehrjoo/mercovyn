@@ -21,6 +21,7 @@ function ad_videos_ensure_schema(): void
           `subtitle_srt_en` VARCHAR(500) NOT NULL DEFAULT '',
           `subtitle_srt_ru` VARCHAR(500) NOT NULL DEFAULT '',
           `subtitle_srt_hy` VARCHAR(500) NOT NULL DEFAULT '',
+          `placement` VARCHAR(32) NOT NULL DEFAULT 'home',
           `sort_order` INT NOT NULL DEFAULT 0,
           `is_active` TINYINT(1) NOT NULL DEFAULT 1,
           `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -29,7 +30,30 @@ function ad_videos_ensure_schema(): void
           KEY `idx_site_videos_active_sort` (`is_active`, `sort_order`, `id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+    $col = $db->query("SHOW COLUMNS FROM site_videos LIKE 'placement'")->fetch();
+    if (!$col) {
+        $db->exec(
+            "ALTER TABLE site_videos ADD COLUMN placement VARCHAR(32) NOT NULL DEFAULT 'home' AFTER subtitle_srt_hy"
+        );
+        $db->exec(
+            'ALTER TABLE site_videos ADD KEY idx_site_videos_placement (placement, is_active, sort_order, id)'
+        );
+    }
     $done = true;
+}
+
+/** @return array<string, string> */
+function ad_video_placement_options(): array
+{
+    return [
+        'home' => 'صفحه اصلی (کاروسل — زیر Our Advantages)',
+        'about' => 'درباره ما (زیر سکشن اصلی)',
+    ];
+}
+
+function ad_video_placement_valid(string $placement): bool
+{
+    return array_key_exists($placement, ad_video_placement_options());
 }
 
 function ad_videos_get(int $id): ?array
@@ -73,12 +97,18 @@ function ad_video_localized_title(array $row, string $lang): string
 /**
  * @return list<array<string, mixed>>
  */
-function ad_videos_list_public(string $lang = 'en'): array
+function ad_videos_list_public(string $lang = 'en', string $placement = 'home'): array
 {
     ad_videos_ensure_schema();
-    $rows = ad_db()->query(
-        "SELECT * FROM site_videos WHERE is_active = 1 AND video_url <> '' ORDER BY sort_order ASC, id ASC"
-    )->fetchAll();
+    if (!ad_video_placement_valid($placement)) {
+        return [];
+    }
+    $stmt = ad_db()->prepare(
+        "SELECT * FROM site_videos WHERE is_active = 1 AND video_url <> '' AND placement = ?
+         ORDER BY sort_order ASC, id ASC"
+    );
+    $stmt->execute([$placement]);
+    $rows = $stmt->fetchAll();
     $out = [];
     foreach ($rows as $row) {
         $id = (int) $row['id'];

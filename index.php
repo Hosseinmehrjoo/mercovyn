@@ -32,7 +32,7 @@ $translations = loadTranslations($currentLang);
 // Define page routes (without language prefix)
 $routes = [
     '' => 'pages/home.php',
-    'about' => 'about.html',
+    'about' => 'pages/about.php',
     'products' => 'pages/products.php',
     'product' => 'pages/product.php',
     'service' => 'pages/products.php',

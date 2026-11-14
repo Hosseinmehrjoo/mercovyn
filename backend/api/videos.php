@@ -15,7 +15,12 @@ if (!in_array($lang, ['en', 'ru', 'hy'], true)) {
     $lang = 'en';
 }
 
+$placement = trim((string) ($_GET['placement'] ?? ''));
+if (!ad_video_placement_valid($placement)) {
+    ad_json(['ok' => true, 'items' => []]);
+}
+
 ad_json([
     'ok' => true,
-    'items' => ad_videos_list_public($lang),
+    'items' => ad_videos_list_public($lang, $placement),
 ]);

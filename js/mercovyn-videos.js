@@ -467,34 +467,43 @@
     return slide;
   }
 
-  function fetchVideoItems() {
-    if (Array.isArray(window.MercovynVideoItems)) {
-      return Promise.resolve(window.MercovynVideoItems);
+  function fetchVideoItems(placement) {
+    var key = placement || 'home';
+    if (window.MercovynVideoItems && window.MercovynVideoItems[key]) {
+      return Promise.resolve(window.MercovynVideoItems[key]);
     }
     var lang = document.documentElement.lang || 'en';
-    return fetch('/backend/api/videos.php?lang=' + encodeURIComponent(lang), { credentials: 'same-origin' })
+    var qs = '?lang=' + encodeURIComponent(lang) + '&placement=' + encodeURIComponent(key);
+    return fetch('/backend/api/videos.php' + qs, { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(function (data) { return (data && data.items) || []; });
   }
 
-  function loadVideos() {
-    var carousel = document.getElementById('videoCarousel');
+  function loadVideoSection(section) {
+    if (!section) return;
+    var placement = section.getAttribute('data-video-placement') || 'home';
+    var carousel = section.querySelector('.video-carousel');
     if (!carousel) return;
-    var section = document.getElementById('mercovyn-videos-section');
-    fetchVideoItems().then(function (items) {
+    fetchVideoItems(placement).then(function (items) {
       items = Array.isArray(items) ? items : [];
       if (!items.length) {
-        if (section) section.hidden = true;
+        section.hidden = true;
+        section.setAttribute('aria-hidden', 'true');
         return;
       }
-      if (section) {
-        section.hidden = false;
-        section.removeAttribute('aria-hidden');
-      }
+      section.hidden = false;
+      section.removeAttribute('aria-hidden');
       initVideoCarousel(carousel, items);
     }).catch(function () {
-      if (section) section.hidden = true;
+      section.hidden = true;
+      section.setAttribute('aria-hidden', 'true');
     });
+  }
+
+  function loadVideos() {
+    var sections = document.querySelectorAll('[data-video-placement]');
+    if (!sections.length) return;
+    sections.forEach(loadVideoSection);
   }
 
   ready(loadVideos);

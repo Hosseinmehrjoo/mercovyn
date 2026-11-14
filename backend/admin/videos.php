@@ -79,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('آدرس ویدیو الزامی است. ابتدا «بارگذاری ویدیو» را بزنید.');
         }
 
+        $placement = trim((string) ($_POST['placement'] ?? ''));
+        if (!ad_video_placement_valid($placement)) {
+            throw new RuntimeException('انتخاب جایگاه نمایش ویدیو الزامی است (صفحه اصلی یا درباره ما).');
+        }
+
         @set_time_limit(120);
         $english = ['title' => $title];
         $localized = ad_auto_translate_record($english, ['title'], $existing, ['title']);
@@ -88,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id > 0) {
             $stmt = $db->prepare(
                 'UPDATE site_videos SET title=?, title_ru=?, title_hy=?, video_url=?, poster_url=?,
-                    subtitle_srt_en=?, subtitle_srt_ru=?, subtitle_srt_hy=?, sort_order=?, is_active=? WHERE id=?'
+                    subtitle_srt_en=?, subtitle_srt_ru=?, subtitle_srt_hy=?, placement=?, sort_order=?, is_active=? WHERE id=?'
             );
             $stmt->execute([
                 $title,
@@ -99,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $subEn,
                 $subRu,
                 $subHy,
+                $placement,
                 $sort,
                 $active,
                 $id,
@@ -109,8 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $db->prepare(
-            'INSERT INTO site_videos (title, title_ru, title_hy, video_url, poster_url, subtitle_srt_en, subtitle_srt_ru, subtitle_srt_hy, sort_order, is_active)
-             VALUES (?,?,?,?,?,?,?,?,?,?)'
+            'INSERT INTO site_videos (title, title_ru, title_hy, video_url, poster_url, subtitle_srt_en, subtitle_srt_ru, subtitle_srt_hy, placement, sort_order, is_active)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?)'
         );
         $stmt->execute([
             $title,
@@ -121,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subEn,
             $subRu,
             $subHy,
+            $placement,
             $sort,
             $active,
         ]);
@@ -133,6 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $rows = ad_videos_list_all();
+$placementOptions = ad_video_placement_options();
+$currentPlacement = (string) ($edit['placement'] ?? '');
 $pageTitle = 'ویدیوها';
 require __DIR__ . '/_layout_top.php';
 ?>
@@ -146,7 +155,7 @@ require __DIR__ . '/_layout_top.php';
 .subtitle-block h3{margin:0 0 8px;font-size:13px}
 </style>
 <h1>ویدیوهای صفحه اصلی</h1>
-<p class="muted">کاروسل ویدیو در صفحهٔ اصلی نمایش داده می‌شود. زیرنویس هر ویدیو را به‌صورت فایل SRT برای انگلیسی، روسی و ارمنی بارگذاری کنید (در سایت به VTT تبدیل می‌شود).</p>
+<p class="muted">دو جایگاه نمایش دارید: <strong>صفحه اصلی</strong> (کاروسل، بلافاصله زیر Our Advantages) و <strong>درباره ما</strong> (بلافاصله زیر سکشن اصلی). انتخاب جایگاه برای هر ویدیو اجباری است. زیرنویس SRT برای en / ru / hy (در سایت به VTT تبدیل می‌شود).</p>
 <p class="muted"><strong>مهم:</strong> فایل ویدیو را فقط با «بارگذاری ویدیو» بفرستید؛ دکمه «افزودن» فقط اطلاعات را ذخیره می‌کند.</p>
 
 <div class="card">
@@ -156,6 +165,16 @@ require __DIR__ . '/_layout_top.php';
     <input type="hidden" name="action" value="save" />
     <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>" />
 
+    <p>
+      <label>جایگاه نمایش <span style="color:#b32d2e">*</span><br>
+        <select name="placement" required style="max-width:480px;width:100%">
+          <option value="" disabled <?= $currentPlacement === '' ? 'selected' : '' ?>>انتخاب کنید…</option>
+          <?php foreach ($placementOptions as $value => $label): ?>
+            <option value="<?= ad_e($value) ?>" <?= $currentPlacement === $value ? 'selected' : '' ?>><?= ad_e($label) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </label>
+    </p>
     <p>
       <label>عنوان (انگلیسی — پایهٔ ترجمه)<br>
         <input type="text" name="title" class="regular-text" style="width:100%;max-width:480px"
@@ -262,6 +281,7 @@ require __DIR__ . '/_layout_top.php';
         <tr>
           <th style="text-align:right;padding:8px">پوستر</th>
           <th style="text-align:right;padding:8px">عنوان</th>
+          <th style="text-align:right;padding:8px">جایگاه</th>
           <th style="text-align:right;padding:8px">زیرنویس</th>
           <th style="text-align:right;padding:8px">ترتیب</th>
           <th style="text-align:right;padding:8px">وضعیت</th>
@@ -289,6 +309,12 @@ require __DIR__ . '/_layout_top.php';
             <td style="padding:8px">
               <strong><?= ad_e((string) ($row['title'] ?: 'بدون عنوان')) ?></strong><br>
               <span class="muted" dir="ltr" style="font-size:12px;word-break:break-all"><?= ad_e((string) $row['video_url']) ?></span>
+            </td>
+            <td style="padding:8px;white-space:normal;max-width:140px">
+              <?php
+                $pl = (string) ($row['placement'] ?? 'home');
+              echo ad_e($placementOptions[$pl] ?? $pl);
+                ?>
             </td>
             <td style="padding:8px"><?= $subFlags ? ad_e(implode(', ', $subFlags)) : '<span class="muted">—</span>' ?></td>
             <td style="padding:8px"><?= (int) $row['sort_order'] ?></td>
