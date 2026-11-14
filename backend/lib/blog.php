@@ -47,8 +47,51 @@ function ad_blog_ensure_schema(): void
     }
     if ($cols && !in_array('meta_keywords', $cols, true)) {
         $db->exec("ALTER TABLE blog_posts ADD COLUMN `meta_keywords` VARCHAR(500) NOT NULL DEFAULT '' AFTER `meta_description`");
+        $cols[] = 'meta_keywords';
+    }
+    if ($cols) {
+        $blogLangCols = [
+            'title_ru' => "VARCHAR(200) NOT NULL DEFAULT ''",
+            'title_hy' => "VARCHAR(200) NOT NULL DEFAULT ''",
+            'slug_ru' => "VARCHAR(220) NOT NULL DEFAULT ''",
+            'slug_hy' => "VARCHAR(220) NOT NULL DEFAULT ''",
+            'meta_title_ru' => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'meta_title_hy' => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'meta_description_ru' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'meta_description_hy' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'meta_keywords_ru' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'meta_keywords_hy' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'excerpt_ru' => 'TEXT NULL',
+            'excerpt_hy' => 'TEXT NULL',
+            'content_ru' => 'MEDIUMTEXT NULL',
+            'content_hy' => 'MEDIUMTEXT NULL',
+        ];
+        foreach ($blogLangCols as $col => $def) {
+            if (!in_array($col, $cols, true)) {
+                $db->exec("ALTER TABLE blog_posts ADD COLUMN `$col` $def");
+                $cols[] = $col;
+            }
+        }
     }
     $done = true;
+}
+
+/**
+ * @param array<string, string> $english
+ * @param array<string, mixed>|null $existing
+ * @return array<string, string>
+ */
+function ad_blog_build_localized_fields(array $english, ?array $existing = null): array
+{
+    if (!function_exists('ad_auto_translate_record')) {
+        require_once __DIR__ . '/translate.php';
+    }
+    return ad_auto_translate_record(
+        $english,
+        ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords'],
+        $existing,
+        ['title']
+    );
 }
 
 /**
@@ -238,6 +281,19 @@ function ad_blog_post_categories(int $postId): array
  * @param array<string, mixed> $post
  * @return array<string, mixed>
  */
+function ad_blog_post_slug(array $post, string $lang): string
+{
+    if ($lang === 'en') {
+        return (string) ($post['slug'] ?? '');
+    }
+    $key = 'slug_' . $lang;
+    $localized = trim((string) ($post[$key] ?? ''));
+    if ($localized !== '') {
+        return $localized;
+    }
+    return (string) ($post['slug'] ?? '');
+}
+
 function ad_blog_normalize_post(array $post): array
 {
     $id = (int) ($post['id'] ?? 0);

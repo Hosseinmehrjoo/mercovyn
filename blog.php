@@ -20,7 +20,10 @@ try {
     $categories = ad_blog_categories_list();
     $db = ad_db();
     $rows = $db->query(
-        'SELECT id, title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, published_at
+        'SELECT id, title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, published_at,
+                title_ru, title_hy, slug_ru, slug_hy, meta_title_ru, meta_title_hy,
+                meta_description_ru, meta_description_hy, meta_keywords_ru, meta_keywords_hy,
+                excerpt_ru, excerpt_hy, content_ru, content_hy
          FROM blog_posts
          WHERE status = "published"
          ORDER BY published_at DESC, id DESC
@@ -109,10 +112,10 @@ include __DIR__ . '/includes/header.php';
                                         <?php endif; ?>
                                     </div>
                                     <h4 class="blog-title mb-3">
-                                        <a href="<?= url('blog-single/' . $post['slug']) ?>" class="text-secondary text-decoration-none"><?= htmlspecialchars(getPostField($post, 'title')) ?></a>
+                                        <a href="<?= url('blog-single/' . ad_blog_post_slug($post, $currentLang)) ?>" class="text-secondary text-decoration-none"><?= htmlspecialchars(getPostField($post, 'title')) ?></a>
                                     </h4>
                                     <p class="blog-excerpt text-muted flex-grow-1"><?= htmlspecialchars(getPostField($post, 'excerpt')) ?></p>
-                                    <a href="<?= url('blog-single/' . $post['slug']) ?>" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mt-auto align-self-start"><?= __("read_more") ?> <i class="fas fa-arrow-left ms-2"></i></a>
+                                    <a href="<?= url('blog-single/' . ad_blog_post_slug($post, $currentLang)) ?>" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mt-auto align-self-start"><?= __("read_more") ?> <i class="fas fa-arrow-left ms-2"></i></a>
                                 </div>
                             </article>
                         </div>

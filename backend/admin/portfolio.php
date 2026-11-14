@@ -5,6 +5,7 @@ require_once __DIR__ . '/_init.php';
 require_once dirname(__DIR__) . '/lib/portfolio.php';
 require_once dirname(__DIR__) . '/lib/media.php';
 require_once dirname(__DIR__) . '/lib/seo.php';
+require_once dirname(__DIR__) . '/lib/translate.php';
 ad_require_role(['admin']);
 
 ad_portfolio_ensure_schema();
@@ -86,21 +87,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $id = (int) ($_POST['id'] ?? 0);
+        $existing = null;
+        if ($id > 0) {
+            $stmt = $db->prepare('SELECT * FROM portfolio_items WHERE id = ?');
+            $stmt->execute([$id]);
+            $existing = $stmt->fetch() ?: null;
+            if (!$existing) {
+                throw new RuntimeException('نمونه‌کار یافت نشد.');
+            }
+        }
+
         $title = trim((string) ($_POST['title'] ?? ''));
-        $titleRu = trim((string) ($_POST['title_ru'] ?? ''));
-        $titleHy = trim((string) ($_POST['title_hy'] ?? ''));
         $description = trim((string) ($_POST['description'] ?? ''));
-        $descriptionRu = trim((string) ($_POST['description_ru'] ?? ''));
-        $descriptionHy = trim((string) ($_POST['description_hy'] ?? ''));
         $category = $_POST['category'] ?? 'websites';
         if (!in_array($category, ['websites', 'apps'], true)) {
             $category = 'websites';
         }
-        $categoryRu = trim((string) ($_POST['category_ru'] ?? ''));
-        $categoryHy = trim((string) ($_POST['category_hy'] ?? ''));
         $tags = trim((string) ($_POST['tags'] ?? ''));
-        $tagsRu = trim((string) ($_POST['tags_ru'] ?? ''));
-        $tagsHy = trim((string) ($_POST['tags_hy'] ?? ''));
         $postedTechs = $_POST['technologies'] ?? [];
         if (!is_array($postedTechs)) {
             $postedTechs = [$postedTechs];
@@ -120,8 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $url = trim((string) ($_POST['url'] ?? ''));
         $clientName = trim((string) ($_POST['client_name'] ?? ''));
-        $clientNameRu = trim((string) ($_POST['client_name_ru'] ?? ''));
-        $clientNameHy = trim((string) ($_POST['client_name_hy'] ?? ''));
         $deliveryDate = trim((string) ($_POST['delivery_date'] ?? ''));
         $uploadedAt = trim((string) ($_POST['uploaded_at'] ?? ''));
         $teamRoleRows = [];
@@ -162,8 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $executor = implode('، ', $executorNames);
-        $executorRu = trim((string) ($_POST['executor_ru'] ?? ''));
-        $executorHy = trim((string) ($_POST['executor_hy'] ?? ''));
         if ($executor === '') {
             $executor = trim((string) ($_POST['executor'] ?? ''));
         }
@@ -177,17 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $postedShotAlts = [];
         }
         $slugInput = trim((string) ($_POST['slug'] ?? ''));
-        $slugRu = trim((string) ($_POST['slug_ru'] ?? ''));
-        $slugHy = trim((string) ($_POST['slug_hy'] ?? ''));
         $metaTitle = trim((string) ($_POST['meta_title'] ?? ''));
-        $metaTitleRu = trim((string) ($_POST['meta_title_ru'] ?? ''));
-        $metaTitleHy = trim((string) ($_POST['meta_title_hy'] ?? ''));
         $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
-        $metaDescriptionRu = trim((string) ($_POST['meta_description_ru'] ?? ''));
-        $metaDescriptionHy = trim((string) ($_POST['meta_description_hy'] ?? ''));
         $metaKeywords = trim((string) ($_POST['meta_keywords'] ?? ''));
-        $metaKeywordsRu = trim((string) ($_POST['meta_keywords_ru'] ?? ''));
-        $metaKeywordsHy = trim((string) ($_POST['meta_keywords_hy'] ?? ''));
         if (mb_strlen($metaTitle) > 255) {
             $metaTitle = mb_substr($metaTitle, 0, 255);
         }
@@ -218,6 +209,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($title === '') {
             throw new RuntimeException('عنوان الزامی است.');
         }
+
+        @set_time_limit(180);
+        $english = [
+            'title' => $title,
+            'description' => $description,
+            'category' => $category,
+            'tags' => $tags,
+            'client_name' => $clientName,
+            'executor' => $executor,
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'meta_keywords' => $metaKeywords,
+        ];
+        $localized = ad_auto_translate_record(
+            $english,
+            array_keys($english),
+            $existing,
+            ['title']
+        );
+        $titleRu = $localized['title_ru'];
+        $titleHy = $localized['title_hy'];
+        $descriptionRu = $localized['description_ru'];
+        $descriptionHy = $localized['description_hy'];
+        $categoryRu = $localized['category_ru'];
+        $categoryHy = $localized['category_hy'];
+        $tagsRu = $localized['tags_ru'];
+        $tagsHy = $localized['tags_hy'];
+        $clientNameRu = $localized['client_name_ru'];
+        $clientNameHy = $localized['client_name_hy'];
+        $executorRu = $localized['executor_ru'];
+        $executorHy = $localized['executor_hy'];
+        $metaTitleRu = $localized['meta_title_ru'];
+        $metaTitleHy = $localized['meta_title_hy'];
+        $metaDescriptionRu = $localized['meta_description_ru'];
+        $metaDescriptionHy = $localized['meta_description_hy'];
+        $metaKeywordsRu = $localized['meta_keywords_ru'];
+        $metaKeywordsHy = $localized['meta_keywords_hy'];
+        $slugRu = $localized['slug_ru'] !== '' ? $localized['slug_ru'] : ad_slugify($titleRu !== '' ? $titleRu : $title);
+        $slugHy = $localized['slug_hy'] !== '' ? $localized['slug_hy'] : ad_slugify($titleHy !== '' ? $titleHy : $title);
 
         $slug = $slugInput !== '' ? ad_slugify($slugInput) : ad_slugify($title);
         $slug = ad_portfolio_unique_slug($slug, $id);
@@ -266,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $price, $showPrice, $url, $clientName, $clientNameRu, $clientNameHy, $deliveryDate,
                 $executor, $executorRu, $executorHy, $uploadedAt, $screenshotsJson, $sort, $active, $id,
             ]);
-            ad_flash_set('ok', 'نمونه‌کار به‌روزرسانی شد.');
+            $msg = 'نمونه‌کار به‌روزرسانی شد.';
         } else {
             $stmt = $db->prepare(
                 'INSERT INTO portfolio_items (member_id, member_summary, team_roles, title, title_ru, title_hy, slug, slug_ru, slug_hy, meta_title, meta_title_ru, meta_title_hy, meta_description, meta_description_ru, meta_description_hy, meta_keywords, meta_keywords_ru, meta_keywords_hy, description, description_ru, description_hy, category, category_ru, category_hy, cover, tags, tags_ru, tags_hy, technologies, provided_services, price, show_price, url, client_name, client_name_ru, client_name_hy, delivery_date, executor, executor_ru, executor_hy, uploaded_at, screenshots, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
@@ -279,8 +309,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $price, $showPrice, $url, $clientName, $clientNameRu, $clientNameHy, $deliveryDate,
                 $executor, $executorRu, $executorHy, $uploadedAt, $screenshotsJson, $sort, $active,
             ]);
-            ad_flash_set('ok', 'نمونه‌کار افزوده شد.');
+            $msg = 'نمونه‌کار افزوده شد.';
         }
+        $translateWarnings = ad_translate_take_warnings();
+        if ($translateWarnings !== []) {
+            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
+        } elseif (ad_translate_enabled()) {
+            $msg .= ' ترجمهٔ ru/hy به‌روز شد.';
+        }
+        ad_flash_set('ok', $msg);
         ad_seo_on_content_change();
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());

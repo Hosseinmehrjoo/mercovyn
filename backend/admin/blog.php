@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/lib/blog.php';
 require_once dirname(__DIR__) . '/lib/media.php';
 require_once dirname(__DIR__) . '/lib/comments.php';
 require_once dirname(__DIR__) . '/lib/seo.php';
+require_once dirname(__DIR__) . '/lib/translate.php';
 ad_require_capability('blog');
 
 ad_blog_ensure_schema();
@@ -94,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($title === '') {
             throw new RuntimeException('عنوان الزامی است.');
         }
+
+        @set_time_limit(180);
         if ($slug === '') {
             $slug = ad_slugify($title);
         } else {
@@ -116,28 +119,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 : date('Y-m-d H:i:s');
         }
 
+        $english = [
+            'title' => $title,
+            'excerpt' => $excerpt,
+            'content' => $content,
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'meta_keywords' => $metaKeywords,
+        ];
+        $localized = ad_blog_build_localized_fields($english, $existing);
+
         if ($id > 0) {
             $stmt = $db->prepare(
-                'UPDATE blog_posts SET title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?, excerpt=?, content=?, cover=?, status=?, published_at=? WHERE id=?'
-            );
-            $stmt->execute([
-                $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
-                $excerpt, $content, $cover, $status, $publishedAt, $id,
-            ]);
-            ad_blog_post_set_categories($id, $postedCats);
-            ad_flash_set('ok', 'نوشته به‌روزرسانی شد.');
-        } else {
-            $stmt = $db->prepare(
-                'INSERT INTO blog_posts (title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, status, published_at) VALUES (?,?,?,?,?,?,?,?,?,?)'
+                'UPDATE blog_posts SET
+                    title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?,
+                    excerpt=?, content=?, cover=?, status=?, published_at=?,
+                    title_ru=?, title_hy=?, slug_ru=?, slug_hy=?,
+                    meta_title_ru=?, meta_title_hy=?, meta_description_ru=?, meta_description_hy=?,
+                    meta_keywords_ru=?, meta_keywords_hy=?,
+                    excerpt_ru=?, excerpt_hy=?, content_ru=?, content_hy=?
+                 WHERE id=?'
             );
             $stmt->execute([
                 $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
                 $excerpt, $content, $cover, $status, $publishedAt,
+                $localized['title_ru'], $localized['title_hy'],
+                $localized['slug_ru'], $localized['slug_hy'],
+                $localized['meta_title_ru'], $localized['meta_title_hy'],
+                $localized['meta_description_ru'], $localized['meta_description_hy'],
+                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'],
+                $localized['excerpt_ru'], $localized['excerpt_hy'],
+                $localized['content_ru'], $localized['content_hy'],
+                $id,
+            ]);
+            ad_blog_post_set_categories($id, $postedCats);
+            $msg = 'نوشته به‌روزرسانی شد.';
+        } else {
+            $stmt = $db->prepare(
+                'INSERT INTO blog_posts (
+                    title, slug, meta_title, meta_description, meta_keywords,
+                    excerpt, content, cover, status, published_at,
+                    title_ru, title_hy, slug_ru, slug_hy,
+                    meta_title_ru, meta_title_hy, meta_description_ru, meta_description_hy,
+                    meta_keywords_ru, meta_keywords_hy,
+                    excerpt_ru, excerpt_hy, content_ru, content_hy
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            );
+            $stmt->execute([
+                $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
+                $excerpt, $content, $cover, $status, $publishedAt,
+                $localized['title_ru'], $localized['title_hy'],
+                $localized['slug_ru'], $localized['slug_hy'],
+                $localized['meta_title_ru'], $localized['meta_title_hy'],
+                $localized['meta_description_ru'], $localized['meta_description_hy'],
+                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'],
+                $localized['excerpt_ru'], $localized['excerpt_hy'],
+                $localized['content_ru'], $localized['content_hy'],
             ]);
             $newId = (int) $db->lastInsertId();
             ad_blog_post_set_categories($newId, $postedCats);
-            ad_flash_set('ok', 'نوشته افزوده شد.');
+            $msg = 'نوشته افزوده شد.';
         }
+        $translateWarnings = ad_translate_take_warnings();
+        if ($translateWarnings !== []) {
+            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
+        } elseif (ad_translate_enabled()) {
+            $msg .= ' نسخه‌های روسی و ارمنی به‌روز شد.';
+        }
+        ad_flash_set('ok', $msg);
         ad_seo_on_content_change();
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());
@@ -158,7 +207,7 @@ require __DIR__ . '/_layout_top.php';
 <div class="page-toolbar">
   <div>
     <h1>نوشته‌ها</h1>
-    <p class="muted" style="margin:0.35rem 0 0"><a href="../../blog.html" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a></p>
+    <p class="muted" style="margin:0.35rem 0 0"><a href="/blog/" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a> · محتوا را به <strong>انگلیسی</strong> بنویسید؛ با ذخیره، روسی و ارمنی خودکار ساخته می‌شود.</p>
   </div>
   <div class="page-toolbar__actions">
     <a class="btn btn-secondary" href="blog-categories.php">دسته‌بندی‌ها</a>
@@ -199,7 +248,7 @@ require __DIR__ . '/_layout_top.php';
         <td class="row-actions">
           <a href="blog.php?edit=<?= (int) $row['id'] ?>">ویرایش</a>
           <?php if ($row['status'] === 'published'): ?>
-            <a href="../../blog-post.html?slug=<?= rawurlencode((string) $row['slug']) ?>" target="_blank" rel="noopener">مشاهده</a>
+            <a href="/blog-single/<?= ad_e(rawurlencode((string) $row['slug'])) ?>/" target="_blank" rel="noopener">مشاهده</a>
           <?php endif; ?>
           <form method="post" style="display:inline" onsubmit="return confirm('این نوشته حذف شود؟');">
             <input type="hidden" name="csrf" value="<?= ad_e(ad_csrf_token()) ?>" />
@@ -228,10 +277,10 @@ require __DIR__ . '/_layout_top.php';
         <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>" />
 
         <div class="form-section">
-          <h3 class="form-section__title">محتوای نوشته</h3>
+          <h3 class="form-section__title">محتوای نوشته (انگلیسی — منبع)</h3>
           <div class="form-grid">
             <div class="field field--span-2">
-              <label>عنوان</label>
+              <label>عنوان (English)</label>
               <input type="text" name="title" required value="<?= ad_e($edit['title'] ?? '') ?>" />
             </div>
             <div class="field">
@@ -320,7 +369,7 @@ require __DIR__ . '/_layout_top.php';
           <button class="btn" type="submit">ذخیره</button>
           <a class="btn btn-secondary" href="blog.php">انصراف</a>
           <?php if ($edit && ($edit['status'] ?? '') === 'published'): ?>
-            <a class="btn btn-secondary" href="../../blog-post.html?slug=<?= rawurlencode((string) $edit['slug']) ?>" target="_blank" rel="noopener">مشاهده</a>
+            <a class="btn btn-secondary" href="/blog-single/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">مشاهده</a>
           <?php endif; ?>
         </div>
       </form>

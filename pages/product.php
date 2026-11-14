@@ -30,6 +30,19 @@ if ($product) {
     $metaDescription = ad_service_localized_field($product, 'summary') ?: __("meta_description_default");
     $currentPath = 'product/' . ad_service_localized_slug($product);
     $ogImage = trim((string) ($product['cover'] ?? ''));
+    $hreflangPathByLang = [
+        'en' => 'product/' . ad_service_localized_slug($product, 'en'),
+        'ru' => 'product/' . ad_service_localized_slug($product, 'ru'),
+        'hy' => 'product/' . ad_service_localized_slug($product, 'hy'),
+    ];
+    $schemaOrg = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => $title,
+        'description' => ad_service_localized_field($product, 'summary'),
+        'image' => $ogImage !== '' ? $ogImage : null,
+        'brand' => ['@type' => 'Brand', 'name' => __('brand')],
+    ];
 } else {
     $pageTitle = __("page_not_found") . ' | ' . __("brand");
     $metaDescription = __("page_not_found_desc");

@@ -5,6 +5,7 @@ require_once __DIR__ . '/_init.php';
 require_once dirname(__DIR__) . '/lib/team.php';
 require_once dirname(__DIR__) . '/lib/media.php';
 require_once dirname(__DIR__) . '/lib/seo.php';
+require_once dirname(__DIR__) . '/lib/translate.php';
 ad_require_role(['admin']);
 
 ad_team_ensure_schema();
@@ -40,17 +41,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $id = (int) ($_POST['id'] ?? 0);
+        $existing = null;
+        if ($id > 0) {
+            $stmt = $db->prepare('SELECT * FROM team_members WHERE id = ?');
+            $stmt->execute([$id]);
+            $existing = $stmt->fetch() ?: null;
+            if (!$existing) {
+                throw new RuntimeException('عضو یافت نشد.');
+            }
+        }
+
         $name = trim((string) ($_POST['name'] ?? ''));
         $nameEn = trim((string) ($_POST['name_en'] ?? ''));
-        $nameRu = trim((string) ($_POST['name_ru'] ?? ''));
-        $nameHy = trim((string) ($_POST['name_hy'] ?? ''));
         $role = trim((string) ($_POST['role'] ?? ''));
         $roleEn = trim((string) ($_POST['role_en'] ?? ''));
-        $roleRu = trim((string) ($_POST['role_ru'] ?? ''));
-        $roleHy = trim((string) ($_POST['role_hy'] ?? ''));
         $bio = trim((string) ($_POST['bio'] ?? ''));
-        $bioRu = trim((string) ($_POST['bio_ru'] ?? ''));
-        $bioHy = trim((string) ($_POST['bio_hy'] ?? ''));
         $rating = (float) ($_POST['rating'] ?? 5);
         if ($rating < 0) {
             $rating = 0;
@@ -61,12 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $h1 = trim((string) ($_POST['highlight_1'] ?? ''));
         $h2 = trim((string) ($_POST['highlight_2'] ?? ''));
         $h3 = trim((string) ($_POST['highlight_3'] ?? ''));
-        $h1Ru = trim((string) ($_POST['highlight_1_ru'] ?? ''));
-        $h1Hy = trim((string) ($_POST['highlight_1_hy'] ?? ''));
-        $h2Ru = trim((string) ($_POST['highlight_2_ru'] ?? ''));
-        $h2Hy = trim((string) ($_POST['highlight_2_hy'] ?? ''));
-        $h3Ru = trim((string) ($_POST['highlight_3_ru'] ?? ''));
-        $h3Hy = trim((string) ($_POST['highlight_3_hy'] ?? ''));
         $joinedAt = trim((string) ($_POST['joined_at'] ?? ''));
         if ($joinedAt === '') {
             $joinedAt = null;
@@ -81,17 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $photo = trim((string) ($_POST['photo_path'] ?? ''));
         $photoAlt = trim((string) ($_POST['photo_alt'] ?? ''));
         $slugInput = trim((string) ($_POST['slug'] ?? ''));
-        $slugRu = trim((string) ($_POST['slug_ru'] ?? ''));
-        $slugHy = trim((string) ($_POST['slug_hy'] ?? ''));
         $metaTitle = trim((string) ($_POST['meta_title'] ?? ''));
-        $metaTitleRu = trim((string) ($_POST['meta_title_ru'] ?? ''));
-        $metaTitleHy = trim((string) ($_POST['meta_title_hy'] ?? ''));
         $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
-        $metaDescriptionRu = trim((string) ($_POST['meta_description_ru'] ?? ''));
-        $metaDescriptionHy = trim((string) ($_POST['meta_description_hy'] ?? ''));
         $metaKeywords = trim((string) ($_POST['meta_keywords'] ?? ''));
-        $metaKeywordsRu = trim((string) ($_POST['meta_keywords_ru'] ?? ''));
-        $metaKeywordsHy = trim((string) ($_POST['meta_keywords_hy'] ?? ''));
         if (mb_strlen($metaTitle) > 255) {
             $metaTitle = mb_substr($metaTitle, 0, 255);
         }
@@ -105,6 +96,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name === '') {
             throw new RuntimeException('نام الزامی است.');
         }
+
+        @set_time_limit(180);
+        $english = [
+            'name' => $nameEn !== '' ? $nameEn : $name,
+            'role' => $roleEn !== '' ? $roleEn : $role,
+            'bio' => $bio,
+            'highlight_1' => $h1,
+            'highlight_2' => $h2,
+            'highlight_3' => $h3,
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'meta_keywords' => $metaKeywords,
+        ];
+        $localized = ad_auto_translate_record(
+            $english,
+            array_keys($english),
+            $existing,
+            ['name']
+        );
+        $nameRu = $localized['name_ru'];
+        $nameHy = $localized['name_hy'];
+        $roleRu = $localized['role_ru'];
+        $roleHy = $localized['role_hy'];
+        $bioRu = $localized['bio_ru'];
+        $bioHy = $localized['bio_hy'];
+        $h1Ru = $localized['highlight_1_ru'];
+        $h1Hy = $localized['highlight_1_hy'];
+        $h2Ru = $localized['highlight_2_ru'];
+        $h2Hy = $localized['highlight_2_hy'];
+        $h3Ru = $localized['highlight_3_ru'];
+        $h3Hy = $localized['highlight_3_hy'];
+        $metaTitleRu = $localized['meta_title_ru'];
+        $metaTitleHy = $localized['meta_title_hy'];
+        $metaDescriptionRu = $localized['meta_description_ru'];
+        $metaDescriptionHy = $localized['meta_description_hy'];
+        $metaKeywordsRu = $localized['meta_keywords_ru'];
+        $metaKeywordsHy = $localized['meta_keywords_hy'];
+        $slugRu = $localized['slug_ru'] !== '' ? $localized['slug_ru'] : ad_slugify($nameRu !== '' ? $nameRu : $name);
+        $slugHy = $localized['slug_hy'] !== '' ? $localized['slug_hy'] : ad_slugify($nameHy !== '' ? $nameHy : $name);
 
         $slugBase = $slugInput !== '' ? $slugInput : ($nameEn !== '' ? $nameEn : $name);
         $slug = ad_team_unique_slug($slugBase, $id);
@@ -129,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $metaTitle, $metaTitleRu, $metaTitleHy, $metaDescription, $metaDescriptionRu, $metaDescriptionHy,
                 $metaKeywords, $metaKeywordsRu, $metaKeywordsHy, $id,
             ]);
-            ad_flash_set('ok', 'عضو تیم به‌روزرسانی شد.');
+            $msg = 'عضو تیم به‌روزرسانی شد.';
         } else {
             $stmt = $db->prepare(
                 'INSERT INTO team_members (name, name_en, name_ru, name_hy, role, role_en, role_ru, role_hy, bio, bio_ru, bio_hy, rating, highlight_1, highlight_1_ru, highlight_1_hy, highlight_2, highlight_2_ru, highlight_2_hy, highlight_3, highlight_3_ru, highlight_3_hy, joined_at, social_whatsapp, social_telegram, social_instagram, social_linkedin, social_web, photo, sort_order, is_active, slug, slug_ru, slug_hy, meta_title, meta_title_ru, meta_title_hy, meta_description, meta_description_ru, meta_description_hy, meta_keywords, meta_keywords_ru, meta_keywords_hy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
@@ -141,8 +171,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $metaTitle, $metaTitleRu, $metaTitleHy, $metaDescription, $metaDescriptionRu, $metaDescriptionHy,
                 $metaKeywords, $metaKeywordsRu, $metaKeywordsHy,
             ]);
-            ad_flash_set('ok', 'عضو تیم افزوده شد.');
+            $msg = 'عضو تیم افزوده شد.';
         }
+        $translateWarnings = ad_translate_take_warnings();
+        if ($translateWarnings !== []) {
+            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
+        } elseif (ad_translate_enabled()) {
+            $msg .= ' ترجمهٔ ru/hy به‌روز شد.';
+        }
+        ad_flash_set('ok', $msg);
         ad_seo_on_content_change();
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());

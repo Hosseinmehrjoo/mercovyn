@@ -28,8 +28,8 @@ if ($ogImage === '') {
     $ogImage = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . $logoUrl;
 }
 
-// Generate hreflang URLs for current page
-$hreflangUrls = getHreflangUrls($currentPath);
+$hreflangPathByLang = $hreflangPathByLang ?? [];
+$hreflangUrls = getHreflangUrls($currentPath, $hreflangPathByLang);
 $hreflangTags = '';
 foreach ($hreflangUrls as $lang => $url) {
     $rel = $lang === 'x-default' ? 'alternate' : 'alternate';
@@ -71,6 +71,25 @@ foreach ($hreflangUrls as $lang => $url) {
     <meta name="twitter:description" content="<?= htmlspecialchars($metaDescription) ?>">
     <?php if ($ogImage): ?>
     <meta name="twitter:image" content="<?= htmlspecialchars($ogImage) ?>">
+    <?php endif; ?>
+
+    <?php
+    $schemaOrg = $schemaOrg ?? [
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => __('brand'),
+        'url' => $hreflangUrls['en'] ?? ('https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . '/'),
+        'logo' => 'https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . $logoUrl,
+        'email' => 'mercovyn@gmail.com',
+        'telephone' => '+37491551987',
+        'address' => [
+            '@type' => 'PostalAddress',
+            'addressLocality' => 'Yerevan',
+            'addressCountry' => 'AM',
+        ],
+    ];
+    if (!empty($schemaOrg)): ?>
+    <script type="application/ld+json"><?= json_encode($schemaOrg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endif; ?>
     
     <!-- Preload Critical Resources -->

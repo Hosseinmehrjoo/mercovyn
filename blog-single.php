@@ -48,13 +48,15 @@ if ($slug) {
         $db = ad_db();
 $stmt = $db->prepare(
             'SELECT id, title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, published_at,
-                    title_ru, title_hy, slug_ru, slug_hy, meta_title_ru, meta_title_hy, 
+                    title_ru, title_hy, slug_ru, slug_hy, meta_title_ru, meta_title_hy,
                     meta_description_ru, meta_description_hy, meta_keywords_ru, meta_keywords_hy,
                     excerpt_ru, excerpt_hy, content_ru, content_hy
              FROM blog_posts
-             WHERE status = "published" AND slug = ?'
+             WHERE status = "published"
+               AND (slug = ? OR slug_ru = ? OR slug_hy = ?)
+             LIMIT 1'
         );
-        $stmt->execute([$slug]);
+        $stmt->execute([$slug, $slug, $slug]);
         $row = $stmt->fetch();
         if ($row) {
             $post = ad_blog_normalize_post($row);
@@ -92,7 +94,22 @@ if ($post) {
     $metaDescription = getPostField($post, 'meta_description') ?: getPostField($post, 'excerpt');
     $metaKeywords = getPostField($post, 'meta_keywords');
     $ogImage = getPostField($post, 'cover');
-    $currentPath = 'blog-single/' . $post['slug'];
+    $currentPath = 'blog-single/' . ad_blog_post_slug($post, $currentLang);
+    $hreflangPathByLang = [
+        'en' => 'blog-single/' . ad_blog_post_slug($post, 'en'),
+        'ru' => 'blog-single/' . ad_blog_post_slug($post, 'ru'),
+        'hy' => 'blog-single/' . ad_blog_post_slug($post, 'hy'),
+    ];
+    $schemaOrg = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Article',
+        'headline' => getPostField($post, 'title'),
+        'datePublished' => $post['published_at'] ?? '',
+        'image' => getPostField($post, 'cover') ?: null,
+        'author' => ['@type' => 'Organization', 'name' => __('brand')],
+        'publisher' => ['@type' => 'Organization', 'name' => __('brand')],
+        'inLanguage' => $currentLang,
+    ];
 } else {
     $pageTitle = __("page_not_found") . ' | ' . __("brand");
     $metaDescription = __("page_not_found_desc");
@@ -193,9 +210,9 @@ include __DIR__ . '/includes/header.php';
                                         <?php endif; ?>
                                         <div class="blog-content p-3 d-flex flex-column">
                                             <h5 class="blog-title mb-2">
-                                                <a href="<?= url('blog-single/' . getPostField($related, 'slug')) ?>" class="text-secondary text-decoration-none"><?= htmlspecialchars(getPostField($related, 'title')) ?></a>
+                                                <a href="<?= url('blog-single/' . ad_blog_post_slug($related, $currentLang)) ?>" class="text-secondary text-decoration-none"><?= htmlspecialchars(getPostField($related, 'title')) ?></a>
                                             </h5>
-                                            <a href="<?= url('blog-single/' . getPostField($related, 'slug')) ?>" class="btn btn-sm btn-primary border-secondary rounded-pill mt-auto align-self-start"><?= __("read_more") ?> <i class="fas fa-arrow-left ms-1"></i></a>
+                                            <a href="<?= url('blog-single/' . ad_blog_post_slug($related, $currentLang)) ?>" class="btn btn-sm btn-primary border-secondary rounded-pill mt-auto align-self-start"><?= __("read_more") ?> <i class="fas fa-arrow-left ms-1"></i></a>
                                         </div>
                                     </article>
                                 </div>

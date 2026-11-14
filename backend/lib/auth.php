@@ -2,6 +2,19 @@
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/users.php';
+require_once __DIR__ . '/login_throttle.php';
+
+function ad_request_is_https(): bool
+{
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        return true;
+    }
+    if ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443) {
+        return true;
+    }
+    $proto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+    return $proto === 'https';
+}
 
 function ad_session_start(): void
 {
@@ -14,6 +27,7 @@ function ad_session_start(): void
         'path' => '/',
         'httponly' => true,
         'samesite' => 'Lax',
+        'secure' => ad_request_is_https(),
     ]);
     session_start();
 }
@@ -136,13 +150,19 @@ function ad_login_as_user(array $row): void
 function ad_login(string $username, string $password): bool
 {
     ad_users_ensure_schema();
+    if (ad_login_is_locked($username)) {
+        return false;
+    }
     $row = ad_users_find_by_login($username);
     if (!$row || !password_verify($password, (string) $row['password_hash'])) {
+        ad_login_record_failure($username);
         return false;
     }
     if (!(int) ($row['is_active'] ?? 0)) {
+        ad_login_record_failure($username);
         return false;
     }
+    ad_login_clear_failures($username);
     ad_login_as_user($row);
     return true;
 }

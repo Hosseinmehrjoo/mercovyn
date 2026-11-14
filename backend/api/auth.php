@@ -52,7 +52,9 @@ if ($method === 'POST') {
         if ($login === '' || $password === '') {
             ad_json(['ok' => false, 'error' => 'نام کاربری و رمز عبور الزامی است.'], 422);
         }
-        // Rate-ish: simple delay not needed; verify
+        if (ad_login_is_locked($login)) {
+            ad_json(['ok' => false, 'error' => 'تلاش‌های زیاد. لطفاً چند دقیقه بعد دوباره امتحان کنید.'], 429);
+        }
         if (!ad_login($login, $password)) {
             ad_json(['ok' => false, 'error' => 'نام کاربری/ایمیل یا رمز عبور اشتباه است.'], 401);
         }

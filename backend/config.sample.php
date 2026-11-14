@@ -21,4 +21,19 @@ return [
     // مثال: https://ana-developer.ir
     'site_url' => '',
     'timezone' => 'Asia/Yerevan',
+
+    // ترجمه خودکار محتوای CMS (انگلیسی → روسی و ارمنی) هنگام ذخیره در پنل
+    'auto_translate' => true,
+    // libretranslate | mymemory | auto (اول LibreTranslate محلی، سپس MyMemory)
+    'translate_provider' => 'auto',
+    'translate_source_lang' => 'en',
+    // LibreTranslate روی سرور: docker run -p 5000:5000 libretranslate/libretranslate
+    'libretranslate_url' => 'http://127.0.0.1:5000',
+    'libretranslate_api_key' => '',
+    // اختیاری؛ برای سهمیه بالاتر MyMemory
+    'mymemory_email' => '',
+
+    // محدودیت ورود (پس از چند تلاش ناموفق)
+    'login_max_attempts' => 8,
+    'login_lockout_seconds' => 900,
 ];

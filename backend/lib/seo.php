@@ -338,16 +338,36 @@ function ad_redirects_apply_request(): void
 /**
  * @return list<array{loc:string,lastmod:?string,changefreq:string,priority:string,title:string}>
  */
+/**
+ * @return list<string>
+ */
+function ad_seo_langs(): array
+{
+    return ['en', 'ru', 'hy'];
+}
+
+function ad_seo_lang_path(string $path, string $lang): string
+{
+    $path = ltrim($path, '/');
+    if ($lang === 'en') {
+        return $path === '' ? '' : rtrim($path, '/') . '/';
+    }
+    if ($path === '') {
+        return $lang . '/';
+    }
+    return $lang . '/' . rtrim($path, '/') . '/';
+}
+
 function ad_seo_static_pages(): array
 {
     $pages = [
         ['path' => '', 'title' => 'Home', 'changefreq' => 'weekly', 'priority' => '1.0'],
-        ['path' => 'about/', 'title' => 'About', 'changefreq' => 'monthly', 'priority' => '0.8'],
-        ['path' => 'products/', 'title' => 'Products', 'changefreq' => 'weekly', 'priority' => '0.9'],
-        ['path' => 'contact/', 'title' => 'Contact', 'changefreq' => 'monthly', 'priority' => '0.8'],
-        ['path' => 'blog/', 'title' => 'News', 'changefreq' => 'weekly', 'priority' => '0.7'],
-        ['path' => 'feature/', 'title' => 'Advantages', 'changefreq' => 'monthly', 'priority' => '0.5'],
-        ['path' => 'countries/', 'title' => 'Export markets', 'changefreq' => 'monthly', 'priority' => '0.6'],
+        ['path' => 'about', 'title' => 'About', 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['path' => 'products', 'title' => 'Products', 'changefreq' => 'weekly', 'priority' => '0.9'],
+        ['path' => 'contact', 'title' => 'Contact', 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['path' => 'blog', 'title' => 'News', 'changefreq' => 'weekly', 'priority' => '0.7'],
+        ['path' => 'feature', 'title' => 'Advantages', 'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['path' => 'countries', 'title' => 'Export markets', 'changefreq' => 'monthly', 'priority' => '0.6'],
     ];
     $root = ad_seo_site_root();
     $out = [];
@@ -356,8 +376,7 @@ function ad_seo_static_pages(): array
         if ($p['path'] === '') {
             $candidates = [$root . '/pages/home.php', $root . '/index.php'];
         } else {
-            $bare = trim($p['path'], '/');
-            $candidates = [$root . '/pages/' . $bare . '.php', $root . '/' . $bare . '.html'];
+            $candidates = [$root . '/pages/' . $p['path'] . '.php', $root . '/' . $p['path'] . '.html'];
         }
         foreach ($candidates as $file) {
             if (is_file($file)) {
@@ -365,13 +384,15 @@ function ad_seo_static_pages(): array
                 break;
             }
         }
-        $out[] = [
-            'loc' => ad_seo_absolute_url($p['path']),
-            'lastmod' => $mtime ? gmdate('Y-m-d', $mtime) : null,
-            'changefreq' => $p['changefreq'],
-            'priority' => $p['priority'],
-            'title' => $p['title'],
-        ];
+        foreach (ad_seo_langs() as $lang) {
+            $out[] = [
+                'loc' => ad_seo_absolute_url(ad_seo_lang_path($p['path'], $lang)),
+                'lastmod' => $mtime ? gmdate('Y-m-d', $mtime) : null,
+                'changefreq' => $p['changefreq'],
+                'priority' => $lang === 'en' ? $p['priority'] : '0.85',
+                'title' => $p['title'],
+            ];
+        }
     }
     return $out;
 }
@@ -385,26 +406,40 @@ function ad_seo_service_urls(): array
         require_once __DIR__ . '/services.php';
         ad_services_ensure_schema();
         $rows = ad_db()->query(
-            'SELECT title, slug, summary, updated_at, created_at FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
+            'SELECT title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, updated_at, created_at
+             FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
         )->fetchAll();
     } catch (Throwable $e) {
         return [];
     }
     $out = [];
     foreach ($rows as $row) {
-        $slug = trim((string) ($row['slug'] ?? ''));
-        if ($slug === '') {
-            continue;
-        }
         $last = (string) ($row['updated_at'] ?? $row['created_at'] ?? '');
-        $out[] = [
-            'loc' => ad_seo_absolute_url('product/' . rawurlencode($slug) . '/'),
-            'lastmod' => $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null,
-            'changefreq' => 'weekly',
-            'priority' => '0.8',
-            'title' => (string) ($row['title'] ?? $slug),
-            'excerpt' => trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['summary'] ?? ''))) ?? ''),
-        ];
+        $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
+        $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['summary'] ?? ''))) ?? '');
+        foreach (ad_seo_langs() as $lang) {
+            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
+            $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
+            $slug = trim((string) ($row[$slugKey] ?? ''));
+            if ($slug === '') {
+                $slug = trim((string) ($row['slug'] ?? ''));
+            }
+            if ($slug === '') {
+                continue;
+            }
+            $title = trim((string) ($row[$titleKey] ?? ''));
+            if ($title === '') {
+                $title = (string) ($row['title'] ?? $slug);
+            }
+            $out[] = [
+                'loc' => ad_seo_absolute_url(ad_seo_lang_path('product/' . rawurlencode($slug), $lang)),
+                'lastmod' => $lastmod,
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+                'title' => $title,
+                'excerpt' => $excerpt,
+            ];
+        }
     }
     return $out;
 }
@@ -418,7 +453,7 @@ function ad_seo_blog_urls(): array
         require_once __DIR__ . '/blog.php';
         ad_blog_ensure_schema();
         $rows = ad_db()->query(
-            "SELECT title, slug, excerpt, published_at, updated_at
+            "SELECT title, title_ru, title_hy, slug, slug_ru, slug_hy, excerpt, published_at, updated_at
              FROM blog_posts
              WHERE status = 'published'
              ORDER BY published_at DESC, id DESC"
@@ -428,20 +463,32 @@ function ad_seo_blog_urls(): array
     }
     $out = [];
     foreach ($rows as $row) {
-        $slug = (string) ($row['slug'] ?? '');
-        if ($slug === '') {
-            continue;
-        }
         $last = (string) ($row['updated_at'] ?? $row['published_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
-        $out[] = [
-            'loc' => ad_seo_absolute_url('blog-single/' . rawurlencode($slug) . '/'),
-            'lastmod' => $lastmod,
-            'changefreq' => 'weekly',
-            'priority' => '0.7',
-            'title' => (string) ($row['title'] ?? $slug),
-            'excerpt' => trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['excerpt'] ?? ''))) ?? ''),
-        ];
+        $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['excerpt'] ?? ''))) ?? '');
+        foreach (ad_seo_langs() as $lang) {
+            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
+            $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
+            $slug = trim((string) ($row[$slugKey] ?? ''));
+            if ($slug === '') {
+                $slug = trim((string) ($row['slug'] ?? ''));
+            }
+            if ($slug === '') {
+                continue;
+            }
+            $title = trim((string) ($row[$titleKey] ?? ''));
+            if ($title === '') {
+                $title = (string) ($row['title'] ?? $slug);
+            }
+            $out[] = [
+                'loc' => ad_seo_absolute_url(ad_seo_lang_path('blog-single/' . rawurlencode($slug), $lang)),
+                'lastmod' => $lastmod,
+                'changefreq' => 'weekly',
+                'priority' => '0.7',
+                'title' => $title,
+                'excerpt' => $excerpt,
+            ];
+        }
     }
     return $out;
 }
@@ -536,9 +583,7 @@ function ad_seo_build_sitemap_xml(): string
     $urls = array_merge(
         ad_seo_static_pages(),
         ad_seo_service_urls(),
-        ad_seo_blog_urls(),
-        ad_seo_portfolio_urls(),
-        ad_seo_team_urls()
+        ad_seo_blog_urls()
     );
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
@@ -571,8 +616,15 @@ function ad_seo_build_llms_txt(): string
         '',
         '## Main pages',
     ];
-    foreach (ad_seo_static_pages() as $p) {
-        $lines[] = '- [' . $p['title'] . '](' . $p['loc'] . ')';
+    $mainEn = [
+        ['', 'Home'],
+        ['about/', 'About'],
+        ['products/', 'Products'],
+        ['contact/', 'Contact'],
+        ['blog/', 'News'],
+    ];
+    foreach ($mainEn as [$path, $label]) {
+        $lines[] = '- [' . $label . '](' . ad_seo_absolute_url($path) . ')';
     }
     $products = ad_seo_service_urls();
     $lines[] = '';
@@ -624,8 +676,13 @@ function ad_seo_output_llms(): void
 function ad_seo_refresh_public_files(): void
 {
     $root = ad_seo_site_root();
-    @file_put_contents($root . '/sitemap.xml', ad_seo_build_sitemap_xml());
-    @file_put_contents($root . '/llms.txt', ad_seo_build_llms_txt());
+    // Remove legacy static copies so nginx/apache serves dynamic sitemap via index.php
+    foreach (['sitemap.xml', 'llms.txt'] as $legacy) {
+        $path = $root . '/' . $legacy;
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
     ad_seo_ensure_robots_file();
 }
 

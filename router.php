@@ -129,21 +129,32 @@ function url(string $path, string $lang = ''): string
 /**
  * Get all language URLs for hreflang
  */
-function getHreflangUrls(string $currentPath = ''): array
+/**
+ * @param array<string, string> $pathByLang Optional full path per lang without leading slash (e.g. blog-single/foo)
+ */
+function getHreflangUrls(string $currentPath = '', array $pathByLang = []): array
 {
     $urls = [];
     $currentPath = ltrim($currentPath, '/');
     $currentPath = preg_replace('/\.php$/', '', $currentPath);
-    
+    $host = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+
     foreach (SUPPORTED_LANGUAGES as $lang) {
         $prefix = getLanguagePrefix($lang);
+        if (isset($pathByLang[$lang]) && $pathByLang[$lang] !== '') {
+            $path = trim($pathByLang[$lang], '/');
+            $urls[$lang] = $host . $prefix . '/' . $path . '/';
+            continue;
+        }
         $path = $currentPath === '' ? '' : $currentPath . '/';
-        $urls[$lang] = 'https://' . $_SERVER['HTTP_HOST'] . $prefix . '/' . $path;
+        $urls[$lang] = $host . $prefix . '/' . $path;
     }
-    
-    // x-default points to default language
-    $urls['x-default'] = 'https://' . $_SERVER['HTTP_HOST'] . '/' . ($currentPath === '' ? '' : $currentPath . '/');
-    
+
+    $defaultPath = isset($pathByLang['en']) && $pathByLang['en'] !== ''
+        ? trim($pathByLang['en'], '/') . '/'
+        : ($currentPath === '' ? '' : $currentPath . '/');
+    $urls['x-default'] = $host . '/' . $defaultPath;
+
     return $urls;
 }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/_init.php';
 require_once dirname(__DIR__) . '/lib/services.php';
 require_once dirname(__DIR__) . '/lib/media.php';
+require_once dirname(__DIR__) . '/lib/translate.php';
 ad_require_role(['admin']);
 
 ad_services_ensure_schema();
@@ -36,18 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $id = (int) ($_POST['id'] ?? 0);
+        $existing = null;
+        if ($id > 0) {
+            $stmt = $db->prepare('SELECT * FROM services WHERE id = ?');
+            $stmt->execute([$id]);
+            $existing = $stmt->fetch() ?: null;
+            if (!$existing) {
+                throw new RuntimeException('محصول یافت نشد.');
+            }
+        }
+
         $title = trim((string) ($_POST['title'] ?? ''));
-        $titleRu = trim((string) ($_POST['title_ru'] ?? ''));
-        $titleHy = trim((string) ($_POST['title_hy'] ?? ''));
         $slug = trim((string) ($_POST['slug'] ?? ''));
-        $slugRu = trim((string) ($_POST['slug_ru'] ?? ''));
-        $slugHy = trim((string) ($_POST['slug_hy'] ?? ''));
         $summary = trim((string) ($_POST['summary'] ?? ''));
-        $summaryRu = trim((string) ($_POST['summary_ru'] ?? ''));
-        $summaryHy = trim((string) ($_POST['summary_hy'] ?? ''));
         $content = trim((string) ($_POST['content'] ?? ''));
-        $contentRu = trim((string) ($_POST['content_ru'] ?? ''));
-        $contentHy = trim((string) ($_POST['content_hy'] ?? ''));
         $sort = (int) ($_POST['sort_order'] ?? 0);
         $active = isset($_POST['is_active']) ? 1 : 0;
         $cover = trim((string) ($_POST['cover_path'] ?? ''));
@@ -56,22 +59,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($title === '') {
             throw new RuntimeException('عنوان الزامی است.');
         }
+
+        @set_time_limit(180);
+
         if ($slug === '') {
             $slug = ad_slugify($title);
         } else {
             $slug = ad_slugify($slug);
         }
         $slug = ad_service_unique_slug($slug, $id);
-        if ($slugRu === '') {
-            $slugRu = ad_slugify($titleRu !== '' ? $titleRu : $title);
-        } else {
-            $slugRu = ad_slugify($slugRu);
-        }
-        if ($slugHy === '') {
-            $slugHy = ad_slugify($titleHy !== '' ? $titleHy : $title);
-        } else {
-            $slugHy = ad_slugify($slugHy);
-        }
+
+        $localized = ad_auto_translate_record(
+            ['title' => $title, 'summary' => $summary, 'content' => $content],
+            ['title', 'summary', 'content'],
+            $existing,
+            ['title']
+        );
+        $titleRu = $localized['title_ru'];
+        $titleHy = $localized['title_hy'];
+        $summaryRu = $localized['summary_ru'];
+        $summaryHy = $localized['summary_hy'];
+        $contentRu = $localized['content_ru'];
+        $contentHy = $localized['content_hy'];
+        $slugRu = $localized['slug_ru'] !== '' ? $localized['slug_ru'] : ad_slugify($titleRu !== '' ? $titleRu : $title);
+        $slugHy = $localized['slug_hy'] !== '' ? $localized['slug_hy'] : ad_slugify($titleHy !== '' ? $titleHy : $title);
 
         if (!empty($_FILES['cover']['name'])) {
             $uploaded = ad_media_upload($_FILES['cover'], 'services', $coverAlt);
@@ -87,14 +98,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'UPDATE services SET title=?, title_ru=?, title_hy=?, slug=?, slug_ru=?, slug_hy=?, summary=?, summary_ru=?, summary_hy=?, content=?, content_ru=?, content_hy=?, cover=?, sort_order=?, is_active=? WHERE id=?'
             );
             $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active, $id]);
-            ad_flash_set('ok', 'محصول به‌روزرسانی شد.');
+            $msg = 'محصول به‌روزرسانی شد.';
         } else {
             $stmt = $db->prepare(
                 'INSERT INTO services (title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, summary_ru, summary_hy, content, content_ru, content_hy, cover, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active]);
-            ad_flash_set('ok', 'محصول افزوده شد.');
+            $msg = 'محصول افزوده شد.';
         }
+        $translateWarnings = ad_translate_take_warnings();
+        if ($translateWarnings !== []) {
+            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
+        } elseif (ad_translate_enabled()) {
+            $msg .= ' ترجمهٔ روسی و ارمنی به‌روز شد.';
+        }
+        ad_flash_set('ok', $msg);
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());
     }
@@ -107,7 +125,7 @@ $pageTitle = 'محصولات';
 require __DIR__ . '/_layout_top.php';
 ?>
 <h1>مدیریت محصولات</h1>
-<p class="muted"><a href="/products/" target="_blank" rel="noopener">آرشیو محصولات (سایت)</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="/product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?></p>
+<p class="muted"><a href="/products/" target="_blank" rel="noopener">آرشیو محصولات (سایت)</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="/product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?> · متن را <strong>انگلیسی</strong> وارد کنید؛ روسی و ارمنی هنگام ذخیره خودکار می‌شود.</p>
 
 <div class="card">
   <h2><?= $edit ? 'ویرایش محصول' : 'افزودن محصول' ?></h2>
@@ -120,53 +138,26 @@ require __DIR__ . '/_layout_top.php';
       <h3 class="form-section__title">اطلاعات محصول</h3>
       <div class="form-grid">
         <div class="field field--span-2">
-          <label>عنوان پیش‌فرض / انگلیسی (الزامی — در EN نمایش داده می‌شود)</label>
+          <label>عنوان (English — الزامی)</label>
           <input type="text" name="title" required value="<?= ad_e($edit['title'] ?? '') ?>" />
         </div>
-        <div class="field field--span-2">
-          <label>عنوان (روسی)</label>
-          <input type="text" name="title_ru" value="<?= ad_e($edit['title_ru'] ?? '') ?>" />
-        </div>
-        <div class="field field--span-2">
-          <label>عنوان (ارمنی)</label>
-          <input type="text" name="title_hy" value="<?= ad_e($edit['title_hy'] ?? '') ?>" />
-        </div>
         <div class="field">
-          <label>اسلاگ انگلیسی (خالی = خودکار)</label>
+          <label>اسلاگ (خالی = خودکار از عنوان)</label>
           <input type="text" name="slug" value="<?= ad_e($edit['slug'] ?? '') ?>" />
         </div>
-        <div class="field">
-          <label>اسلاگ (روسی)</label>
-          <input type="text" name="slug_ru" value="<?= ad_e($edit['slug_ru'] ?? '') ?>" />
-        </div>
-        <div class="field">
-          <label>اسلاگ (ارمنی)</label>
-          <input type="text" name="slug_hy" value="<?= ad_e($edit['slug_hy'] ?? '') ?>" />
-        </div>
         <div class="field field--span-3">
-          <label>خلاصه (انگلیسی)</label>
+          <label>خلاصه (English)</label>
           <textarea name="summary" rows="3"><?= ad_e($edit['summary'] ?? '') ?></textarea>
         </div>
         <div class="field field--span-3">
-          <label>خلاصه (روسی)</label>
-          <textarea name="summary_ru" rows="3"><?= ad_e($edit['summary_ru'] ?? '') ?></textarea>
-        </div>
-        <div class="field field--span-3">
-          <label>خلاصه (ارمنی)</label>
-          <textarea name="summary_hy" rows="3"><?= ad_e($edit['summary_hy'] ?? '') ?></textarea>
-        </div>
-        <div class="field field--span-3">
-          <label>محتوا (انگلیسی)</label>
+          <label>محتوا (English)</label>
           <textarea name="content" style="min-height:180px"><?= ad_e($edit['content'] ?? '') ?></textarea>
         </div>
+        <?php if ($edit): ?>
         <div class="field field--span-3">
-          <label>محتوا (روسی)</label>
-          <textarea name="content_ru" style="min-height:180px"><?= ad_e($edit['content_ru'] ?? '') ?></textarea>
+          <p class="hint" style="margin:0">پیش‌نمایش ترجمهٔ ذخیره‌شده — <?= ad_e($edit['title_ru'] ?? '—') ?> · <?= ad_e($edit['title_hy'] ?? '—') ?></p>
         </div>
-        <div class="field field--span-3">
-          <label>محتوا (ارمنی)</label>
-          <textarea name="content_hy" style="min-height:180px"><?= ad_e($edit['content_hy'] ?? '') ?></textarea>
-        </div>
+        <?php endif; ?>
       </div>
     </div>
 

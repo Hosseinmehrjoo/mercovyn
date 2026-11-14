@@ -6,6 +6,21 @@
 
 require_once __DIR__ . '/router.php';
 
+$requestPath = trim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/', '/');
+$seoFile = basename($requestPath);
+if (in_array($seoFile, ['sitemap.xml', 'robots.txt', 'llms.txt'], true)) {
+    require_once __DIR__ . '/backend/lib/seo.php';
+    if ($seoFile === 'sitemap.xml') {
+        ad_seo_output_sitemap();
+    } elseif ($seoFile === 'llms.txt') {
+        ad_seo_output_llms();
+    } else {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo ad_seo_read_robots();
+        exit;
+    }
+}
+
 ad_security_headers();
 
 $currentLang = getCurrentLanguage();
@@ -48,19 +63,6 @@ if (in_array($segments[0] ?? '', SUPPORTED_LANGUAGES, true)) {
 // Rebuild clean path after language removal
 $cleanPath = implode('/', $segments);
 $cleanPath = trim($cleanPath, '/');
-
-if (in_array($cleanPath, ['sitemap.xml', 'robots.txt', 'llms.txt'], true)) {
-    require_once __DIR__ . '/backend/lib/seo.php';
-    if ($cleanPath === 'sitemap.xml') {
-        ad_seo_output_sitemap();
-    } elseif ($cleanPath === 'llms.txt') {
-        ad_seo_output_llms();
-    } else {
-        header('Content-Type: text/plain; charset=utf-8');
-        echo ad_seo_read_robots();
-        exit;
-    }
-}
 
 // Single product: /product/{slug}/
 if (count($segments) >= 2 && $segments[0] === 'product' && $segments[1] !== '') {

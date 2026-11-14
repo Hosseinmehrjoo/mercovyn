@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $user = trim((string) ($_POST['username'] ?? ''));
         $pass = (string) ($_POST['password'] ?? '');
-        if (ad_login($user, $pass)) {
+        if (ad_login_is_locked($user)) {
+            $mins = (int) ceil(ad_login_lockout_remaining($user) / 60);
+            $error = 'تلاش‌های زیاد. حدود ' . max(1, $mins) . ' دقیقه صبر کنید و دوباره امتحان کنید.';
+        } elseif (ad_login($user, $pass)) {
             if (ad_role_is_staff(ad_user_role())) {
                 header('Location: index.php');
             } else {
