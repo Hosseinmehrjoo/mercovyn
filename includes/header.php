@@ -100,23 +100,22 @@ foreach ($hreflangUrls as $lang => $url) {
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://code.jquery.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://use.fontawesome.com">
 
-    <!-- Critical CSS (render-blocking) -->
+    <link rel="preload" href="<?= root_asset('css/bootstrap.min.css') ?>" as="style">
+    <link rel="preload" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>" as="style">
+
+    <!-- Critical CSS -->
     <link href="<?= root_asset('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/style.css'), ENT_QUOTES, 'UTF-8') ?>">
 
     <!-- Non-critical CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css" media="print" onload="this.media='all'">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
     <?php if (!empty($loadOwlCarousel)): ?>
     <link href="<?= root_asset('lib/owlcarousel/assets/owl.carousel.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
     <?php endif; ?>
-    <link href="<?= root_asset('lib/animate/animate.min.css') ?>" rel="stylesheet" media="print" onload="this.media='all'">
 </head>
 
 <body>
@@ -158,7 +157,7 @@ foreach ($hreflangUrls as $lang => $url) {
     <div class="container-fluid nav-bar p-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
             <a href="<?= url('') ?>" class="navbar-brand p-0 d-inline-flex align-items-center" aria-label="<?= htmlspecialchars(__('brand'), ENT_QUOTES, 'UTF-8') ?>">
-                <img src="<?= $logoUrl ?>" class="site-logo" alt="<?= htmlspecialchars(__('brand'), ENT_QUOTES, 'UTF-8') ?>" decoding="async" fetchpriority="high">
+                <img src="<?= $logoUrl ?>" class="site-logo" alt="<?= htmlspecialchars(__('brand'), ENT_QUOTES, 'UTF-8') ?>" width="120" height="120" decoding="async" fetchpriority="high">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="fa fa-bars"></span>

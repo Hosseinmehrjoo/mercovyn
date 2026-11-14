@@ -75,7 +75,8 @@ function ad_service_find_by_slug(string $slug): ?array
 function ad_service_list_active(int $limit = 0): array
 {
     ad_services_ensure_schema();
-    $sql = 'SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC';
+    $sql = 'SELECT id, title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, summary_ru, summary_hy, content, content_ru, content_hy, cover, sort_order, is_active
+            FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC';
     if ($limit > 0) {
         $sql .= ' LIMIT ' . (int) $limit;
     }

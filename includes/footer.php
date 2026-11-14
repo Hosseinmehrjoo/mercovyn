@@ -83,23 +83,19 @@ $loadCounterUp = $loadCounterUp ?? false;
 
     <?php include __DIR__ . '/floating-contact.php'; ?>
 
-    <script src="<?= htmlspecialchars(asset_url('js/page-skeleton.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="<?= root_asset('lib/wow/wow.min.js') ?>" defer></script>
-    <script src="<?= root_asset('lib/easing/easing.min.js') ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('js/page-skeleton.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('js/vendor/jquery-3.7.1.min.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('js/vendor/bootstrap.bundle.min.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <?php if ($loadOwlCarousel): ?>
+    <script src="<?= root_asset('lib/owlcarousel/owl.carousel.min.js') ?>" defer></script>
+    <?php endif; ?>
     <?php if ($loadCounterUp): ?>
     <script src="<?= root_asset('lib/waypoints/waypoints.min.js') ?>" defer></script>
     <script src="<?= root_asset('lib/counterup/counterup.min.js') ?>" defer></script>
     <?php endif; ?>
-    <?php if ($loadOwlCarousel): ?>
-    <script src="<?= root_asset('lib/owlcarousel/owl.carousel.min.js') ?>" defer></script>
-    <?php endif; ?>
-
-    <!-- Template Javascript -->
     <script src="<?= htmlspecialchars(asset_url('js/main.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
     <script src="<?= htmlspecialchars(asset_url('js/floating-contact.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('js/deferred-animations.js'), ENT_QUOTES, 'UTF-8') ?>" defer></script>
 </body>
 
 </html>

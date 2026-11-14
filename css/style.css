@@ -1,4 +1,10 @@
 
+/*** Motion: visible until WOW loads (faster first paint) ***/
+html.motion-off .wow,
+.wow {
+    visibility: visible;
+}
+
 /*** Page skeleton (initial load) ***/
 #page-skeleton,
 .page-skeleton {
@@ -450,7 +456,7 @@
 .btn.btn-primary {
     background: var(--bs-secondary) !important;
     color: var(--bs-white) !important;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     font-weight: 400;
     transition: 0.5s;
 }
@@ -464,7 +470,7 @@
 .btn.btn-secondary {
     background: transparent;
     color: var(--bs-secondary);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     font-weight: 400;
     border: none;
     transition: 0.5s;
@@ -576,7 +582,7 @@
 
 /*** Navbar ***/
 .navbar-light .navbar-nav .nav-link {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     position: relative;
     margin-right: 25px;
     padding: 35px 0;

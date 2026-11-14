@@ -6,41 +6,22 @@ require_once __DIR__ . '/../backend/lib/db.php';
 require_once __DIR__ . '/../backend/lib/helpers.php';
 require_once __DIR__ . '/../backend/lib/media.php';
 require_once __DIR__ . '/../backend/lib/services.php';
-require_once __DIR__ . '/../backend/lib/team.php';
-require_once __DIR__ . '/../backend/lib/portfolio.php';
 require_once __DIR__ . '/../router.php';
 
 $currentLang = getCurrentLanguage();
 $langInfo = getLanguageInfo();
 
-ad_services_ensure_schema();
-ad_team_ensure_schema();
-ad_portfolio_ensure_schema();
-
 try {
-    $db = ad_db();
-    // Services/Products
+    require_once __DIR__ . '/../backend/lib/services.php';
+    ad_services_ensure_schema();
     $services = ad_service_list_active(6);
-    
-    // Team
-    $stmt = $db->query(
-        "SELECT id, name, name_en, role, role_en, photo, sort_order, name_ru, name_hy, role_ru, role_hy
-         FROM team_members WHERE is_active = 1 ORDER BY sort_order ASC, id ASC LIMIT 4"
-    );
-    $team = $stmt->fetchAll();
-    
-    // Portfolio/Gallery
-    $stmt = $db->query(
-        "SELECT id, title, slug, description, category, cover, client_name, sort_order, title_ru, title_hy, description_ru, description_hy
-         FROM portfolio_items WHERE is_active = 1 ORDER BY sort_order ASC, id ASC LIMIT 6"
-    );
-    $portfolio = $stmt->fetchAll();
 } catch (Throwable $e) {
     $services = [];
-    $team = [];
-    $portfolio = [];
     error_log('Homepage error: ' . $e->getMessage());
 }
+
+$team = [];
+$portfolio = [];
 
 function getField(array $row, string $field, string $lang): string
 {
@@ -58,6 +39,7 @@ $metaDescription = __("meta_description_default");
 $currentPath = '';
 $preloadHeroImage = 'assets/images/other/hero-bg.webp';
 $loadOwlCarousel = true;
+$loadCounterUp = false;
 
 include __DIR__ . '/../includes/header.php';
 ?>

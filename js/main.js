@@ -7,12 +7,6 @@
     $(window).on('load', hideLoadSkeleton);
     setTimeout(hideLoadSkeleton, 150);
     
-    
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && typeof WOW !== 'undefined') {
-        new WOW().init();
-    }
-
-
     // Sticky Navbar
     $(window).scroll(function () {
         if ($(this).scrollTop() > 45) {
@@ -22,11 +16,12 @@
         }
     });
 
-    // Facts counter
-    $('[data-toggle="counter-up"]').counterUp({
-        delay: 5,
-        time: 2000
-    });
+    if (typeof $.fn.counterUp === 'function') {
+        $('[data-toggle="counter-up"]').counterUp({
+            delay: 5,
+            time: 2000
+        });
+    }
 
 
     // Modal Video
@@ -55,8 +50,8 @@
         margin: 25,
         nav : true,
         navText : [
-            '<i class="bi bi-arrow-left"></i>',
-            '<i class="bi bi-arrow-right"></i>'
+            '<i class="fas fa-arrow-left"></i>',
+            '<i class="fas fa-arrow-right"></i>'
         ],
         responsiveClass: true,
         responsive: {

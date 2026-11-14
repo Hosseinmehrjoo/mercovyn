@@ -21,5 +21,5 @@
         }, { once: true });
     }
 
-    window.setTimeout(hidePageSkeleton, 4000);
+    window.setTimeout(hidePageSkeleton, 2500);
 })();
