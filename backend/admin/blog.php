@@ -415,8 +415,19 @@ require __DIR__ . '/_layout_top.php';
   /* Must stay above --z-admin-modal / --z-admin-media-picker in wp-admin.css */
   var CKE_FLOAT_Z = 100250;
 
+  function ckeditorReady() {
+    return typeof window.CKEDITOR !== "undefined";
+  }
+
+  function warnEditorMissing() {
+    var el = document.getElementById(EDITOR_ID);
+    if (!el || el.dataset.ckeWarned) return;
+    el.dataset.ckeWarned = "1";
+    console.warn("CKEditor failed to load (check CSP or CDN). Using plain textarea.");
+  }
+
   function refreshEditorLayout() {
-    if (typeof CKEDITOR === "undefined") return;
+    if (!ckeditorReady()) return;
     var inst = CKEDITOR.instances[EDITOR_ID];
     if (!inst) return;
     try {
@@ -425,7 +436,10 @@ require __DIR__ . '/_layout_top.php';
   }
 
   function initEditor() {
-    if (typeof CKEDITOR === "undefined") return;
+    if (!ckeditorReady()) {
+      warnEditorMissing();
+      return;
+    }
     var modal = document.getElementById(MODAL_ID);
     if (modal && modal.hidden) return;
     if (CKEDITOR.instances[EDITOR_ID]) {
@@ -459,11 +473,15 @@ require __DIR__ . '/_layout_top.php';
     });
   }
 
-  document.addEventListener("DOMContentLoaded", initEditor);
-  document.addEventListener("admin-modal:open", function (e) {
-    if (!e.detail || e.detail.id !== MODAL_ID) return;
+  function bootEditor() {
     initEditor();
     setTimeout(refreshEditorLayout, 40);
+  }
+
+  document.addEventListener("DOMContentLoaded", bootEditor);
+  document.addEventListener("admin-modal:open", function (e) {
+    if (!e.detail || e.detail.id !== MODAL_ID) return;
+    bootEditor();
   });
 
   var form = document.getElementById("blog-post-form");

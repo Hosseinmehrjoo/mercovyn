@@ -25,8 +25,8 @@ function ad_security_headers(): void
 {
     $csp = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://use.fontawesome.com",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com https://cdn.jsdelivr.net",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://use.fontawesome.com https://cdn.ckeditor.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com https://cdn.jsdelivr.net https://cdn.ckeditor.com",
         "font-src 'self' data: https://fonts.gstatic.com https://use.fontawesome.com",
         "img-src 'self' data: https:",
         "media-src 'self' https: blob: data:",

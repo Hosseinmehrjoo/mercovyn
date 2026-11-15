@@ -294,6 +294,45 @@ function ad_blog_post_slug(array $post, string $lang): string
     return trim((string) ($post['slug'] ?? ''));
 }
 
+function ad_blog_localized_field(array $row, string $field, string $lang = ''): string
+{
+    if ($lang === '') {
+        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
+    }
+    $suffix = $lang === 'en' ? '' : '_' . $lang;
+    $key = $field . $suffix;
+    $value = $row[$key] ?? null;
+    if ($value === '' || $value === null) {
+        return (string) ($row[$field] ?? '');
+    }
+    return (string) $value;
+}
+
+function ad_blog_format_date(?string $dateStr, string $lang = ''): string
+{
+    $dateStr = trim((string) $dateStr);
+    if ($dateStr === '') {
+        return '';
+    }
+    if ($lang === '') {
+        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
+    }
+    $dt = DateTime::createFromFormat('Y-m-d H:i:s', $dateStr);
+    if (!$dt) {
+        return $dateStr;
+    }
+    $months = [
+        'en' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        'ru' => ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        'hy' => ['Հուն', 'Փետ', 'Մար', 'Ապր', 'Մայ', 'Հուն', 'Հուլ', 'Օգս', 'Սեպ', 'Հոկ', 'Նոյ', 'Դեկ'],
+        'ar' => ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+    ];
+    $langMonths = $months[$lang] ?? $months['en'];
+    $m = (int) $dt->format('m') - 1;
+
+    return $dt->format('d') . ' ' . $langMonths[$m] . ' ' . $dt->format('Y');
+}
+
 function ad_blog_normalize_post(array $post): array
 {
     $id = (int) ($post['id'] ?? 0);
