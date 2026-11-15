@@ -77,12 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $titleRu = $localized['title_ru'];
         $titleHy = $localized['title_hy'];
+        $titleAr = $localized['title_ar'];
         $summaryRu = $localized['summary_ru'];
         $summaryHy = $localized['summary_hy'];
+        $summaryAr = $localized['summary_ar'];
         $contentRu = $localized['content_ru'];
         $contentHy = $localized['content_hy'];
+        $contentAr = $localized['content_ar'];
         $slugRu = $slug;
         $slugHy = $slug;
+        $slugAr = $slug;
 
         if (!empty($_FILES['cover']['name'])) {
             $uploaded = ad_media_upload($_FILES['cover'], 'services', $coverAlt);
@@ -95,22 +99,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($id > 0) {
             $stmt = $db->prepare(
-                'UPDATE services SET title=?, title_ru=?, title_hy=?, slug=?, slug_ru=?, slug_hy=?, summary=?, summary_ru=?, summary_hy=?, content=?, content_ru=?, content_hy=?, cover=?, sort_order=?, is_active=? WHERE id=?'
+                'UPDATE services SET title=?, title_ru=?, title_hy=?, title_ar=?, slug=?, slug_ru=?, slug_hy=?, slug_ar=?,
+                    summary=?, summary_ru=?, summary_hy=?, summary_ar=?, content=?, content_ru=?, content_hy=?, content_ar=?,
+                    cover=?, sort_order=?, is_active=? WHERE id=?'
             );
-            $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active, $id]);
+            $stmt->execute([
+                $title, $titleRu, $titleHy, $titleAr, $slug, $slugRu, $slugHy, $slugAr,
+                $summary, $summaryRu, $summaryHy, $summaryAr, $content, $contentRu, $contentHy, $contentAr,
+                $cover, $sort, $active, $id,
+            ]);
             $msg = 'محصول به‌روزرسانی شد.';
         } else {
             $stmt = $db->prepare(
-                'INSERT INTO services (title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, summary_ru, summary_hy, content, content_ru, content_hy, cover, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO services (title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar,
+                    summary, summary_ru, summary_hy, summary_ar, content, content_ru, content_hy, content_ar, cover, sort_order, is_active)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
-            $stmt->execute([$title, $titleRu, $titleHy, $slug, $slugRu, $slugHy, $summary, $summaryRu, $summaryHy, $content, $contentRu, $contentHy, $cover, $sort, $active]);
+            $stmt->execute([
+                $title, $titleRu, $titleHy, $titleAr, $slug, $slugRu, $slugHy, $slugAr,
+                $summary, $summaryRu, $summaryHy, $summaryAr, $content, $contentRu, $contentHy, $contentAr,
+                $cover, $sort, $active,
+            ]);
             $msg = 'محصول افزوده شد.';
         }
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
             $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
         } elseif (ad_translate_enabled()) {
-            $msg .= ' ترجمهٔ روسی و ارمنی به‌روز شد.';
+            $msg .= ' ترجمهٔ ru / hy / ar به‌روز شد.';
         }
         ad_flash_set('ok', $msg);
     } catch (Throwable $e) {
@@ -125,7 +141,7 @@ $pageTitle = 'محصولات';
 require __DIR__ . '/_layout_top.php';
 ?>
 <h1>مدیریت محصولات</h1>
-<p class="muted"><a href="/products/" target="_blank" rel="noopener">آرشیو محصولات (سایت)</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="/product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?> · متن را <strong>انگلیسی</strong> وارد کنید؛ روسی و ارمنی هنگام ذخیره خودکار می‌شود.</p>
+<p class="muted"><a href="/products/" target="_blank" rel="noopener">آرشیو محصولات (سایت)</a><?php if ($edit && !empty($edit['slug'])): ?> · <a href="/product/<?= ad_e(rawurlencode((string) $edit['slug'])) ?>/" target="_blank" rel="noopener">پیش‌نمایش محصول</a><?php endif; ?> · متن را <strong>انگلیسی</strong> وارد کنید؛ ru، hy و ar هنگام ذخیره خودکار می‌شود.</p>
 
 <div class="card">
   <h2><?= $edit ? 'ویرایش محصول' : 'افزودن محصول' ?></h2>
@@ -155,7 +171,7 @@ require __DIR__ . '/_layout_top.php';
         </div>
         <?php if ($edit): ?>
         <div class="field field--span-3">
-          <p class="hint" style="margin:0">پیش‌نمایش ترجمهٔ ذخیره‌شده — <?= ad_e($edit['title_ru'] ?? '—') ?> · <?= ad_e($edit['title_hy'] ?? '—') ?></p>
+          <p class="hint" style="margin:0">پیش‌نمایش ترجمهٔ ذخیره‌شده — <?= ad_e($edit['title_ru'] ?? '—') ?> · <?= ad_e($edit['title_hy'] ?? '—') ?> · <?= ad_e($edit['title_ar'] ?? '—') ?></p>
         </div>
         <?php endif; ?>
       </div>

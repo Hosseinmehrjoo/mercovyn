@@ -83,10 +83,10 @@ function ad_service_find_by_slug(string $slug): ?array
     $stmt = ad_db()->prepare(
         'SELECT * FROM services
          WHERE is_active = 1
-           AND (slug = ? OR slug_ru = ? OR slug_hy = ?)
+           AND (slug = ? OR slug_ru = ? OR slug_hy = ? OR slug_ar = ?)
          LIMIT 1'
     );
-    $stmt->execute([$slug, $slug, $slug]);
+    $stmt->execute([$slug, $slug, $slug, $slug]);
     $row = $stmt->fetch();
     return $row ? ad_service_normalize_public_row($row) : null;
 }
@@ -97,7 +97,9 @@ function ad_service_find_by_slug(string $slug): ?array
 function ad_service_list_active(int $limit = 0): array
 {
     ad_services_ensure_schema();
-    $sql = 'SELECT id, title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, summary_ru, summary_hy, content, content_ru, content_hy, cover, sort_order, is_active
+    $sql = 'SELECT id, title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar,
+                   summary, summary_ru, summary_hy, summary_ar, content, content_ru, content_hy, content_ar,
+                   cover, sort_order, is_active
             FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC';
     if ($limit > 0) {
         $sql .= ' LIMIT ' . (int) $limit;

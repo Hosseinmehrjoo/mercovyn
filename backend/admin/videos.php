@@ -89,16 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $localized = ad_auto_translate_record($english, ['title'], $existing, ['title']);
         $titleRu = (string) ($localized['title_ru'] ?? '');
         $titleHy = (string) ($localized['title_hy'] ?? '');
+        $titleAr = (string) ($localized['title_ar'] ?? '');
 
         if ($id > 0) {
             $stmt = $db->prepare(
-                'UPDATE site_videos SET title=?, title_ru=?, title_hy=?, video_url=?, poster_url=?,
+                'UPDATE site_videos SET title=?, title_ru=?, title_hy=?, title_ar=?, video_url=?, poster_url=?,
                     subtitle_srt_en=?, subtitle_srt_ru=?, subtitle_srt_hy=?, placement=?, sort_order=?, is_active=? WHERE id=?'
             );
             $stmt->execute([
                 $title,
                 $titleRu,
                 $titleHy,
+                $titleAr,
                 $videoUrl,
                 $posterUrl,
                 $subEn,
@@ -115,13 +117,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt = $db->prepare(
-            'INSERT INTO site_videos (title, title_ru, title_hy, video_url, poster_url, subtitle_srt_en, subtitle_srt_ru, subtitle_srt_hy, placement, sort_order, is_active)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+            'INSERT INTO site_videos (title, title_ru, title_hy, title_ar, video_url, poster_url, subtitle_srt_en, subtitle_srt_ru, subtitle_srt_hy, placement, sort_order, is_active)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
         );
         $stmt->execute([
             $title,
             $titleRu,
             $titleHy,
+            $titleAr,
             $videoUrl,
             $posterUrl,
             $subEn,

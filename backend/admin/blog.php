@@ -130,28 +130,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $localized = ad_blog_build_localized_fields($english, $existing);
         $localized['slug_ru'] = $slug;
         $localized['slug_hy'] = $slug;
+        $localized['slug_ar'] = $slug;
 
         if ($id > 0) {
             $stmt = $db->prepare(
                 'UPDATE blog_posts SET
                     title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?,
                     excerpt=?, content=?, cover=?, status=?, published_at=?,
-                    title_ru=?, title_hy=?, slug_ru=?, slug_hy=?,
-                    meta_title_ru=?, meta_title_hy=?, meta_description_ru=?, meta_description_hy=?,
-                    meta_keywords_ru=?, meta_keywords_hy=?,
-                    excerpt_ru=?, excerpt_hy=?, content_ru=?, content_hy=?
+                    title_ru=?, title_hy=?, title_ar=?, slug_ru=?, slug_hy=?, slug_ar=?,
+                    meta_title_ru=?, meta_title_hy=?, meta_title_ar=?,
+                    meta_description_ru=?, meta_description_hy=?, meta_description_ar=?,
+                    meta_keywords_ru=?, meta_keywords_hy=?, meta_keywords_ar=?,
+                    excerpt_ru=?, excerpt_hy=?, excerpt_ar=?, content_ru=?, content_hy=?, content_ar=?
                  WHERE id=?'
             );
             $stmt->execute([
                 $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
                 $excerpt, $content, $cover, $status, $publishedAt,
-                $localized['title_ru'], $localized['title_hy'],
-                $localized['slug_ru'], $localized['slug_hy'],
-                $localized['meta_title_ru'], $localized['meta_title_hy'],
-                $localized['meta_description_ru'], $localized['meta_description_hy'],
-                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'],
-                $localized['excerpt_ru'], $localized['excerpt_hy'],
-                $localized['content_ru'], $localized['content_hy'],
+                $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
+                $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
+                $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
+                $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
+                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
+                $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
+                $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
                 $id,
             ]);
             ad_blog_post_set_categories($id, $postedCats);
@@ -161,22 +163,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'INSERT INTO blog_posts (
                     title, slug, meta_title, meta_description, meta_keywords,
                     excerpt, content, cover, status, published_at,
-                    title_ru, title_hy, slug_ru, slug_hy,
-                    meta_title_ru, meta_title_hy, meta_description_ru, meta_description_hy,
-                    meta_keywords_ru, meta_keywords_hy,
-                    excerpt_ru, excerpt_hy, content_ru, content_hy
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                    title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
+                    meta_title_ru, meta_title_hy, meta_title_ar,
+                    meta_description_ru, meta_description_hy, meta_description_ar,
+                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
+                    excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute([
                 $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
                 $excerpt, $content, $cover, $status, $publishedAt,
-                $localized['title_ru'], $localized['title_hy'],
-                $localized['slug_ru'], $localized['slug_hy'],
-                $localized['meta_title_ru'], $localized['meta_title_hy'],
-                $localized['meta_description_ru'], $localized['meta_description_hy'],
-                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'],
-                $localized['excerpt_ru'], $localized['excerpt_hy'],
-                $localized['content_ru'], $localized['content_hy'],
+                $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
+                $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
+                $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
+                $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
+                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
+                $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
+                $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
             ]);
             $newId = (int) $db->lastInsertId();
             ad_blog_post_set_categories($newId, $postedCats);
@@ -186,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($translateWarnings !== []) {
             $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
         } elseif (ad_translate_enabled()) {
-            $msg .= ' نسخه‌های روسی و ارمنی به‌روز شد.';
+            $msg .= ' نسخه‌های ru / hy / ar به‌روز شد.';
         }
         ad_flash_set('ok', $msg);
         ad_seo_on_content_change();
@@ -209,7 +212,7 @@ require __DIR__ . '/_layout_top.php';
 <div class="page-toolbar">
   <div>
     <h1>نوشته‌ها</h1>
-    <p class="muted" style="margin:0.35rem 0 0"><a href="/blog/" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a> · محتوا را به <strong>انگلیسی</strong> بنویسید؛ با ذخیره، روسی و ارمنی خودکار ساخته می‌شود.</p>
+    <p class="muted" style="margin:0.35rem 0 0"><a href="/blog/" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a> · محتوا را به <strong>انگلیسی</strong> بنویسید؛ با ذخیره، ru / hy / ar خودکار ساخته می‌شود.</p>
   </div>
   <div class="page-toolbar__actions">
     <a class="btn btn-secondary" href="blog-categories.php">دسته‌بندی‌ها</a>

@@ -22,7 +22,7 @@ return [
     'site_url' => '',
     'timezone' => 'Asia/Yerevan',
 
-    // ترجمه خودکار محتوای CMS (انگلیسی → روسی و ارمنی) هنگام ذخیره در پنل
+    // ترجمه خودکار محتوای CMS (انگلیسی → ru / hy / ar) هنگام ذخیره در پنل
     'auto_translate' => true,
     // libretranslate | mymemory | auto (اول LibreTranslate محلی، سپس MyMemory)
     'translate_provider' => 'auto',

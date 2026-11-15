@@ -8,7 +8,10 @@ require_once __DIR__ . '/helpers.php';
  */
 function ad_translate_locales(): array
 {
-    return ['ru', 'hy'];
+    return array_values(array_filter(
+        ad_supported_languages(),
+        static fn (string $lang): bool => $lang !== 'en'
+    ));
 }
 
 function ad_translate_enabled(): bool
