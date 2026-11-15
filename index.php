@@ -21,6 +21,18 @@ if (in_array($seoFile, ['sitemap.xml', 'robots.txt', 'llms.txt'], true)) {
     }
 }
 
+// PHP built-in server / front controller: run backend API & admin scripts directly
+$backendPath = ltrim($requestPath, '/');
+if (str_starts_with($backendPath, 'backend/')) {
+    $backendFile = __DIR__ . '/' . $backendPath;
+    $backendRoot = realpath(__DIR__ . '/backend');
+    $resolved = is_file($backendFile) ? realpath($backendFile) : false;
+    if ($resolved && $backendRoot && str_starts_with($resolved, $backendRoot) && str_ends_with($resolved, '.php')) {
+        require $resolved;
+        exit;
+    }
+}
+
 ad_security_headers();
 
 $currentLang = getCurrentLanguage();

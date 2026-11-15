@@ -105,9 +105,9 @@ return [
     // Testimonial
     'testimonials' => 'Testimonials',
     'what_clients_say' => 'What Our Clients Say',
-    'videos_section_kicker' => 'Factory & field',
-    'videos_section_title' => 'See Mercovyn in action',
-    'videos_section_subtitle' => 'Short clips from production and customers worldwide.',
+    'videos_section_kicker' => 'TECHNICAL VIDEO GUIDES',
+    'videos_section_title' => 'Baler Twine & Equipment Tutorials',
+    'videos_section_subtitle' => 'Explore our step-by-step guides on baler twine threading, knotter adjustment, and equipment maintenance.',
     'video_carousel_prev' => 'Previous video',
     'video_carousel_next' => 'Next video',
     'video_sub_off' => 'Off',

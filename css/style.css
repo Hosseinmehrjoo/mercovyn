@@ -1,3 +1,15 @@
+/*** Mercovyn brand theme ***/
+:root {
+    --bs-primary: #15321A;
+    --bs-secondary: #BA923B;
+    --bs-dark: #15321A;
+    --bs-primary-rgb: 21, 50, 26;
+    --bs-secondary-rgb: 186, 146, 59;
+    --mercovyn-primary-light: #2a5c34;
+    --mercovyn-secondary-light: #d4ad5c;
+    --mercovyn-tint: rgba(21, 50, 26, 0.08);
+    --mercovyn-tint-strong: rgba(21, 50, 26, 0.12);
+}
 
 /*** Motion: visible until WOW loads (faster first paint) ***/
 html.motion-off .wow,
@@ -259,8 +271,8 @@ html.motion-off .wow,
     pointer-events: none;
 }
 
-.fab-contact__item--phone { background: linear-gradient(135deg, #003a66, #005a9e); }
-.fab-contact__item--email { background: linear-gradient(135deg, #e02454, #ff4d7a); }
+.fab-contact__item--phone { background: linear-gradient(135deg, #15321A, var(--mercovyn-primary-light)); }
+.fab-contact__item--email { background: linear-gradient(135deg, #BA923B, var(--mercovyn-secondary-light)); }
 .fab-contact__item--whatsapp { background: linear-gradient(135deg, #128c7e, #25d366); }
 .fab-contact__item--telegram { background: linear-gradient(135deg, #0088cc, #229ed9); }
 
@@ -751,7 +763,7 @@ html.motion-off .wow,
 
 /*** Single Page Hero Header Start ***/
 .bg-breadcrumb {
-    background: linear-gradient(rgba(0, 58, 102, 0.85), rgba(0, 58, 102, 0.75)), url(../assets/images/other/hero-bg.webp);
+    background: linear-gradient(rgba(21, 50, 26, 0.88), rgba(21, 50, 26, 0.78)), url(../assets/images/other/hero-bg.webp);
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: initial;
@@ -906,7 +918,7 @@ html.motion-off .wow,
     left: 50%;
     transform: translateX(-50%);
     border-radius: 10px 10px 0 0;
-    background: rgba(0, 58, 102, 0.5);
+    background: rgba(21, 50, 26, 0.5);
     z-index: -1;
     clip-path: polygon(0% 0%, 100% 0, 100% 70%, 50% 100%, 0 70%);
 }
@@ -1028,7 +1040,7 @@ html.motion-off .wow,
     bottom: 0;
     left: 0;
     border-radius: 10px;
-    background: rgba(0, 58, 102, 0.1);
+    background: rgba(21, 50, 26, 0.1);
     z-index: -1;
     transition: 0.5s;
 }
@@ -1078,7 +1090,7 @@ html.motion-off .wow,
     height: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 58, 102, 0.7);
+    background: rgba(21, 50, 26, 0.7);
     border-radius: 10px;
     transition: 0.5s;
     z-index: 1;
@@ -1219,7 +1231,7 @@ html.motion-off .wow,
 }
 
 .training .training-item:hover .training-inner .training-title-name {
-    background: rgba(0, 58, 102, 0.5);
+    background: rgba(21, 50, 26, 0.5);
 }
 
 .training .training-item:hover .training-inner .training-title-name a {
@@ -1258,7 +1270,7 @@ html.motion-off .wow,
 }
 
 .contact .office .office-item:hover {
-    box-shadow: 20px 20px 20px rgba(0, 58, 102, 0.3);
+    box-shadow: 20px 20px 20px rgba(21, 50, 26, 0.3);
 }
 
 .contact .office .office-item .office-img {
@@ -1293,7 +1305,7 @@ html.motion-off .wow,
 .products-section,
 .products-archive {
     position: relative;
-    background: linear-gradient(180deg, #f0f7fc 0%, #ffffff 55%);
+    background: linear-gradient(180deg, #f4f6f0 0%, #ffffff 55%);
     overflow: hidden;
 }
 
@@ -1322,64 +1334,35 @@ html.motion-off .wow,
 
 .custom-colors-section {
     position: relative;
-    background: linear-gradient(180deg, #ffffff 0%, #f0f7fc 55%, #f8f9fa 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f4f6f0 55%, #f8f9fa 100%);
     overflow: hidden;
 }
 
 .custom-colors-section__hero {
-    position: relative;
     width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
 }
 
 .custom-colors-section__figure {
     margin: 0;
     overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 12px 40px rgba(21, 50, 26, 0.1);
+    border: 1px solid rgba(21, 50, 26, 0.06);
 }
 
 .custom-colors-section__img {
     display: block;
     width: 100%;
     height: auto;
-}
-
-.custom-colors-section__overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: flex-end;
-    background: linear-gradient(
-        180deg,
-        rgba(0, 35, 65, 0) 30%,
-        rgba(0, 35, 65, 0.35) 65%,
-        rgba(0, 35, 65, 0.72) 100%
-    );
-    pointer-events: none;
-}
-
-.custom-colors-section__overlay .container {
-    padding-bottom: clamp(1.25rem, 3.5vw, 2.75rem);
-}
-
-.custom-colors-section__overlay-inner .sub-title {
-    color: var(--bs-secondary) !important;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-}
-
-.custom-colors-section__overlay-inner .sub-title::before,
-.custom-colors-section__overlay-inner .sub-title::after,
-.custom-colors-section__overlay-inner .sub-style::before,
-.custom-colors-section__overlay-inner .sub-style::after {
-    border-color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.custom-colors-section__overlay-inner h2 {
-    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
-    max-width: 16ch;
+    max-height: none;
 }
 
 .custom-colors-section__body {
     position: relative;
     z-index: 1;
+    text-align: center;
 }
 
 .custom-colors-section__swatch {
@@ -1397,41 +1380,13 @@ html.motion-off .wow,
 }
 
 @media (min-width: 992px) {
-    .custom-colors-section__img {
-        width: 100%;
-        min-height: clamp(300px, 36vw, 480px);
-        object-fit: cover;
-        object-position: center 40%;
-    }
-
-    .custom-colors-section__overlay-inner h2 {
-        font-size: clamp(2.25rem, 3.2vw, 3.25rem);
+    .custom-colors-section__hero {
+        padding-left: 100px;
+        padding-right: 100px;
     }
 }
 
 @media (max-width: 991.98px) {
-    .custom-colors-section__overlay {
-        background: linear-gradient(
-            180deg,
-            rgba(0, 35, 65, 0) 20%,
-            rgba(0, 35, 65, 0.5) 100%
-        );
-    }
-
-    .custom-colors-section__overlay-inner {
-        text-align: center !important;
-    }
-
-    .custom-colors-section__overlay-inner h2 {
-        max-width: none;
-        font-size: clamp(1.75rem, 6vw, 2.25rem);
-    }
-
-    .custom-colors-section__overlay-inner .sub-style {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
     .custom-colors-section .btn {
         display: block;
         width: 100%;
@@ -1459,8 +1414,8 @@ html.motion-off .wow,
     background: #fff;
     border-radius: 1.25rem;
     overflow: hidden;
-    box-shadow: 0 12px 40px rgba(0, 58, 102, 0.08);
-    border: 1px solid rgba(0, 58, 102, 0.06);
+    box-shadow: 0 12px 40px rgba(21, 50, 26, 0.08);
+    border: 1px solid rgba(21, 50, 26, 0.06);
     display: flex;
     flex-direction: column;
     transition: transform 0.35s ease, box-shadow 0.35s ease;
@@ -1468,7 +1423,7 @@ html.motion-off .wow,
 
 .product-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 48px rgba(224, 36, 84, 0.12);
+    box-shadow: 0 20px 48px rgba(186, 146, 59, 0.12);
 }
 
 .product-card__media {
@@ -1497,7 +1452,7 @@ html.motion-off .wow,
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--bs-primary), #005a9e);
+    background: linear-gradient(135deg, var(--bs-primary), var(--mercovyn-primary-light));
     color: rgba(255, 255, 255, 0.85);
     font-size: 2.5rem;
 }
@@ -1518,7 +1473,7 @@ html.motion-off .wow,
     text-transform: uppercase;
     padding: 0.4rem 0.85rem;
     border-radius: 2rem;
-    box-shadow: 0 4px 12px rgba(224, 36, 84, 0.35);
+    box-shadow: 0 4px 12px rgba(186, 146, 59, 0.35);
 }
 
 .product-card__body {
@@ -1568,8 +1523,8 @@ html.motion-off .wow,
 }
 
 .product-single__inquiry {
-    background: linear-gradient(135deg, rgba(0, 58, 102, 0.06), rgba(224, 36, 84, 0.06));
-    border: 1px solid rgba(0, 58, 102, 0.1);
+    background: linear-gradient(135deg, rgba(21, 50, 26, 0.06), rgba(186, 146, 59, 0.06));
+    border: 1px solid rgba(21, 50, 26, 0.1);
 }
 
 /*** Product cards end ***/
@@ -1605,8 +1560,8 @@ html.motion-off .wow,
 
 /*** Responsive — global ***/
 .language-switcher--navbar .language-switcher__btn {
-    border-color: rgba(0, 58, 102, 0.22);
-    background: rgba(0, 58, 102, 0.06);
+    border-color: rgba(21, 50, 26, 0.22);
+    background: rgba(21, 50, 26, 0.06);
     color: var(--bs-primary) !important;
 }
 
@@ -1634,7 +1589,7 @@ html.motion-off .wow,
     }
 
     .navbar-mobile-tools {
-        border-color: rgba(0, 58, 102, 0.12) !important;
+        border-color: rgba(21, 50, 26, 0.12) !important;
     }
 
     .bg-breadcrumb {

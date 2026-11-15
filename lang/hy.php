@@ -105,9 +105,9 @@ return [
     // Testimonial
     'testimonials' => 'Կարծիքներ',
     'what_clients_say' => 'Ինչ են ասում հաճախորդները',
-    'videos_section_kicker' => 'Արտադրություն',
-    'videos_section_title' => 'Mercovyn-ը գործում',
-    'videos_section_subtitle' => 'Կարճ տեսանյութեր արտադրությունից և հաճախորդներից։',
+    'videos_section_kicker' => 'ՏԵԽՆԻԿԱԿԱՆ ՏԵՍԱՈՒՂԻՉՆԵՐ',
+    'videos_section_title' => 'Բինդեր և սարքավորում՝ ուսուցողական տեսանյութեր',
+    'videos_section_subtitle' => 'Քայլ առ քայլ՝ բինդերի մտցում, հանգույցի կարգավորում և սարքավորումների սպասարկում։',
     'video_carousel_prev' => 'Նախորդ տեսանյութ',
     'video_carousel_next' => 'Հաջորդ տեսանյութ',
     'video_sub_off' => 'Անջատ.',

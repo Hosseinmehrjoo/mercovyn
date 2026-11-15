@@ -105,9 +105,9 @@ return [
     // Testimonial
     'testimonials' => 'Отзывы',
     'what_clients_say' => 'Что говорят клиенты',
-    'videos_section_kicker' => 'Производство',
-    'videos_section_title' => 'Mercovyn в действии',
-    'videos_section_subtitle' => 'Короткие ролики о производстве и отзывах клиентов.',
+    'videos_section_kicker' => 'ТЕХНИЧЕСКИЕ ВИДЕОГАЙДЫ',
+    'videos_section_title' => 'Биндер и оборудование: обучающие ролики',
+    'videos_section_subtitle' => 'Пошаговые инструкции: заправка биндера, настройка узловязателя и обслуживание техники.',
     'video_carousel_prev' => 'Предыдущее видео',
     'video_carousel_next' => 'Следующее видео',
     'video_sub_off' => 'Выкл.',
