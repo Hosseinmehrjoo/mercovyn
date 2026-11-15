@@ -123,6 +123,75 @@ function ad_translate_http_get(string $url, int $timeout = 45): ?array
     return is_array($decoded) ? $decoded : null;
 }
 
+function ad_translate_libretranslate_reachable(): bool
+{
+    static $reachable = null;
+    if ($reachable !== null) {
+        return $reachable;
+    }
+    $s = ad_translate_settings();
+    $url = $s['libretranslate_url'] . '/languages';
+    $res = ad_translate_http_get($url, 4);
+    $reachable = is_array($res) && $res !== [];
+    if (!$reachable) {
+        static $warnedUnreachable = false;
+        if (!$warnedUnreachable) {
+            $warnedUnreachable = true;
+            ad_translate_warn(
+                'LibreTranslate در ' . $s['libretranslate_url'] . ' در دسترس نیست؛ از MyMemory برای بلوک‌های کوتاه استفاده می‌شود.'
+            );
+        }
+    }
+    return $reachable;
+}
+
+/**
+ * MyMemory fallback: strip HTML, translate plain text, keep simple wrapper tag.
+ */
+function ad_translate_html_mymemory_fallback(string $chunk, string $to, string $from): ?string
+{
+    $plain = html_entity_decode(strip_tags($chunk), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $plain = trim(preg_replace('/\s+/u', ' ', $plain));
+    if ($plain === '') {
+        return $chunk;
+    }
+
+    $translated = '';
+    if (mb_strlen($plain) > 480) {
+        foreach (ad_translate_build_chunks($plain, false, 450) as $sc) {
+            if (trim($sc) === '') {
+                continue;
+            }
+            $piece = ad_translate_mymemory($sc, $to, $from);
+            if ($piece === null) {
+                return null;
+            }
+            $translated .= $piece;
+            usleep(120000);
+        }
+    } else {
+        $piece = ad_translate_mymemory($plain, $to, $from);
+        if ($piece === null) {
+            return null;
+        }
+        $translated = $piece;
+    }
+
+    $trimmed = trim($chunk);
+    if (preg_match('/^(<([a-z0-9]+)[^>]*>)([\s\S]*)(<\/\2>)\s*$/iu', $trimmed, $m)) {
+        return $m[1] . $translated . $m[4];
+    }
+    if (preg_match('/^(<(?:p|h[1-6]|li|div|blockquote)[^>]*>)/iu', $trimmed, $m)) {
+        $open = $m[1];
+        if (preg_match('/<\/(p|h[1-6]|li|div|blockquote)>/i', $trimmed, $c)) {
+            return $open . $translated . '</' . strtolower($c[1]) . '>';
+        }
+        return $open . $translated;
+    }
+
+    return '<p>' . $translated . '</p>';
+}
+
 function ad_translate_libretranslate(string $text, string $to, string $from, bool $html): ?string
 {
     $s = ad_translate_settings();
@@ -189,6 +258,9 @@ function ad_translate_once(string $text, string $to, string $from, bool $html): 
         if ($out !== null && trim($out) !== '') {
             return $out;
         }
+    }
+    if ($html) {
+        return ad_translate_html_mymemory_fallback($text, $to, $from);
     }
     return null;
 }
@@ -264,7 +336,8 @@ function ad_translate_text(string $text, string $to, string $from = 'en'): strin
         return '';
     }
     $html = (bool) preg_match('/<[a-z][\s\S]*?>/i', $text);
-    $maxChunk = $html ? 1600 : 3500;
+    $libreOk = $html ? ad_translate_libretranslate_reachable() : false;
+    $maxChunk = $html ? ($libreOk ? 1600 : 480) : 3500;
     $chunks = ad_translate_build_chunks($text, $html, $maxChunk);
     if (count($chunks) === 1) {
         $t = ad_translate_once($chunks[0], $to, $from, $html);
@@ -277,6 +350,9 @@ function ad_translate_text(string $text, string $to, string $from = 'en'): strin
             continue;
         }
         $piece = ad_translate_once($chunk, $to, $from, $html);
+        if ($piece === null && $html) {
+            $piece = ad_translate_html_mymemory_fallback($chunk, $to, $from);
+        }
         if ($piece === null) {
             ad_translate_warn('ترجمه بخشی از متن برای ' . $to . ' ناموفق بود (قطعه ' . ($i + 1) . ').');
             $out .= $chunk;
