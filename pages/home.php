@@ -127,6 +127,8 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
+    <?php include __DIR__ . '/../includes/partials/custom-colors-section.php'; ?>
+
     <!-- Features/Advantages Section -->
     <section class="container-fluid features-section py-5" style="background: #f8f9fa;">
         <div class="container py-5">
