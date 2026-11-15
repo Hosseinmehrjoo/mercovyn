@@ -114,6 +114,7 @@ return [
     'video_sub_lang_en' => 'Անգլերեն',
     'video_sub_lang_ru' => 'Ռուսերեն',
     'video_sub_lang_hy' => 'Հայերեն',
+    'video_sub_lang_ar' => 'Արաբերեն',
 
     // Countries/Export
     'popular_countries' => 'Արտահանման շուկաներ',
@@ -154,8 +155,9 @@ return [
     'awards_won' => 'Կտրման ուժ (կգ)',
 
     // Homepage
+    'home_meta_title' => 'Mercovyn | Պոլիպրոպիլենային բինդերի արտադրող և մատակարար',
     'home_hero_title' => 'Պրեմիում բինդերի արտադրող և ներմուծող',
-    'hero_title' => 'Բինդեր, որը պահում է հավաքածը միասին',
+    'hero_title' => 'Հուսալի պոլիպրոպիլենային բինդեր գյուղատնտեսական բիզնեսի համար',
     'hero_subtitle' => 'Mercovyn LLC — ամրացված բինդեր Հայաստանից, Երևան. Գլոբալ վաճառք և արտահանում ամբողջ աշխարհում։',
     'hero_stat_spool_label' => 'կգ մեկ զույգ կաթղի վրա (մոտ.)',
     'hero_stat_pp_label' => 'PP (պոլիպրոպիլեն)',

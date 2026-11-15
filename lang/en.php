@@ -114,6 +114,7 @@ return [
     'video_sub_lang_en' => 'English',
     'video_sub_lang_ru' => 'Russian',
     'video_sub_lang_hy' => 'Armenian',
+    'video_sub_lang_ar' => 'Arabic',
     
     // Countries/Export
     'popular_countries' => 'Export Markets',
@@ -154,8 +155,9 @@ return [
     'awards_won' => 'Breaking Strength (kg)',
     
     // Homepage
+    'home_meta_title' => 'Mercovyn | Polypropylene Baler Twine Manufacturer & Supplier',
     'home_hero_title' => 'Premium Baler Twine Manufacturer & Importer',
-    'hero_title' => 'Twine Built to Hold the Harvest Together',
+    'hero_title' => 'Reliable Polypropylene Baler Twine for Agricultural Businesses',
     'hero_subtitle' => 'Mercovyn LLC supplies heavy-duty polypropylene baler twine from Armenia, Yerevan — with global sales and export to markets worldwide.',
     'hero_stat_spool_label' => 'kg per spool pair (approx.)',
     'hero_stat_pp_label' => 'Made from PP (polypropylene)',

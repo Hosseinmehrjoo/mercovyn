@@ -15,7 +15,7 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $slug = trim((string) ($_GET['slug'] ?? ''));
 $lang = trim((string) ($_GET['lang'] ?? ''));
 
-$supportedLangs = ['en', 'ru', 'hy'];
+$supportedLangs = ad_supported_languages();
 if ($lang !== '' && !in_array($lang, $supportedLangs, true)) {
     $lang = '';
 }

@@ -16,6 +16,9 @@ require_once __DIR__ . '/../router.php';
 $langInfo = getLanguageInfo();
 $currentLang = $langInfo['current'];
 $langPrefix = $langInfo['prefix'];
+$pageDir = $currentLang === 'ar' ? 'rtl' : 'ltr';
+$ogLocales = ['en' => 'en_US', 'ru' => 'ru_RU', 'hy' => 'hy_AM', 'ar' => 'ar_SA'];
+$ogLocale = $ogLocales[$currentLang] ?? 'en_US';
 $loadMercovynVideos = $loadMercovynVideos ?? false;
 
 // Default SEO values
@@ -39,7 +42,7 @@ foreach ($hreflangUrls as $lang => $url) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?= $currentLang ?>" dir="ltr">
+<html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES, 'UTF-8') ?>" dir="<?= htmlspecialchars($pageDir, ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
     <meta charset="utf-8">
@@ -64,7 +67,7 @@ foreach ($hreflangUrls as $lang => $url) {
     <?php if ($ogImage): ?>
     <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
     <?php endif; ?>
-    <meta property="og:locale" content="<?= $currentLang === 'en' ? 'en_US' : ($currentLang === 'ru' ? 'ru_RU' : 'hy_AM') ?>">
+    <meta property="og:locale" content="<?= htmlspecialchars($ogLocale, ENT_QUOTES, 'UTF-8') ?>">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -172,6 +175,7 @@ foreach ($hreflangUrls as $lang => $url) {
                     <a href="<?= url('') ?>" class="nav-item nav-link"><?= __("home") ?></a>
                     <a href="<?= url('about') ?>" class="nav-item nav-link"><?= __("about") ?></a>
                     <a href="<?= url('products') ?>" class="nav-item nav-link"><?= __("services") ?></a>
+                    <a href="<?= url('blog') ?>" class="nav-item nav-link"><?= __("blog") ?></a>
                     <a href="<?= url('contact') ?>" class="nav-item nav-link"><?= __("contact") ?></a>
                 </div>
                 <div class="d-lg-none navbar-mobile-tools w-100 pt-3 mt-2 border-top">

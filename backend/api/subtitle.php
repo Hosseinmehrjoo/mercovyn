@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . '/lib/subtitles.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $lang = trim((string) ($_GET['lang'] ?? 'en'));
-if ($id < 1 || !in_array($lang, ['en', 'ru', 'hy'], true)) {
+if ($id < 1 || !in_array($lang, ad_supported_languages(), true)) {
     http_response_code(404);
     header('Content-Type: text/plain; charset=utf-8');
     echo 'Not found';

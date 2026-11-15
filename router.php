@@ -6,11 +6,12 @@
  * - domain.com/ (default: English)
  * - domain.com/ru/ (Russian)
  * - domain.com/hy/ (Armenian)
+ * - domain.com/ar/ (Arabic)
  * - domain.com/en/ (English - explicit)
  */
 
 // Supported languages
-const SUPPORTED_LANGUAGES = ['en', 'ru', 'hy'];
+const SUPPORTED_LANGUAGES = ['en', 'ru', 'hy', 'ar'];
 const DEFAULT_LANGUAGE = 'en';
 
 // Language cookie name

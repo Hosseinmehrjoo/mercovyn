@@ -38,6 +38,7 @@ function formatDate($dateStr) {
         'en' => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
         'ru' => ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
         'hy' => ['Հուն','Փետ','Մար','Ապր','Մայ','Հուն','Հուլ','Օգս','Սեպ','Հոկ','Նոյ','Դեկ'],
+        'ar' => ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
     ];
     $langMonths = $months[$GLOBALS['currentLang']] ?? $months['en'];
     return $dt->format('d') . ' ' . $langMonths[(int)$dt->format('m') - 1] . ' ' . $dt->format('Y');
@@ -100,6 +101,7 @@ if ($post) {
         'en' => 'blog-single/' . $postSlug,
         'ru' => 'blog-single/' . $postSlug,
         'hy' => 'blog-single/' . $postSlug,
+        'ar' => 'blog-single/' . $postSlug,
     ];
     $schemaOrg = [
         '@context' => 'https://schema.org',

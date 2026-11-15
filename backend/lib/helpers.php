@@ -1,5 +1,15 @@
 <?php
 
+/** @return list<string> */
+function ad_supported_languages(): array
+{
+    if (defined('SUPPORTED_LANGUAGES')) {
+        return SUPPORTED_LANGUAGES;
+    }
+
+    return ['en', 'ru', 'hy', 'ar'];
+}
+
 function ad_json(array $payload, int $status = 200): void
 {
     http_response_code($status);

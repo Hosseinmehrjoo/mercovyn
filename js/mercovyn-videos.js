@@ -14,7 +14,7 @@
   function defaultSubtitleLang() {
     if (window.MercovynVideoDefaultSub) return window.MercovynVideoDefaultSub;
     var pageLang = (document.documentElement.lang || 'en').toLowerCase();
-    return ['en', 'ru', 'hy'].indexOf(pageLang) >= 0 ? pageLang : 'en';
+    return ['en', 'ru', 'hy', 'ar'].indexOf(pageLang) >= 0 ? pageLang : 'en';
   }
 
   function applySubtitles(video, lang) {

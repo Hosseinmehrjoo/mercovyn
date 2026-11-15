@@ -65,6 +65,13 @@ function ad_blog_ensure_schema(): void
             'excerpt_hy' => 'TEXT NULL',
             'content_ru' => 'MEDIUMTEXT NULL',
             'content_hy' => 'MEDIUMTEXT NULL',
+            'title_ar' => "VARCHAR(200) NOT NULL DEFAULT ''",
+            'slug_ar' => "VARCHAR(220) NOT NULL DEFAULT ''",
+            'meta_title_ar' => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'meta_description_ar' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'meta_keywords_ar' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'excerpt_ar' => 'TEXT NULL',
+            'content_ar' => 'MEDIUMTEXT NULL',
         ];
         foreach ($blogLangCols as $col => $def) {
             if (!in_array($col, $cols, true)) {

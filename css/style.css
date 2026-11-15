@@ -1737,4 +1737,38 @@ html.motion-off .wow,
         align-items: center;
     }
 }
+
+/*** RTL (Arabic) ***/
+html[dir="rtl"] body {
+    text-align: right;
+}
+
+html[dir="rtl"] .navbar-nav {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+}
+
+html[dir="rtl"] .section-title.text-start {
+    text-align: right !important;
+}
+
+html[dir="rtl"] .language-switcher__list {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .fab-contact {
+    left: 1rem;
+    right: auto;
+}
+
+html[dir="rtl"] .btn .fa-arrow-right,
+html[dir="rtl"] .btn .fa-arrow-left,
+html[dir="rtl"] .btn .ms-2,
+html[dir="rtl"] .btn .me-2 {
+    transform: scaleX(-1);
+}
+
+html[dir="rtl"] .video-carousel {
+    direction: ltr;
+}
 /*** Responsive end ***/

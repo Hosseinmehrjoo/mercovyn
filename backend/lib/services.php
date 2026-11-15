@@ -57,6 +57,10 @@ function ad_services_ensure_schema(): void
         'content_hy' => "MEDIUMTEXT NULL",
         'slug_ru' => "VARCHAR(200) NOT NULL DEFAULT ''",
         'slug_hy' => "VARCHAR(200) NOT NULL DEFAULT ''",
+        'title_ar' => "VARCHAR(180) NOT NULL DEFAULT ''",
+        'summary_ar' => "TEXT NULL",
+        'content_ar' => "MEDIUMTEXT NULL",
+        'slug_ar' => "VARCHAR(200) NOT NULL DEFAULT ''",
     ];
     foreach ($langCols as $col => $def) {
         if (!in_array($col, $cols, true)) {

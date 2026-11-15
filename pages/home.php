@@ -34,7 +34,7 @@ function getField(array $row, string $field, string $lang): string
     return $value;
 }
 
-$pageTitle = __("brand") . ' - ' . __("tagline");
+$pageTitle = __('home_meta_title');
 $metaDescription = __("meta_description_default");
 $currentPath = '';
 $preloadHeroImage = 'assets/images/other/hero-bg.webp';

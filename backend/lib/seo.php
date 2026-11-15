@@ -343,7 +343,7 @@ function ad_redirects_apply_request(): void
  */
 function ad_seo_langs(): array
 {
-    return ['en', 'ru', 'hy'];
+    return ad_supported_languages();
 }
 
 function ad_seo_lang_path(string $path, string $lang): string

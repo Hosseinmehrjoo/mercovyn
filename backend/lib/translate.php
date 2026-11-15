@@ -196,7 +196,8 @@ function ad_translate_text(string $text, string $to, string $from = 'en'): strin
     if (trim($text) === '' || !ad_translate_enabled()) {
         return '';
     }
-  if (!in_array($to, ad_translate_locales(), true) && $to !== 'en') {
+    $allowedTargets = array_unique(array_merge(['en'], ad_translate_locales(), ad_supported_languages()));
+    if (!in_array($to, $allowedTargets, true)) {
         return '';
     }
     $html = (bool) preg_match('/<[a-z][\s\S]*?>/i', $text);

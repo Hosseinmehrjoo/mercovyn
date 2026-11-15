@@ -11,7 +11,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 }
 
 $lang = trim((string) ($_GET['lang'] ?? 'en'));
-if (!in_array($lang, ['en', 'ru', 'hy'], true)) {
+if (!in_array($lang, ad_supported_languages(), true)) {
     $lang = 'en';
 }
 

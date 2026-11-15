@@ -19,6 +19,7 @@ $languageLabels = [
     'en' => ['label' => 'EN', 'name' => 'English', 'flag' => '🇺🇸'],
     'ru' => ['label' => 'RU', 'name' => 'Русский', 'flag' => '🇷🇺'],
     'hy' => ['label' => 'HY', 'name' => 'Հայերեն', 'flag' => '🇦🇲'],
+    'ar' => ['label' => 'AR', 'name' => 'العربية', 'flag' => '🇸🇦'],
 ];
 ?>
 

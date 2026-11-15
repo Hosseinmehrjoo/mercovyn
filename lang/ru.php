@@ -114,6 +114,7 @@ return [
     'video_sub_lang_en' => 'Английский',
     'video_sub_lang_ru' => 'Русский',
     'video_sub_lang_hy' => 'Армянский',
+    'video_sub_lang_ar' => 'Арабский',
     
     // Countries/Export
     'popular_countries' => 'Рынки сбыта',
@@ -154,8 +155,9 @@ return [
     'awards_won' => 'Разрывная нагрузка (кг)',
     
     // Homepage
+    'home_meta_title' => 'Mercovyn | Производитель и поставщик полипропиленового биндера',
     'home_hero_title' => 'Премиальный производитель и импортёр биндера',
-    'hero_title' => 'Нить, созданная чтобы удерживать урожай',
+    'hero_title' => 'Надёжный полипропиленовый биндер для агробизнеса',
     'hero_subtitle' => 'Mercovyn LLC поставляет полипропиленовый биндер из Армении, Ереван — глобальные продажи и экспорт по всему миру.',
     'hero_stat_spool_label' => 'кг на пару катушек (прибл.)',
     'hero_stat_pp_label' => 'Из PP (полипропилен)',
