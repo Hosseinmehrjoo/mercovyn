@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('عنوان الزامی است.');
         }
 
-        @set_time_limit(180);
+        @set_time_limit(900);
         if ($slug === '') {
             $slug = ad_slugify($title);
         } else {
@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
-            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 2)) . ')';
+            $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 5)) . ')';
         } elseif (ad_translate_enabled()) {
             $msg .= ' نسخه‌های ru / hy / ar به‌روز شد.';
         }

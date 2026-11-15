@@ -15,7 +15,7 @@ $coverAlt = trim((string) ($post['cover_alt'] ?? ''));
 if ($coverAlt === '') {
     $coverAlt = $title;
 }
-$detailUrl = url('blog-single/' . ad_blog_post_slug($post));
+$detailUrl = url('blog-single/' . ad_blog_post_slug($post, getCurrentLanguage()));
 $dateLabel = ad_blog_format_date($post['published_at'] ?? '');
 $categories = $post['categories'] ?? [];
 $firstCat = $categories[0]['name'] ?? '';

@@ -181,6 +181,9 @@ function ad_translate_once(string $text, string $to, string $from, bool $html): 
         if ($p === 'libretranslate') {
             $out = ad_translate_libretranslate($text, $to, $from, $html);
         } else {
+            if (mb_strlen($text) > 480) {
+                continue;
+            }
             $out = ad_translate_mymemory($text, $to, $from);
         }
         if ($out !== null && trim($out) !== '') {
@@ -188,6 +191,63 @@ function ad_translate_once(string $text, string $to, string $from, bool $html): 
         }
     }
     return null;
+}
+
+/**
+ * Split text into translation-sized chunks (HTML-aware for CKEditor bodies).
+ *
+ * @return list<string>
+ */
+function ad_translate_build_chunks(string $text, bool $html, int $maxChunk): array
+{
+    if (mb_strlen($text) <= $maxChunk) {
+        return [$text];
+    }
+
+    if ($html) {
+        $blocks = preg_split(
+            '/(?<=<\/(?:p|h[1-6]|li|div|blockquote|tr|td|th|figcaption)>)/iu',
+            $text,
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
+        if (!is_array($blocks) || count($blocks) <= 1) {
+            $blocks = preg_split('/(?<=<\/[^>]+>)/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [$text];
+        }
+    } else {
+        $blocks = preg_split('/(\r\n\r\n|\n\n)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if (!is_array($blocks)) {
+            $blocks = [$text];
+        }
+    }
+
+    $chunks = [];
+    $buffer = '';
+    foreach ($blocks as $part) {
+        if (mb_strlen($part) > $maxChunk) {
+            if ($buffer !== '') {
+                $chunks[] = $buffer;
+                $buffer = '';
+            }
+            $len = mb_strlen($part);
+            for ($offset = 0; $offset < $len; $offset += $maxChunk) {
+                $chunks[] = mb_substr($part, $offset, $maxChunk);
+            }
+            continue;
+        }
+        $candidate = $buffer . $part;
+        if (mb_strlen($candidate) > $maxChunk && $buffer !== '') {
+            $chunks[] = $buffer;
+            $buffer = $part;
+        } else {
+            $buffer = $candidate;
+        }
+    }
+    if ($buffer !== '') {
+        $chunks[] = $buffer;
+    }
+
+    return $chunks !== [] ? $chunks : [$text];
 }
 
 /**
@@ -204,41 +264,26 @@ function ad_translate_text(string $text, string $to, string $from = 'en'): strin
         return '';
     }
     $html = (bool) preg_match('/<[a-z][\s\S]*?>/i', $text);
-    $maxChunk = 3500;
-    if (mb_strlen($text) <= $maxChunk) {
-        $t = ad_translate_once($text, $to, $from, $html);
+    $maxChunk = $html ? 1600 : 3500;
+    $chunks = ad_translate_build_chunks($text, $html, $maxChunk);
+    if (count($chunks) === 1) {
+        $t = ad_translate_once($chunks[0], $to, $from, $html);
         return $t ?? '';
     }
-    $parts = preg_split('/(\r\n\r\n|\n\n)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-    if (!is_array($parts)) {
-        $parts = [$text];
-    }
     $out = '';
-    $buffer = '';
-    foreach ($parts as $part) {
-        $candidate = $buffer . $part;
-        if (mb_strlen($candidate) > $maxChunk && $buffer !== '') {
-            $piece = ad_translate_once($buffer, $to, $from, $html);
-            if ($piece === null) {
-                ad_translate_warn('ترجمه بخشی از متن برای ' . $to . ' ناموفق بود.');
-                $out .= $buffer;
-            } else {
-                $out .= $piece;
-            }
-            $buffer = $part;
-            usleep(120000);
+    foreach ($chunks as $i => $chunk) {
+        if (trim($chunk) === '') {
+            $out .= $chunk;
             continue;
         }
-        $buffer = $candidate;
-    }
-    if ($buffer !== '') {
-        $piece = ad_translate_once($buffer, $to, $from, $html);
+        $piece = ad_translate_once($chunk, $to, $from, $html);
         if ($piece === null) {
-            ad_translate_warn('ترجمه بخشی از متن برای ' . $to . ' ناموفق بود.');
-            $out .= $buffer;
+            ad_translate_warn('ترجمه بخشی از متن برای ' . $to . ' ناموفق بود (قطعه ' . ($i + 1) . ').');
+            $out .= $chunk;
         } else {
             $out .= $piece;
         }
+        usleep(150000);
     }
     return $out;
 }
@@ -279,9 +324,11 @@ function ad_auto_translate_record(
 
     foreach (ad_translate_locales() as $locale) {
         foreach ($fields as $field) {
-            $src = trim((string) ($english[$field] ?? ''));
+            $src = ($field === 'content')
+                ? (string) ($english[$field] ?? '')
+                : trim((string) ($english[$field] ?? ''));
             $key = $field . '_' . $locale;
-            if ($src === '') {
+            if (trim($src) === '') {
                 $out[$key] = '';
                 continue;
             }

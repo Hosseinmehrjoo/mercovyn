@@ -288,7 +288,7 @@ function ad_blog_post_categories(int $postId): array
  * @param array<string, mixed> $post
  * @return array<string, mixed>
  */
-function ad_blog_post_slug(array $post, string $lang): string
+function ad_blog_post_slug(array $post, string $lang = ''): string
 {
     unset($lang);
     return trim((string) ($post['slug'] ?? ''));
@@ -306,6 +306,24 @@ function ad_blog_localized_field(array $row, string $field, string $lang = ''): 
         return (string) ($row[$field] ?? '');
     }
     return (string) $value;
+}
+
+/**
+ * True when localized HTML body is missing or still identical to English source.
+ */
+function ad_blog_locale_content_missing(array $row, string $locale): bool
+{
+    if ($locale === '' || $locale === 'en') {
+        return false;
+    }
+    $key = 'content_' . $locale;
+    $localized = trim((string) ($row[$key] ?? ''));
+    $base = (string) ($row['content'] ?? '');
+    if ($localized === '') {
+        return trim($base) !== '';
+    }
+
+    return $localized === $base;
 }
 
 function ad_blog_format_date(?string $dateStr, string $lang = ''): string
