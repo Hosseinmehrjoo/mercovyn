@@ -1,6 +1,24 @@
 <?php
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/helpers.php';
+
+/**
+ * Root-absolute media URLs for front (fixes /ru/product/ relative paths).
+ *
+ * @param array<string, mixed> $row
+ * @return array<string, mixed>
+ */
+function ad_service_normalize_public_row(array $row): array
+{
+    foreach (['cover', 'icon'] as $field) {
+        $path = trim((string) ($row[$field] ?? ''));
+        if ($path !== '') {
+            $row[$field] = ad_public_upload_url($path);
+        }
+    }
+    return $row;
+}
 
 function ad_services_ensure_schema(): void
 {
@@ -66,7 +84,7 @@ function ad_service_find_by_slug(string $slug): ?array
     );
     $stmt->execute([$slug, $slug, $slug]);
     $row = $stmt->fetch();
-    return $row ?: null;
+    return $row ? ad_service_normalize_public_row($row) : null;
 }
 
 /**
@@ -80,7 +98,8 @@ function ad_service_list_active(int $limit = 0): array
     if ($limit > 0) {
         $sql .= ' LIMIT ' . (int) $limit;
     }
-    return ad_db()->query($sql)->fetchAll() ?: [];
+    $rows = ad_db()->query($sql)->fetchAll() ?: [];
+    return array_map('ad_service_normalize_public_row', $rows);
 }
 
 function ad_service_localized_field(array $row, string $field, string $lang = ''): string
@@ -97,20 +116,8 @@ function ad_service_localized_field(array $row, string $field, string $lang = ''
 
 function ad_service_localized_slug(array $row, string $lang = ''): string
 {
-    $lang = $lang ?: getCurrentLanguage();
-    if ($lang === 'ru') {
-        $s = trim((string) ($row['slug_ru'] ?? ''));
-        if ($s !== '') {
-            return $s;
-        }
-    }
-    if ($lang === 'hy') {
-        $s = trim((string) ($row['slug_hy'] ?? ''));
-        if ($s !== '') {
-            return $s;
-        }
-    }
-    return (string) ($row['slug'] ?? '');
+    unset($lang);
+    return trim((string) ($row['slug'] ?? ''));
 }
 
 function ad_service_public_url(array $row, string $lang = ''): string

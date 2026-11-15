@@ -90,7 +90,7 @@ function ad_blog_build_localized_fields(array $english, ?array $existing = null)
         $english,
         ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords'],
         $existing,
-        ['title']
+        []
     );
 }
 
@@ -283,15 +283,8 @@ function ad_blog_post_categories(int $postId): array
  */
 function ad_blog_post_slug(array $post, string $lang): string
 {
-    if ($lang === 'en') {
-        return (string) ($post['slug'] ?? '');
-    }
-    $key = 'slug_' . $lang;
-    $localized = trim((string) ($post[$key] ?? ''));
-    if ($localized !== '') {
-        return $localized;
-    }
-    return (string) ($post['slug'] ?? '');
+    unset($lang);
+    return trim((string) ($post['slug'] ?? ''));
 }
 
 function ad_blog_normalize_post(array $post): array

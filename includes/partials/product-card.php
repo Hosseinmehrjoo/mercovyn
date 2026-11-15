@@ -10,6 +10,9 @@ $cardDelay = $cardDelay ?? ($index * 0.08);
 $title = ad_service_localized_field($product, 'title');
 $summary = ad_service_localized_field($product, 'summary');
 $cover = trim((string) ($product['cover'] ?? ''));
+if ($cover !== '' && function_exists('ad_public_upload_url')) {
+    $cover = ad_public_upload_url($cover);
+}
 $detailUrl = ad_service_public_url($product);
 $contactUrl = url('contact');
 ?>

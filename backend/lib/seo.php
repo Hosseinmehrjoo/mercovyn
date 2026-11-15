@@ -417,16 +417,12 @@ function ad_seo_service_urls(): array
         $last = (string) ($row['updated_at'] ?? $row['created_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
         $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['summary'] ?? ''))) ?? '');
+        $slug = trim((string) ($row['slug'] ?? ''));
+        if ($slug === '') {
+            continue;
+        }
         foreach (ad_seo_langs() as $lang) {
-            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
-            $slug = trim((string) ($row[$slugKey] ?? ''));
-            if ($slug === '') {
-                $slug = trim((string) ($row['slug'] ?? ''));
-            }
-            if ($slug === '') {
-                continue;
-            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
                 $title = (string) ($row['title'] ?? $slug);
@@ -466,16 +462,12 @@ function ad_seo_blog_urls(): array
         $last = (string) ($row['updated_at'] ?? $row['published_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
         $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['excerpt'] ?? ''))) ?? '');
+        $slug = trim((string) ($row['slug'] ?? ''));
+        if ($slug === '') {
+            continue;
+        }
         foreach (ad_seo_langs() as $lang) {
-            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
-            $slug = trim((string) ($row[$slugKey] ?? ''));
-            if ($slug === '') {
-                $slug = trim((string) ($row['slug'] ?? ''));
-            }
-            if ($slug === '') {
-                continue;
-            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
                 $title = (string) ($row['title'] ?? $slug);

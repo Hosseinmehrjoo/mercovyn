@@ -128,6 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'meta_keywords' => $metaKeywords,
         ];
         $localized = ad_blog_build_localized_fields($english, $existing);
+        $localized['slug_ru'] = $slug;
+        $localized['slug_hy'] = $slug;
 
         if ($id > 0) {
             $stmt = $db->prepare(

@@ -83,7 +83,7 @@ function applyLocalization(array $row, string $suffix, array $baseFields): array
         return $row;
     }
     
-    $localizedFields = ['title', 'slug', 'summary', 'content'];
+    $localizedFields = ['title', 'summary', 'content'];
     foreach ($localizedFields as $field) {
         $localizedKey = $field . $suffix;
         if (isset($row[$localizedKey]) && $row[$localizedKey] !== '') {

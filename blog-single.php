@@ -95,10 +95,11 @@ if ($post) {
     $metaKeywords = getPostField($post, 'meta_keywords');
     $ogImage = getPostField($post, 'cover');
     $currentPath = 'blog-single/' . ad_blog_post_slug($post, $currentLang);
+    $postSlug = ad_blog_post_slug($post, $currentLang);
     $hreflangPathByLang = [
-        'en' => 'blog-single/' . ad_blog_post_slug($post, 'en'),
-        'ru' => 'blog-single/' . ad_blog_post_slug($post, 'ru'),
-        'hy' => 'blog-single/' . ad_blog_post_slug($post, 'hy'),
+        'en' => 'blog-single/' . $postSlug,
+        'ru' => 'blog-single/' . $postSlug,
+        'hy' => 'blog-single/' . $postSlug,
     ];
     $schemaOrg = [
         '@context' => 'https://schema.org',

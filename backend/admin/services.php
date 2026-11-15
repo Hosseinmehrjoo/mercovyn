@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ['title' => $title, 'summary' => $summary, 'content' => $content],
             ['title', 'summary', 'content'],
             $existing,
-            ['title']
+            []
         );
         $titleRu = $localized['title_ru'];
         $titleHy = $localized['title_hy'];
@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $summaryHy = $localized['summary_hy'];
         $contentRu = $localized['content_ru'];
         $contentHy = $localized['content_hy'];
-        $slugRu = $localized['slug_ru'] !== '' ? $localized['slug_ru'] : ad_slugify($titleRu !== '' ? $titleRu : $title);
-        $slugHy = $localized['slug_hy'] !== '' ? $localized['slug_hy'] : ad_slugify($titleHy !== '' ? $titleHy : $title);
+        $slugRu = $slug;
+        $slugHy = $slug;
 
         if (!empty($_FILES['cover']['name'])) {
             $uploaded = ad_media_upload($_FILES['cover'], 'services', $coverAlt);

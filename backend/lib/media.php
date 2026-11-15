@@ -320,5 +320,8 @@ function ad_media_with_cover_alt(array $row): array
 {
     $cover = trim((string) ($row['cover'] ?? ''));
     $row['cover_alt'] = $cover !== '' ? ad_media_alt($cover) : '';
+    if ($cover !== '' && function_exists('ad_public_upload_url')) {
+        $row['cover'] = ad_public_upload_url($cover);
+    }
     return $row;
 }

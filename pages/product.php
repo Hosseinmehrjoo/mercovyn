@@ -30,6 +30,9 @@ if ($product) {
     $metaDescription = ad_service_localized_field($product, 'summary') ?: __("meta_description_default");
     $currentPath = 'product/' . ad_service_localized_slug($product);
     $ogImage = trim((string) ($product['cover'] ?? ''));
+    if ($ogImage !== '') {
+        $ogImage = ad_public_upload_url($ogImage);
+    }
     $hreflangPathByLang = [
         'en' => 'product/' . ad_service_localized_slug($product, 'en'),
         'ru' => 'product/' . ad_service_localized_slug($product, 'ru'),
@@ -81,6 +84,9 @@ $whatsapp = __('whatsapp_link');
                 $summary = ad_service_localized_field($product, 'summary');
                 $content = ad_service_localized_field($product, 'content');
                 $cover = trim((string) ($product['cover'] ?? ''));
+                if ($cover !== '') {
+                    $cover = ad_public_upload_url($cover);
+                }
                 ?>
                 <div class="row g-5 align-items-start">
                     <div class="col-lg-6 wow fadeInLeft">

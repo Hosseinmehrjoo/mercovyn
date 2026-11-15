@@ -121,7 +121,7 @@ function applyLocalization(array $row, string $suffix): array
         return $row;
     }
     
-    $localizedFields = ['title', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'excerpt', 'content'];
+    $localizedFields = ['title', 'meta_title', 'meta_description', 'meta_keywords', 'excerpt', 'content'];
     foreach ($localizedFields as $field) {
         $localizedKey = $field . $suffix;
         if (isset($row[$localizedKey]) && $row[$localizedKey] !== '') {
