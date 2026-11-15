@@ -88,17 +88,74 @@ function ad_blog_ensure_schema(): void
  * @param array<string, mixed>|null $existing
  * @return array<string, string>
  */
-function ad_blog_build_localized_fields(array $english, ?array $existing = null): array
-{
+function ad_blog_build_localized_fields(
+    array $english,
+    ?array $existing = null,
+    bool $includeContent = true
+): array {
     if (!function_exists('ad_auto_translate_record')) {
         require_once __DIR__ . '/translate.php';
     }
-    return ad_auto_translate_record(
-        $english,
-        ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords'],
-        $existing,
-        []
-    );
+    $fields = ['title', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords'];
+    if ($includeContent) {
+        $fields[] = 'content';
+    }
+    $localized = ad_auto_translate_record($english, $fields, $existing, []);
+    if (!$includeContent) {
+        foreach (ad_translate_locales() as $locale) {
+            $key = 'content_' . $locale;
+            $localized[$key] = (string) ($existing[$key] ?? '');
+        }
+    }
+
+    return $localized;
+}
+
+/**
+ * Translate English post body into content_{locale} columns (CLI / background).
+ *
+ * @return array{ok:bool,warnings:list<string>}
+ */
+function ad_blog_translate_post_body(int $id): array
+{
+    ad_blog_ensure_schema();
+    if ($id < 1 || !ad_translate_enabled()) {
+        return ['ok' => false, 'warnings' => ['ترجمه غیرفعال یا شناسه نامعتبر.']];
+    }
+    $stmt = ad_db()->prepare('SELECT * FROM blog_posts WHERE id = ?');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        return ['ok' => false, 'warnings' => ['نوشته یافت نشد.']];
+    }
+    if (!function_exists('ad_translate_text')) {
+        require_once __DIR__ . '/translate.php';
+    }
+
+    $content = (string) ($row['content'] ?? '');
+    if (trim($content) === '') {
+        return ['ok' => true, 'warnings' => []];
+    }
+
+    @set_time_limit(0);
+    $sets = [];
+    $params = [];
+    foreach (ad_translate_locales() as $locale) {
+        $translated = ad_translate_text($content, $locale, ad_translate_settings()['source']);
+        if (trim($translated) === '') {
+            continue;
+        }
+        $col = 'content_' . $locale;
+        $sets[] = '`' . $col . '` = ?';
+        $params[] = $translated;
+    }
+    if ($sets === []) {
+        return ['ok' => false, 'warnings' => ad_translate_take_warnings()];
+    }
+    $params[] = $id;
+    ad_db()->prepare('UPDATE blog_posts SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($params);
+
+    return ['ok' => true, 'warnings' => ad_translate_take_warnings()];
 }
 
 /**

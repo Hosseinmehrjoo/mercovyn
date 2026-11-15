@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('عنوان الزامی است.');
         }
 
-        @set_time_limit(900);
+        @set_time_limit(120);
         if ($slug === '') {
             $slug = ad_slugify($title);
         } else {
@@ -127,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'meta_description' => $metaDescription,
             'meta_keywords' => $metaKeywords,
         ];
-        $localized = ad_blog_build_localized_fields($english, $existing);
+        $deferBody = ad_translate_enabled() && trim($content) !== '';
+        $localized = ad_blog_build_localized_fields($english, $existing, !$deferBody);
         $localized['slug_ru'] = $slug;
         $localized['slug_hy'] = $slug;
         $localized['slug_ar'] = $slug;
@@ -184,10 +185,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newId = (int) $db->lastInsertId();
             ad_blog_post_set_categories($newId, $postedCats);
             $msg = 'نوشته افزوده شد.';
+            $id = $newId;
+        }
+        $bodyJobStarted = false;
+        if ($deferBody && $id > 0) {
+            $bodyJobStarted = ad_spawn_background_php('jobs/translate_blog_post.php', [(string) $id]);
         }
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
             $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 5)) . ')';
+        }
+        if ($deferBody && $id > 0) {
+            if ($bodyJobStarted) {
+                $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه در پس‌زمینه (۱–۳ دقیقه) ترجمه می‌شود.';
+            } else {
+                $msg .= ' بدنه را دستی ترجمه کنید: php backend/jobs/translate_blog_post.php ' . $id;
+            }
         } elseif (ad_translate_enabled()) {
             $msg .= ' نسخه‌های ru / hy / ar به‌روز شد.';
         }

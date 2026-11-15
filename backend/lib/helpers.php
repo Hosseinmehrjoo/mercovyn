@@ -320,3 +320,38 @@ function ad_csrf_check(?string $token): bool
     }
     return is_string($token) && isset($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $token);
 }
+
+/**
+ * Run a PHP script under backend/ in the background (requires exec).
+ */
+function ad_spawn_background_php(string $relativePath, array $argv = []): bool
+{
+    if (!function_exists('exec')) {
+        return false;
+    }
+    $root = dirname(__DIR__, 2);
+    $script = $root . '/backend/' . ltrim($relativePath, '/');
+    if (!is_file($script)) {
+        return false;
+    }
+    $phpBin = 'php';
+    if (defined('PHP_BINARY') && is_string(PHP_BINARY) && PHP_BINARY !== '' && is_executable(PHP_BINARY)) {
+        $phpBin = PHP_BINARY;
+    } else {
+        foreach (['/usr/bin/php', '/usr/local/bin/php'] as $candidate) {
+            if (is_executable($candidate)) {
+                $phpBin = $candidate;
+                break;
+            }
+        }
+    }
+    $cmd = escapeshellarg($phpBin)
+        . ' ' . escapeshellarg($script);
+    foreach ($argv as $arg) {
+        $cmd .= ' ' . escapeshellarg((string) $arg);
+    }
+    $cmd .= ' > /dev/null 2>&1 &';
+    @exec($cmd);
+
+    return true;
+}
