@@ -127,11 +127,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'meta_description' => $metaDescription,
             'meta_keywords' => $metaKeywords,
         ];
-        $deferBody = ad_translate_enabled() && trim($content) !== '';
-        $localized = ad_blog_build_localized_fields($english, $existing, !$deferBody);
-        $localized['slug_ru'] = $slug;
-        $localized['slug_hy'] = $slug;
-        $localized['slug_ar'] = $slug;
+        $localized = ad_blog_build_localized_fields($english, $existing);
+        $localized = ad_blog_merge_locale_fields(
+            $localized,
+            ad_blog_read_manual_locales_from_post($_POST),
+            $existing
+        );
 
         if ($id > 0) {
             $stmt = $db->prepare(
@@ -187,34 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = 'نوشته افزوده شد.';
             $id = $newId;
         }
-        $bodyJobStarted = false;
-        $bodyJobInline = false;
-        if ($deferBody && $id > 0) {
-            $bodyJobStarted = ad_spawn_background_php('jobs/translate_blog_post.php', [(string) $id]);
-            if (!$bodyJobStarted) {
-                ad_run_after_http_response(static function () use ($id): void {
-                    ad_blog_translate_post_body($id);
-                });
-                $bodyJobStarted = true;
-                $bodyJobInline = true;
-            }
-        }
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
             $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 5)) . ')';
         }
-        if ($deferBody && $id > 0) {
-            if ($bodyJobStarted) {
-                if (!empty($bodyJobInline)) {
-                    $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه بلافاصله پس از ذخیره ترجمه می‌شود (۱–۳ دقیقه صبر کنید).';
-                } else {
-                    $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه در پس‌زمینه (۱–۳ دقیقه) ترجمه می‌شود.';
-                }
-            } else {
-                $msg .= ' بدنه را دستی ترجمه کنید: php backend/jobs/translate_blog_post.php ' . $id;
-            }
-        } elseif (ad_translate_enabled()) {
-            $msg .= ' نسخه‌های ru / hy / ar به‌روز شد.';
+        if (ad_translate_enabled()) {
+            $msg .= ' عنوان و خلاصه/متا (در صورت خالی بودن در زبان‌های دیگر) خودکار به‌روز شد؛ بدنه را در هر زبان جدا وارد کنید.';
         }
         ad_flash_set('ok', $msg);
         ad_seo_on_content_change();
@@ -237,7 +216,7 @@ require __DIR__ . '/_layout_top.php';
 <div class="page-toolbar">
   <div>
     <h1>نوشته‌ها</h1>
-    <p class="muted" style="margin:0.35rem 0 0"><a href="/blog/" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a> · محتوا را به <strong>انگلیسی</strong> بنویسید؛ با ذخیره، ru / hy / ar خودکار ساخته می‌شود.</p>
+    <p class="muted" style="margin:0.35rem 0 0"><a href="/blog/" target="_blank" rel="noopener">مشاهده آرشیو وبلاگ</a> · متن اصلی <strong>انگلیسی</strong> است؛ عنوان/خلاصه/متا خودکار ترجمه می‌شود — <strong>بدنهٔ هر زبان را دستی</strong> در فرم وارد کنید.</p>
   </div>
   <div class="page-toolbar__actions">
     <a class="btn btn-secondary" href="blog-categories.php">دسته‌بندی‌ها</a>
@@ -335,6 +314,50 @@ require __DIR__ . '/_layout_top.php';
             </div>
           </div>
         </div>
+
+        <?php
+        $blogLocalePanels = [
+            'ru' => 'روسی (RU)',
+            'hy' => 'ارمنی (HY)',
+            'ar' => 'عربی (AR)',
+        ];
+        foreach ($blogLocalePanels as $locale => $localeLabel):
+            ?>
+        <div class="form-section blog-locale-panel">
+          <h3 class="form-section__title">ترجمه — <?= ad_e($localeLabel) ?></h3>
+          <p class="hint" style="margin:0 0 0.75rem">بدنه را خودتان وارد کنید. اگر عنوان/خلاصه/متا خالی بماند، با ذخیره از نسخهٔ انگلیسی ترجمهٔ خودکار پر می‌شود.</p>
+          <div class="form-grid">
+            <div class="field field--span-2">
+              <label>عنوان</label>
+              <input type="text" name="title_<?= ad_e($locale) ?>" value="<?= ad_e($edit['title_' . $locale] ?? '') ?>" />
+            </div>
+            <div class="field field--span-3">
+              <label>نامک (اسلاگ)</label>
+              <input type="text" name="slug_<?= ad_e($locale) ?>" value="<?= ad_e($edit['slug_' . $locale] ?? '') ?>" placeholder="خالی = از عنوان این زبان" />
+            </div>
+            <div class="field field--span-3">
+              <label>خلاصه</label>
+              <textarea name="excerpt_<?= ad_e($locale) ?>" rows="3"><?= ad_e($edit['excerpt_' . $locale] ?? '') ?></textarea>
+            </div>
+            <div class="field field--span-3">
+              <label>محتوا (بدنه)</label>
+              <textarea name="content_<?= ad_e($locale) ?>" id="blog-content-<?= ad_e($locale) ?>" class="blog-content-locale" rows="12"><?= ad_e($edit['content_' . $locale] ?? '') ?></textarea>
+            </div>
+            <div class="field field--span-2">
+              <label>متا تایتل</label>
+              <input type="text" name="meta_title_<?= ad_e($locale) ?>" maxlength="255" value="<?= ad_e($edit['meta_title_' . $locale] ?? '') ?>" />
+            </div>
+            <div class="field field--span-2">
+              <label>متا دیسکریپشن</label>
+              <textarea name="meta_description_<?= ad_e($locale) ?>" rows="2" maxlength="500"><?= ad_e($edit['meta_description_' . $locale] ?? '') ?></textarea>
+            </div>
+            <div class="field field--span-2">
+              <label>متا کیورد</label>
+              <input type="text" name="meta_keywords_<?= ad_e($locale) ?>" maxlength="500" value="<?= ad_e($edit['meta_keywords_' . $locale] ?? '') ?>" />
+            </div>
+          </div>
+        </div>
+        <?php endforeach; ?>
 
         <div class="form-section" id="categories">
           <h3 class="form-section__title">دسته‌بندی‌ها</h3>
@@ -435,86 +458,66 @@ require __DIR__ . '/_layout_top.php';
 <script src="https://cdn.ckeditor.com/4.25.2-lts/full/ckeditor.js"></script>
 <script>
 (function () {
-  var EDITOR_ID = "blog-content";
+  var EDITOR_IDS = ["blog-content", "blog-content-ru", "blog-content-hy", "blog-content-ar"];
   var MODAL_ID = "blog-form-modal";
-  /* Must stay above --z-admin-modal / --z-admin-media-picker in wp-admin.css */
   var CKE_FLOAT_Z = 100250;
+
+  var LOCALE_RTL = { ar: true, hy: false, ru: false };
 
   function ckeditorReady() {
     return typeof window.CKEDITOR !== "undefined";
   }
 
-  function warnEditorMissing() {
-    var el = document.getElementById(EDITOR_ID);
-    if (!el || el.dataset.ckeWarned) return;
-    el.dataset.ckeWarned = "1";
-    console.warn("CKEditor failed to load (check CSP or CDN). Using plain textarea.");
-  }
-
-  function refreshEditorLayout() {
-    if (!ckeditorReady()) return;
-    var inst = CKEDITOR.instances[EDITOR_ID];
-    if (!inst) return;
-    try {
-      inst.resize("100%", 380, true, false);
-    } catch (e) {}
-  }
-
-  function initEditor() {
-    if (!ckeditorReady()) {
-      warnEditorMissing();
-      return;
-    }
-    var modal = document.getElementById(MODAL_ID);
-    if (modal && modal.hidden) return;
-    if (CKEDITOR.instances[EDITOR_ID]) {
-      refreshEditorLayout();
-      return;
-    }
-    var el = document.getElementById(EDITOR_ID);
-    if (!el) return;
-
-    CKEDITOR.replace(EDITOR_ID, {
+  function editorConfig(id) {
+    var locale = id.replace("blog-content-", "");
+    var rtl = locale && LOCALE_RTL[locale];
+    return {
       language: "fa",
-      contentsLangDirection: "rtl",
-      height: 380,
+      contentsLangDirection: rtl ? "rtl" : "ltr",
+      height: id === "blog-content" ? 380 : 280,
       baseFloatZIndex: CKE_FLOAT_Z,
       removePlugins: "exportpdf",
       allowedContent: true,
       toolbar: [
-        { name: "document", items: ["Source", "-", "Maximize", "Preview"] },
+        { name: "document", items: ["Source", "-", "Maximize"] },
         { name: "clipboard", items: ["Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "Undo", "Redo"] },
-        { name: "editing", items: ["Find", "Replace", "-", "SelectAll"] },
         "/",
-        { name: "basicstyles", items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "-", "RemoveFormat"] },
-        { name: "paragraph", items: ["NumberedList", "BulletedList", "-", "Outdent", "Indent", "-", "Blockquote", "CreateDiv", "-", "JustifyRight", "JustifyCenter", "JustifyLeft", "JustifyBlock"] },
-        { name: "links", items: ["Link", "Unlink", "Anchor"] },
-        { name: "insert", items: ["Image", "Table", "HorizontalRule", "SpecialChar"] },
-        "/",
-        { name: "styles", items: ["Styles", "Format", "Font", "FontSize"] },
-        { name: "colors", items: ["TextColor", "BGColor"] },
-        { name: "tools", items: ["ShowBlocks"] }
+        { name: "basicstyles", items: ["Bold", "Italic", "Underline", "-", "RemoveFormat"] },
+        { name: "paragraph", items: ["NumberedList", "BulletedList", "-", "JustifyLeft", "JustifyCenter", "JustifyRight"] },
+        { name: "links", items: ["Link", "Unlink"] },
+        { name: "insert", items: ["Image", "Table", "HorizontalRule"] }
       ]
-    });
+    };
   }
 
-  function bootEditor() {
-    initEditor();
-    setTimeout(refreshEditorLayout, 40);
+  function initEditor(id) {
+    if (!ckeditorReady()) return;
+    if (CKEDITOR.instances[id]) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    CKEDITOR.replace(id, editorConfig(id));
   }
 
-  document.addEventListener("DOMContentLoaded", bootEditor);
+  function bootEditors() {
+    if (!ckeditorReady()) return;
+    var modal = document.getElementById(MODAL_ID);
+    if (modal && modal.hidden) return;
+    EDITOR_IDS.forEach(initEditor);
+  }
+
+  document.addEventListener("DOMContentLoaded", bootEditors);
   document.addEventListener("admin-modal:open", function (e) {
     if (!e.detail || e.detail.id !== MODAL_ID) return;
-    bootEditor();
+    bootEditors();
   });
 
   var form = document.getElementById("blog-post-form");
   if (form) {
     form.addEventListener("submit", function () {
-      if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances[EDITOR_ID]) {
-        CKEDITOR.instances[EDITOR_ID].updateElement();
-      }
+      if (typeof CKEDITOR === "undefined") return;
+      EDITOR_IDS.forEach(function (id) {
+        if (CKEDITOR.instances[id]) CKEDITOR.instances[id].updateElement();
+      });
     });
   }
 })();

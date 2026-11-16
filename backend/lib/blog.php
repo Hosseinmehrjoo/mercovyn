@@ -83,32 +83,100 @@ function ad_blog_ensure_schema(): void
     $done = true;
 }
 
+/** @return list<string> */
+function ad_blog_locale_form_fields(): array
+{
+    return ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
+}
+
 /**
+ * فقط فیلدهای کوتاه (عنوان، خلاصه، متا) — بدنهٔ مقاله ترجمه خودکار نمی‌شود.
+ *
  * @param array<string, string> $english
  * @param array<string, mixed>|null $existing
  * @return array<string, string>
  */
-function ad_blog_build_localized_fields(
-    array $english,
-    ?array $existing = null,
-    bool $includeContent = true
-): array {
+function ad_blog_build_localized_fields(array $english, ?array $existing = null): array
+{
     if (!function_exists('ad_auto_translate_record')) {
         require_once __DIR__ . '/translate.php';
     }
-    $fields = ['title', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords'];
-    if ($includeContent) {
-        $fields[] = 'content';
-    }
-    $localized = ad_auto_translate_record($english, $fields, $existing, []);
-    if (!$includeContent) {
-        foreach (ad_translate_locales() as $locale) {
-            $key = 'content_' . $locale;
-            $localized[$key] = (string) ($existing[$key] ?? '');
+    $light = ['title', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords'];
+    $localized = ad_auto_translate_record($english, $light, $existing, []);
+
+    foreach (ad_translate_locales() as $locale) {
+        $localized['content_' . $locale] = '';
+        if (!isset($localized['slug_' . $locale])) {
+            $localized['slug_' . $locale] = '';
         }
     }
 
     return $localized;
+}
+
+/**
+ * @param array<string, mixed> $post
+ * @return array<string, string>
+ */
+function ad_blog_read_manual_locales_from_post(array $post): array
+{
+    $out = [];
+    foreach (ad_translate_locales() as $locale) {
+        foreach (ad_blog_locale_form_fields() as $field) {
+            $key = $field . '_' . $locale;
+            if (!array_key_exists($key, $post)) {
+                continue;
+            }
+            $out[$key] = $field === 'content' ? (string) $post[$key] : trim((string) $post[$key]);
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * ترکیب ترجمهٔ خودکار فیلدهای سبک با مقادیر دستی (به‌ویژه بدنهٔ HTML).
+ *
+ * @param array<string, string> $auto
+ * @param array<string, string> $manual
+ * @param array<string, mixed>|null $existing
+ * @return array<string, string>
+ */
+function ad_blog_merge_locale_fields(array $auto, array $manual, ?array $existing = null): array
+{
+    $existing = $existing ?? [];
+    $merged = $auto;
+    $light = ['title', 'excerpt', 'meta_title', 'meta_description', 'meta_keywords'];
+
+    foreach (ad_translate_locales() as $locale) {
+        foreach ($light as $field) {
+            $key = $field . '_' . $locale;
+            $man = (string) ($manual[$key] ?? '');
+            if (trim($man) !== '') {
+                $merged[$key] = $man;
+            } elseif (!isset($merged[$key]) || trim((string) $merged[$key]) === '') {
+                $merged[$key] = trim((string) ($existing[$key] ?? ''));
+            }
+        }
+
+        $contentKey = 'content_' . $locale;
+        $merged[$contentKey] = array_key_exists($contentKey, $manual)
+            ? (string) $manual[$contentKey]
+            : (string) ($existing[$contentKey] ?? '');
+
+        $slugKey = 'slug_' . $locale;
+        $slugMan = trim((string) ($manual[$slugKey] ?? ''));
+        if ($slugMan !== '') {
+            $merged[$slugKey] = ad_slugify($slugMan);
+        } else {
+            $titleLoc = trim((string) ($merged['title_' . $locale] ?? ''));
+            $merged[$slugKey] = $titleLoc !== ''
+                ? ad_slugify($titleLoc)
+                : ad_slugify((string) ($existing['slug'] ?? $existing['title'] ?? ''));
+        }
+    }
+
+    return $merged;
 }
 
 /**
