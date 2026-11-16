@@ -57,137 +57,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $id = (int) ($_POST['id'] ?? 0);
-        $existing = null;
-        if ($id > 0) {
-            $stmt = $db->prepare('SELECT * FROM blog_posts WHERE id = ?');
-            $stmt->execute([$id]);
-            $existing = $stmt->fetch() ?: null;
-            if (!$existing) {
-                throw new RuntimeException('نوشته یافت نشد.');
-            }
-        }
-
-        $title = trim((string) ($_POST['title'] ?? ''));
-        $slug = trim((string) ($_POST['slug'] ?? ''));
-        $excerpt = trim((string) ($_POST['excerpt'] ?? ''));
-        $content = (string) ($_POST['content'] ?? '');
-        $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
-        $cover = trim((string) ($_POST['cover_path'] ?? ''));
-        $coverAlt = trim((string) ($_POST['cover_alt'] ?? ''));
-        $metaTitle = trim((string) ($_POST['meta_title'] ?? ''));
-        $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
-        $metaKeywords = trim((string) ($_POST['meta_keywords'] ?? ''));
-        if (mb_strlen($metaTitle) > 255) {
-            $metaTitle = mb_substr($metaTitle, 0, 255);
-        }
-        if (mb_strlen($metaDescription) > 500) {
-            $metaDescription = mb_substr($metaDescription, 0, 500);
-        }
-        if (mb_strlen($metaKeywords) > 500) {
-            $metaKeywords = mb_substr($metaKeywords, 0, 500);
-        }
-        $postedCats = $_POST['categories'] ?? [];
-        if (!is_array($postedCats)) {
-            $postedCats = [$postedCats];
-        }
-
-        if ($title === '') {
-            throw new RuntimeException('عنوان الزامی است.');
-        }
-
         @set_time_limit(120);
-        if ($slug === '') {
-            $slug = ad_slugify($title);
-        } else {
-            $slug = ad_slugify($slug);
-        }
-
+        $postInput = $_POST;
         if (!empty($_FILES['cover']['name'])) {
+            $coverAlt = trim((string) ($_POST['cover_alt'] ?? ''));
             $uploaded = ad_media_upload($_FILES['cover'], 'blog', $coverAlt);
             if ($uploaded !== '') {
-                $cover = $uploaded;
+                $postInput['cover_path'] = $uploaded;
             }
-        } elseif ($cover !== '') {
-            ad_media_set_alt($cover, $coverAlt);
         }
 
-        $publishedAt = null;
-        if ($status === 'published') {
-            $publishedAt = !empty($existing['published_at'])
-                ? (string) $existing['published_at']
-                : date('Y-m-d H:i:s');
-        }
-
-        $english = [
-            'title' => $title,
-            'excerpt' => $excerpt,
-            'content' => $content,
-            'meta_title' => $metaTitle,
-            'meta_description' => $metaDescription,
-            'meta_keywords' => $metaKeywords,
-        ];
-        $localized = ad_blog_build_localized_fields($english, $existing);
-        $localized = ad_blog_merge_locale_fields(
-            $localized,
-            ad_blog_read_manual_locales_from_post($_POST),
-            $existing
-        );
-
-        if ($id > 0) {
-            $stmt = $db->prepare(
-                'UPDATE blog_posts SET
-                    title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?,
-                    excerpt=?, content=?, cover=?, status=?, published_at=?,
-                    title_ru=?, title_hy=?, title_ar=?, slug_ru=?, slug_hy=?, slug_ar=?,
-                    meta_title_ru=?, meta_title_hy=?, meta_title_ar=?,
-                    meta_description_ru=?, meta_description_hy=?, meta_description_ar=?,
-                    meta_keywords_ru=?, meta_keywords_hy=?, meta_keywords_ar=?,
-                    excerpt_ru=?, excerpt_hy=?, excerpt_ar=?, content_ru=?, content_hy=?, content_ar=?
-                 WHERE id=?'
-            );
-            $stmt->execute([
-                $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
-                $excerpt, $content, $cover, $status, $publishedAt,
-                $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
-                $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
-                $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
-                $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
-                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
-                $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
-                $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
-                $id,
-            ]);
-            ad_blog_post_set_categories($id, $postedCats);
-            $msg = 'نوشته به‌روزرسانی شد.';
-        } else {
-            $stmt = $db->prepare(
-                'INSERT INTO blog_posts (
-                    title, slug, meta_title, meta_description, meta_keywords,
-                    excerpt, content, cover, status, published_at,
-                    title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
-                    meta_title_ru, meta_title_hy, meta_title_ar,
-                    meta_description_ru, meta_description_hy, meta_description_ar,
-                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
-                    excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-            );
-            $stmt->execute([
-                $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
-                $excerpt, $content, $cover, $status, $publishedAt,
-                $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
-                $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
-                $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
-                $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
-                $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
-                $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
-                $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
-            ]);
-            $newId = (int) $db->lastInsertId();
-            ad_blog_post_set_categories($newId, $postedCats);
-            $msg = 'نوشته افزوده شد.';
-            $id = $newId;
-        }
+        $saved = ad_blog_save_post_from_input($postInput, false);
+        $id = $saved['id'];
+        $msg = !empty($saved['created']) ? 'نوشته افزوده شد.' : 'نوشته به‌روزرسانی شد.';
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
             $msg .= ' (هشدار ترجمه: ' . implode('؛ ', array_slice($translateWarnings, 0, 5)) . ')';
@@ -196,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg .= ' عنوان و خلاصه/متا (در صورت خالی بودن در زبان‌های دیگر) خودکار به‌روز شد؛ بدنه را در هر زبان جدا وارد کنید.';
         }
         ad_flash_set('ok', $msg);
-        ad_seo_on_content_change();
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());
         $failId = (int) ($_POST['id'] ?? 0);
@@ -276,7 +157,10 @@ require __DIR__ . '/_layout_top.php';
   <div class="admin-modal__backdrop" data-admin-modal-close></div>
   <div class="admin-modal__dialog admin-modal__dialog--wide">
     <div class="admin-modal__header">
-      <h2><?= $edit ? 'ویرایش نوشته' : 'نوشتن جدید' ?></h2>
+      <div>
+        <h2 style="margin:0"><?= $edit ? 'ویرایش نوشته' : 'نوشتن جدید' ?></h2>
+        <p id="blog-autosave-status" class="muted" style="margin:0.35rem 0 0;font-size:12px"></p>
+      </div>
       <button type="button" class="admin-modal__close" data-admin-modal-close aria-label="بستن">×</button>
     </div>
     <div class="admin-modal__body">
@@ -586,4 +470,5 @@ require __DIR__ . '/_layout_top.php';
   }
 })();
 </script>
+<script src="blog-autosave.js?ver=20261116autosave" defer></script>
 <?php require __DIR__ . '/_layout_bottom.php'; ?>

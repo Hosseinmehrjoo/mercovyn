@@ -176,6 +176,242 @@ function ad_blog_merge_locale_fields(array $auto, array $manual, ?array $existin
     return $merged;
 }
 
+function ad_blog_unique_slug(string $base, int $ignoreId = 0): string
+{
+    $base = ad_slugify($base);
+    if ($base === '') {
+        $base = 'draft';
+    }
+    $slug = $base;
+    $n = 2;
+    $db = ad_db();
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM blog_posts WHERE slug = ? AND id <> ? LIMIT 1');
+        $stmt->execute([$slug, $ignoreId]);
+        if (!$stmt->fetch()) {
+            return $slug;
+        }
+        $slug = $base . '-' . $n;
+        $n++;
+    }
+}
+
+/**
+ * @param array<string, mixed> $existing
+ * @return array<string, string>
+ */
+function ad_blog_localized_for_autosave(?array $existing, array $input): array
+{
+    $existing = $existing ?? [];
+    $out = [];
+    foreach (ad_translate_locales() as $locale) {
+        foreach (['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords', 'slug'] as $field) {
+            $key = $field . '_' . $locale;
+            $out[$key] = (string) ($existing[$key] ?? '');
+        }
+    }
+    foreach (ad_blog_read_manual_locales_from_post($input) as $key => $val) {
+        $out[$key] = $val;
+    }
+
+    return $out;
+}
+
+/**
+ * @param array<string, mixed> $input  شبیه $_POST
+ * @return array{id:int, slug:string, status:string, saved_at:string, created:bool}
+ */
+function ad_blog_save_post_from_input(array $input, bool $autosave = false): array
+{
+    ad_blog_ensure_schema();
+    require_once __DIR__ . '/translate.php';
+
+    $id = (int) ($input['id'] ?? 0);
+    $existing = null;
+    if ($id > 0) {
+        $stmt = ad_db()->prepare('SELECT * FROM blog_posts WHERE id = ?');
+        $stmt->execute([$id]);
+        $existing = $stmt->fetch() ?: null;
+        if (!$existing) {
+            throw new RuntimeException('نوشته یافت نشد.');
+        }
+    }
+
+    $title = trim((string) ($input['title'] ?? ''));
+    $slug = trim((string) ($input['slug'] ?? ''));
+    $excerpt = trim((string) ($input['excerpt'] ?? ''));
+    $content = (string) ($input['content'] ?? '');
+    $cover = trim((string) ($input['cover_path'] ?? ''));
+    $coverAlt = trim((string) ($input['cover_alt'] ?? ''));
+    $metaTitle = trim((string) ($input['meta_title'] ?? ''));
+    $metaDescription = trim((string) ($input['meta_description'] ?? ''));
+    $metaKeywords = trim((string) ($input['meta_keywords'] ?? ''));
+    if (mb_strlen($metaTitle) > 255) {
+        $metaTitle = mb_substr($metaTitle, 0, 255);
+    }
+    if (mb_strlen($metaDescription) > 500) {
+        $metaDescription = mb_substr($metaDescription, 0, 500);
+    }
+    if (mb_strlen($metaKeywords) > 500) {
+        $metaKeywords = mb_substr($metaKeywords, 0, 500);
+    }
+
+    $postedCats = $input['categories'] ?? [];
+    if (!is_array($postedCats)) {
+        $postedCats = [$postedCats];
+    }
+
+    $plain = trim(preg_replace('/\s+/u', ' ', strip_tags($content)));
+    if ($autosave && $id < 1 && $title === '' && $excerpt === '' && $plain === '') {
+        $hasLocaleBody = false;
+        foreach (ad_translate_locales() as $locale) {
+            if (trim(strip_tags((string) ($input['content_' . $locale] ?? ''))) !== '') {
+                $hasLocaleBody = true;
+                break;
+            }
+        }
+        if (!$hasLocaleBody) {
+            throw new RuntimeException('هنوز محتوایی برای ذخیره نیست.');
+        }
+    }
+
+    if ($title === '') {
+        if ($autosave) {
+            $title = 'پیش‌نویس ' . date('Y-m-d H:i');
+        } else {
+            throw new RuntimeException('عنوان الزامی است.');
+        }
+    }
+
+    if ($slug === '') {
+        $slug = ad_slugify($title);
+    } else {
+        $slug = ad_slugify($slug);
+    }
+    $slug = ad_blog_unique_slug($slug, $id);
+
+    if ($cover !== '') {
+        if (!function_exists('ad_media_set_alt')) {
+            require_once __DIR__ . '/media.php';
+        }
+        ad_media_set_alt($cover, $coverAlt);
+    }
+
+    if ($autosave) {
+        if ($existing && ($existing['status'] ?? '') === 'published') {
+            $status = 'published';
+            $publishedAt = $existing['published_at'] ?? null;
+        } else {
+            $status = 'draft';
+            $publishedAt = null;
+        }
+    } else {
+        $status = (($input['status'] ?? 'draft') === 'published') ? 'published' : 'draft';
+        $publishedAt = null;
+        if ($status === 'published') {
+            $publishedAt = !empty($existing['published_at'])
+                ? (string) $existing['published_at']
+                : date('Y-m-d H:i:s');
+        }
+    }
+
+    $english = [
+        'title' => $title,
+        'excerpt' => $excerpt,
+        'content' => $content,
+        'meta_title' => $metaTitle,
+        'meta_description' => $metaDescription,
+        'meta_keywords' => $metaKeywords,
+    ];
+
+    if ($autosave) {
+        $localized = ad_blog_localized_for_autosave($existing, $input);
+        foreach (ad_translate_locales() as $locale) {
+            $slugKey = 'slug_' . $locale;
+            if (trim((string) ($localized[$slugKey] ?? '')) === '') {
+                $titleLoc = trim((string) ($localized['title_' . $locale] ?? ''));
+                $localized[$slugKey] = $titleLoc !== ''
+                    ? ad_blog_unique_slug(ad_slugify($titleLoc), $id)
+                    : $slug;
+            }
+        }
+    } else {
+        $localized = ad_blog_build_localized_fields($english, $existing);
+        $localized = ad_blog_merge_locale_fields(
+            $localized,
+            ad_blog_read_manual_locales_from_post($input),
+            $existing
+        );
+    }
+
+    $created = false;
+    if ($id > 0) {
+        $stmt = ad_db()->prepare(
+            'UPDATE blog_posts SET
+                title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?,
+                excerpt=?, content=?, cover=?, status=?, published_at=?,
+                title_ru=?, title_hy=?, title_ar=?, slug_ru=?, slug_hy=?, slug_ar=?,
+                meta_title_ru=?, meta_title_hy=?, meta_title_ar=?,
+                meta_description_ru=?, meta_description_hy=?, meta_description_ar=?,
+                meta_keywords_ru=?, meta_keywords_hy=?, meta_keywords_ar=?,
+                excerpt_ru=?, excerpt_hy=?, excerpt_ar=?, content_ru=?, content_hy=?, content_ar=?
+             WHERE id=?'
+        );
+        $stmt->execute([
+            $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
+            $excerpt, $content, $cover, $status, $publishedAt,
+            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
+            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
+            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
+            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
+            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
+            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
+            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
+            $id,
+        ]);
+        ad_blog_post_set_categories($id, $postedCats);
+    } else {
+        $stmt = ad_db()->prepare(
+            'INSERT INTO blog_posts (
+                title, slug, meta_title, meta_description, meta_keywords,
+                excerpt, content, cover, status, published_at,
+                title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
+                meta_title_ru, meta_title_hy, meta_title_ar,
+                meta_description_ru, meta_description_hy, meta_description_ar,
+                meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
+                excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        );
+        $stmt->execute([
+            $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
+            $excerpt, $content, $cover, $status, $publishedAt,
+            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
+            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
+            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
+            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
+            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
+            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
+            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
+        ]);
+        $id = (int) ad_db()->lastInsertId();
+        ad_blog_post_set_categories($id, $postedCats);
+        $created = true;
+    }
+
+    if (!$autosave) {
+        require_once __DIR__ . '/seo.php';
+        ad_seo_on_content_change();
+    }
+
+    return [
+        'id' => $id,
+        'slug' => $slug,
+        'status' => $status,
+        'saved_at' => date('c'),
+        'created' => $created,
+    ];
+}
+
 /**
  * Translate English post body into content_{locale} columns (CLI / background).
  *
