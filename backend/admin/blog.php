@@ -436,11 +436,41 @@ require __DIR__ . '/_layout_top.php';
 (function () {
   var EDITOR_IDS = ["blog-content", "blog-content-ru", "blog-content-hy", "blog-content-ar"];
   var MODAL_ID = "blog-form-modal";
-  var CKE_FLOAT_Z = 100250;
+  var CKE_FLOAT_Z = 200000;
+  var CKE_DIALOG_COVER_Z = 200010;
+  var CKE_DIALOG_Z = 200020;
   var bootScheduled = false;
 
   function ckeditorReady() {
     return typeof window.CKEDITOR !== "undefined" && typeof window.CKEDITOR.replace === "function";
+  }
+
+  function liftCkeDialogsToBody() {
+    var cover = document.querySelector(".cke_dialog_background_cover");
+    var dialog = document.querySelector(".cke_dialog");
+    [cover, dialog].forEach(function (node) {
+      if (!node || !node.parentNode) return;
+      if (node.parentNode === document.body) {
+        return;
+      }
+      if (node.parentNode.closest && node.parentNode.closest(".admin-modal")) {
+        document.body.appendChild(node);
+      }
+    });
+    if (cover) cover.style.zIndex = String(CKE_DIALOG_COVER_Z);
+    if (dialog) dialog.style.zIndex = String(CKE_DIALOG_Z);
+  }
+
+  function wireEditorDialogs(editor) {
+    editor.on("dialogShow", function () {
+      window.setTimeout(liftCkeDialogsToBody, 0);
+      window.setTimeout(liftCkeDialogsToBody, 50);
+    });
+  }
+
+  function applyGlobalCkeZIndex() {
+    if (!ckeditorReady()) return;
+    CKEDITOR.config.baseFloatZIndex = CKE_FLOAT_Z;
   }
 
   function editorConfig(id) {
@@ -479,7 +509,13 @@ require __DIR__ . '/_layout_top.php';
     var modal = el.closest(".admin-modal");
     if (modal && modal.hidden) return false;
     try {
-      CKEDITOR.replace(id, editorConfig(id));
+      applyGlobalCkeZIndex();
+      var editor = CKEDITOR.replace(id, editorConfig(id));
+      if (editor) {
+        var attach = function () { wireEditorDialogs(editor); };
+        if (editor.status === "ready") attach();
+        else editor.on("instanceReady", attach);
+      }
       return true;
     } catch (err) {
       console.warn("CKEditor init failed for", id, err);
@@ -531,6 +567,7 @@ require __DIR__ . '/_layout_top.php';
   var ckScript = document.getElementById("mercovyn-ckeditor-js");
   if (ckScript) {
     ckScript.addEventListener("load", function () {
+      applyGlobalCkeZIndex();
       if (modalIsOpen()) bootEditors();
     });
     ckScript.addEventListener("error", function () {

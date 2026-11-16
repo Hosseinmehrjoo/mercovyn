@@ -52,7 +52,7 @@ foreach ($allMenuItems as $item) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?= ad_e($pageTitle ?? 'پنل ادمین') ?> ‹ <?= ad_e(AD_PANEL_NAME) ?></title>
-  <link rel="stylesheet" href="/backend/admin/wp-admin.css?ver=20261017users" />
+  <link rel="stylesheet" href="/backend/admin/wp-admin.css?ver=20261116cke" />
   <style>
     /* critical fallback if cached CSS fails */
     body.wp-admin{margin:0;background:#f0f0f1;font-family:Tahoma,sans-serif;font-size:13px;color:#1d2327}

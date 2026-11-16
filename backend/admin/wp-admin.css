@@ -27,10 +27,11 @@
   --z-admin-modal: 100050;
   --z-admin-modal-nested: 100100;
   --z-admin-media-picker: 100150;
-  --z-cke-panel: 100250;
-  --z-cke-dialog-cover: 100260;
-  --z-cke-dialog: 100270;
-  --z-cke-maximized: 100300;
+  /* CKEditor must sit above modals (100050+) — use a high band */
+  --z-cke-panel: 200000;
+  --z-cke-dialog-cover: 200010;
+  --z-cke-dialog: 200020;
+  --z-cke-maximized: 200050;
 }
 
 * { box-sizing: border-box; }
@@ -780,6 +781,7 @@ body.admin-modal-open { overflow: hidden; }
 .admin-modal__backdrop {
   position: fixed;
   inset: 0;
+  z-index: 0;
   background: rgba(0, 0, 0, 0.55);
 }
 .admin-modal__dialog {
@@ -819,13 +821,22 @@ body.admin-modal-open { overflow: hidden; }
   z-index: var(--z-cke-panel) !important;
 }
 .cke_dialog_background_cover {
+  position: fixed !important;
+  inset: 0 !important;
   z-index: var(--z-cke-dialog-cover) !important;
 }
 .cke_dialog {
+  position: fixed !important;
   z-index: var(--z-cke-dialog) !important;
 }
 .cke_maximized {
   z-index: var(--z-cke-maximized) !important;
+}
+body.admin-modal-open .cke_dialog {
+  z-index: var(--z-cke-dialog) !important;
+}
+body.admin-modal-open .cke_dialog_background_cover {
+  z-index: var(--z-cke-dialog-cover) !important;
 }
 .admin-modal__header {
   display: flex;
