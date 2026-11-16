@@ -30,7 +30,6 @@ include __DIR__ . '/../includes/header.php';
 
     <?php
     $videoPlacement = 'home_products';
-    $videoSectionShowHeading = false;
     include __DIR__ . '/../includes/partials/video-carousel-section.php';
     ?>
 

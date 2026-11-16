@@ -13,6 +13,10 @@ if (!ad_video_placement_valid($videoPlacement)) {
     $videoPlacement = 'home';
 }
 $videoSectionShowHeading = $videoSectionShowHeading ?? true;
+$useFactoryHeadings = in_array($videoPlacement, ['about', 'home_products'], true);
+$videoKicker = $useFactoryHeadings ? __('videos_factory_kicker') : __('videos_section_kicker');
+$videoTitle = $useFactoryHeadings ? __('videos_factory_title') : __('videos_section_title');
+$videoSubtitle = $useFactoryHeadings ? __('videos_factory_subtitle') : __('videos_section_subtitle');
 $sectionDomId = 'mercovyn-videos-' . $videoPlacement;
 $sectionExtraClass = $videoPlacement === 'home_products' ? ' mercovyn-videos-section--compact' : '';
 ?>
@@ -25,10 +29,10 @@ $sectionExtraClass = $videoPlacement === 'home_products' ? ' mercovyn-videos-sec
         <?php if ($videoSectionShowHeading): ?>
         <div class="section-title text-center mb-4">
             <div class="sub-style">
-                <h5 class="sub-title text-primary px-3"><?= __("videos_section_kicker") ?></h5>
+                <h5 class="sub-title text-primary px-3"><?= htmlspecialchars($videoKicker, ENT_QUOTES, 'UTF-8') ?></h5>
             </div>
-            <h2 class="display-6 mb-2"><?= __("videos_section_title") ?></h2>
-            <p class="text-muted mb-0"><?= __("videos_section_subtitle") ?></p>
+            <h2 class="display-6 mb-2"><?= htmlspecialchars($videoTitle, ENT_QUOTES, 'UTF-8') ?></h2>
+            <p class="text-muted mb-0"><?= htmlspecialchars($videoSubtitle, ENT_QUOTES, 'UTF-8') ?></p>
         </div>
         <?php endif; ?>
         <div class="video-carousel" id="videoCarousel-<?= htmlspecialchars($videoPlacement, ENT_QUOTES, 'UTF-8') ?>">
