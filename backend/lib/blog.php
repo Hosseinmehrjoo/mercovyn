@@ -122,12 +122,9 @@ function ad_blog_read_manual_locales_from_post(array $post): array
 {
     $out = [];
     foreach (ad_translate_locales() as $locale) {
-        foreach (ad_blog_locale_form_fields() as $field) {
-            $key = $field . '_' . $locale;
-            if (!array_key_exists($key, $post)) {
-                continue;
-            }
-            $out[$key] = $field === 'content' ? (string) $post[$key] : trim((string) $post[$key]);
+        $key = 'content_' . $locale;
+        if (array_key_exists($key, $post)) {
+            $out[$key] = (string) $post[$key];
         }
     }
 

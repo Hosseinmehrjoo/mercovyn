@@ -324,36 +324,12 @@ require __DIR__ . '/_layout_top.php';
         foreach ($blogLocalePanels as $locale => $localeLabel):
             ?>
         <div class="form-section blog-locale-panel">
-          <h3 class="form-section__title">ترجمه — <?= ad_e($localeLabel) ?></h3>
-          <p class="hint" style="margin:0 0 0.75rem">بدنه را خودتان وارد کنید. اگر عنوان/خلاصه/متا خالی بماند، با ذخیره از نسخهٔ انگلیسی ترجمهٔ خودکار پر می‌شود.</p>
+          <h3 class="form-section__title">محتوای نوشته — <?= ad_e($localeLabel) ?></h3>
+          <p class="hint" style="margin:0 0 0.75rem">فقط بدنهٔ مقاله را دستی وارد کنید. عنوان، خلاصه و متا با ذخیره خودکار از انگلیسی ترجمه می‌شوند.</p>
           <div class="form-grid">
-            <div class="field field--span-2">
-              <label>عنوان</label>
-              <input type="text" name="title_<?= ad_e($locale) ?>" value="<?= ad_e($edit['title_' . $locale] ?? '') ?>" />
-            </div>
-            <div class="field field--span-3">
-              <label>نامک (اسلاگ)</label>
-              <input type="text" name="slug_<?= ad_e($locale) ?>" value="<?= ad_e($edit['slug_' . $locale] ?? '') ?>" placeholder="خالی = از عنوان این زبان" />
-            </div>
-            <div class="field field--span-3">
-              <label>خلاصه</label>
-              <textarea name="excerpt_<?= ad_e($locale) ?>" rows="3"><?= ad_e($edit['excerpt_' . $locale] ?? '') ?></textarea>
-            </div>
             <div class="field field--span-3">
               <label>محتوا (بدنه)</label>
               <textarea name="content_<?= ad_e($locale) ?>" id="blog-content-<?= ad_e($locale) ?>" class="blog-content-locale" rows="12"><?= ad_e($edit['content_' . $locale] ?? '') ?></textarea>
-            </div>
-            <div class="field field--span-2">
-              <label>متا تایتل</label>
-              <input type="text" name="meta_title_<?= ad_e($locale) ?>" maxlength="255" value="<?= ad_e($edit['meta_title_' . $locale] ?? '') ?>" />
-            </div>
-            <div class="field field--span-2">
-              <label>متا دیسکریپشن</label>
-              <textarea name="meta_description_<?= ad_e($locale) ?>" rows="2" maxlength="500"><?= ad_e($edit['meta_description_' . $locale] ?? '') ?></textarea>
-            </div>
-            <div class="field field--span-2">
-              <label>متا کیورد</label>
-              <input type="text" name="meta_keywords_<?= ad_e($locale) ?>" maxlength="500" value="<?= ad_e($edit['meta_keywords_' . $locale] ?? '') ?>" />
             </div>
           </div>
         </div>
@@ -455,61 +431,112 @@ require __DIR__ . '/_layout_top.php';
   </div>
 </div>
 
-<script src="https://cdn.ckeditor.com/4.25.2-lts/full/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js" id="mercovyn-ckeditor-js"></script>
 <script>
 (function () {
   var EDITOR_IDS = ["blog-content", "blog-content-ru", "blog-content-hy", "blog-content-ar"];
   var MODAL_ID = "blog-form-modal";
   var CKE_FLOAT_Z = 100250;
-
-  var LOCALE_RTL = { ar: true, hy: false, ru: false };
+  var bootScheduled = false;
 
   function ckeditorReady() {
-    return typeof window.CKEDITOR !== "undefined";
+    return typeof window.CKEDITOR !== "undefined" && typeof window.CKEDITOR.replace === "function";
   }
 
   function editorConfig(id) {
-    var locale = id.replace("blog-content-", "");
-    var rtl = locale && LOCALE_RTL[locale];
+    var locale = id === "blog-content" ? "en" : id.replace("blog-content-", "");
+    var rtl = locale === "ar";
     return {
-      language: "fa",
+      language: "en",
       contentsLangDirection: rtl ? "rtl" : "ltr",
-      height: id === "blog-content" ? 380 : 280,
+      height: id === "blog-content" ? 380 : 300,
       baseFloatZIndex: CKE_FLOAT_Z,
       removePlugins: "exportpdf",
       allowedContent: true,
       toolbar: [
-        { name: "document", items: ["Source", "-", "Maximize"] },
+        { name: "document", items: ["Source", "-", "Maximize", "Preview"] },
         { name: "clipboard", items: ["Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "Undo", "Redo"] },
+        { name: "editing", items: ["Find", "Replace", "-", "SelectAll"] },
         "/",
-        { name: "basicstyles", items: ["Bold", "Italic", "Underline", "-", "RemoveFormat"] },
-        { name: "paragraph", items: ["NumberedList", "BulletedList", "-", "JustifyLeft", "JustifyCenter", "JustifyRight"] },
-        { name: "links", items: ["Link", "Unlink"] },
-        { name: "insert", items: ["Image", "Table", "HorizontalRule"] }
+        { name: "basicstyles", items: ["Bold", "Italic", "Underline", "Strike", "-", "RemoveFormat"] },
+        { name: "paragraph", items: ["NumberedList", "BulletedList", "-", "Outdent", "Indent", "-", "Blockquote", "-", "JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock"] },
+        { name: "links", items: ["Link", "Unlink", "Anchor"] },
+        { name: "insert", items: ["Image", "Table", "HorizontalRule", "SpecialChar"] },
+        "/",
+        { name: "styles", items: ["Styles", "Format", "Font", "FontSize"] },
+        { name: "colors", items: ["TextColor", "BGColor"] }
       ]
     };
   }
 
   function initEditor(id) {
-    if (!ckeditorReady()) return;
-    if (CKEDITOR.instances[id]) return;
+    if (!ckeditorReady()) return false;
+    if (CKEDITOR.instances[id]) {
+      try { CKEDITOR.instances[id].destroy(true); } catch (ignore) {}
+    }
     var el = document.getElementById(id);
-    if (!el) return;
-    CKEDITOR.replace(id, editorConfig(id));
+    if (!el) return false;
+    var modal = el.closest(".admin-modal");
+    if (modal && modal.hidden) return false;
+    try {
+      CKEDITOR.replace(id, editorConfig(id));
+      return true;
+    } catch (err) {
+      console.warn("CKEditor init failed for", id, err);
+      return false;
+    }
+  }
+
+  function modalIsOpen() {
+    var modal = document.getElementById(MODAL_ID);
+    return modal && !modal.hidden;
   }
 
   function bootEditors() {
-    if (!ckeditorReady()) return;
-    var modal = document.getElementById(MODAL_ID);
-    if (modal && modal.hidden) return;
-    EDITOR_IDS.forEach(initEditor);
+    if (!modalIsOpen()) return;
+    if (!ckeditorReady()) {
+      if (!bootScheduled) {
+        bootScheduled = true;
+        setTimeout(function () {
+          bootScheduled = false;
+          bootEditors();
+        }, 150);
+      }
+      return;
+    }
+    window.setTimeout(function () {
+      EDITOR_IDS.forEach(function (id) {
+        initEditor(id);
+      });
+      EDITOR_IDS.forEach(function (id) {
+        var inst = CKEDITOR.instances[id];
+        if (inst) {
+          try { inst.resize("100%", id === "blog-content" ? 380 : 300, true); } catch (e) {}
+        }
+      });
+    }, 60);
   }
 
-  document.addEventListener("DOMContentLoaded", bootEditors);
+  window.MercovynBlogCkeBoot = bootEditors;
+
   document.addEventListener("admin-modal:open", function (e) {
     if (!e.detail || e.detail.id !== MODAL_ID) return;
     bootEditors();
   });
+
+  window.addEventListener("load", function () {
+    if (modalIsOpen()) bootEditors();
+  });
+
+  var ckScript = document.getElementById("mercovyn-ckeditor-js");
+  if (ckScript) {
+    ckScript.addEventListener("load", function () {
+      if (modalIsOpen()) bootEditors();
+    });
+    ckScript.addEventListener("error", function () {
+      console.error("CKEditor CDN failed to load. Check network or CSP.");
+    });
+  }
 
   var form = document.getElementById("blog-post-form");
   if (form) {
