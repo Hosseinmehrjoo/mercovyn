@@ -102,6 +102,12 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
+    <?php
+    $videoPlacement = 'home_products';
+    $videoSectionShowHeading = false;
+    include __DIR__ . '/../includes/partials/video-carousel-section.php';
+    ?>
+
     <!-- Products Section -->
     <section class="container-fluid services-section products-section py-4">
         <div class="container py-4">

@@ -249,6 +249,17 @@
   padding: 48px 16px;
   color: #5a6b84;
 }
+.mercovyn-videos-section--compact {
+  padding-top: 0 !important;
+  padding-bottom: 1rem !important;
+}
+.mercovyn-videos-section--compact .container {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+.video-carousel.is-single .video-carousel-button {
+  display: none;
+}
 @media (max-width: 900px) {
   .video-carousel { padding: 36px 0 12px; }
   .video-carousel-track { height: clamp(280px, 48vh, 520px); }

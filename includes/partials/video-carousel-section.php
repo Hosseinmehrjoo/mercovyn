@@ -1,21 +1,28 @@
 <?php
 /**
- * Video carousel slot (home | about).
+ * Video carousel slot (home | about | home_products, …).
  *
  * @var string $videoPlacement
+ * @var bool   $videoSectionShowHeading
  */
 $videoPlacement = $videoPlacement ?? 'home';
-if (!in_array($videoPlacement, ['home', 'about'], true)) {
+if (!function_exists('ad_video_placement_valid')) {
+    require_once dirname(__DIR__, 2) . '/backend/lib/videos.php';
+}
+if (!ad_video_placement_valid($videoPlacement)) {
     $videoPlacement = 'home';
 }
+$videoSectionShowHeading = $videoSectionShowHeading ?? true;
 $sectionDomId = 'mercovyn-videos-' . $videoPlacement;
+$sectionExtraClass = $videoPlacement === 'home_products' ? ' mercovyn-videos-section--compact' : '';
 ?>
 <section id="<?= htmlspecialchars($sectionDomId, ENT_QUOTES, 'UTF-8') ?>"
-         class="container-fluid py-5 mercovyn-videos-section"
+         class="container-fluid py-5 mercovyn-videos-section<?= $sectionExtraClass ?>"
          data-video-placement="<?= htmlspecialchars($videoPlacement, ENT_QUOTES, 'UTF-8') ?>"
          hidden
          aria-hidden="true">
     <div class="container py-3">
+        <?php if ($videoSectionShowHeading): ?>
         <div class="section-title text-center mb-4">
             <div class="sub-style">
                 <h5 class="sub-title text-primary px-3"><?= __("videos_section_kicker") ?></h5>
@@ -23,6 +30,7 @@ $sectionDomId = 'mercovyn-videos-' . $videoPlacement;
             <h2 class="display-6 mb-2"><?= __("videos_section_title") ?></h2>
             <p class="text-muted mb-0"><?= __("videos_section_subtitle") ?></p>
         </div>
+        <?php endif; ?>
         <div class="video-carousel" id="videoCarousel-<?= htmlspecialchars($videoPlacement, ENT_QUOTES, 'UTF-8') ?>">
             <button type="button" class="video-carousel-button prev" aria-label="<?= __("video_carousel_prev") ?>">‹</button>
             <div class="video-carousel-track"></div>

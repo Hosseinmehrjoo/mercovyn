@@ -57,9 +57,30 @@ function ad_video_placement_options(): array
     ];
 }
 
+/** @var array<string, string> placement slug → DB placement to load */
+function ad_video_placement_aliases(): array
+{
+    return [
+        // همان ویدیوی(های) جایگاه «درباره ما»، بدون رکورد جدا در پنل
+        'home_products' => 'about',
+    ];
+}
+
+function ad_video_placement_resolve(string $placement): string
+{
+  $placement = trim($placement);
+    $aliases = ad_video_placement_aliases();
+
+    return $aliases[$placement] ?? $placement;
+}
+
 function ad_video_placement_valid(string $placement): bool
 {
-    return array_key_exists($placement, ad_video_placement_options());
+    if (array_key_exists($placement, ad_video_placement_options())) {
+        return true;
+    }
+
+    return array_key_exists($placement, ad_video_placement_aliases());
 }
 
 function ad_videos_get(int $id): ?array
@@ -126,17 +147,18 @@ function ad_video_localized_title(array $row, string $lang): string
 /**
  * @return list<array<string, mixed>>
  */
-function ad_videos_list_public(string $lang = 'en', string $placement = 'home'): array
+function ad_videos_list_public(string $lang = 'en', string $placement = 'home', ?int $limit = null): array
 {
     ad_videos_ensure_schema();
     if (!ad_video_placement_valid($placement)) {
         return [];
     }
+    $dbPlacement = ad_video_placement_resolve($placement);
     $stmt = ad_db()->prepare(
         "SELECT * FROM site_videos WHERE is_active = 1 AND video_url <> '' AND placement = ?
          ORDER BY sort_order ASC, id ASC"
     );
-    $stmt->execute([$placement]);
+    $stmt->execute([$dbPlacement]);
     $rows = $stmt->fetchAll();
     $out = [];
     foreach ($rows as $row) {
@@ -156,6 +178,10 @@ function ad_videos_list_public(string $lang = 'en', string $placement = 'home'):
             'subtitles' => $subs,
         ];
     }
+    if ($limit !== null && $limit > 0) {
+        $out = array_slice($out, 0, $limit);
+    }
+
     return $out;
 }
 

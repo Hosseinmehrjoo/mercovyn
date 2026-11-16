@@ -9,6 +9,14 @@
 
 /backend/config.php
 
+# کوکی/نشست توسعه (curl و مرورگر)
+cookies.txt
+
+# راه‌اندازی SSH و pull ماشین‌محور — روی لوکال/سرور نگه دارید، در GitHub نرود
+deploy/github-ssh-local.sh
+deploy/github-ssh-server.sh
+deploy/mercovyn-git-pull.sh
+
 *.pem
 *.key
 *.crt
@@ -105,8 +113,3 @@ desktop.ini
 *.sql.gz
 *.sql.zip
 
-# ==========================================
-# Git
-# ==========================================
-
-.git/

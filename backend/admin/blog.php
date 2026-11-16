@@ -188,8 +188,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $newId;
         }
         $bodyJobStarted = false;
+        $bodyJobInline = false;
         if ($deferBody && $id > 0) {
             $bodyJobStarted = ad_spawn_background_php('jobs/translate_blog_post.php', [(string) $id]);
+            if (!$bodyJobStarted) {
+                ad_run_after_http_response(static function () use ($id): void {
+                    ad_blog_translate_post_body($id);
+                });
+                $bodyJobStarted = true;
+                $bodyJobInline = true;
+            }
         }
         $translateWarnings = ad_translate_take_warnings();
         if ($translateWarnings !== []) {
@@ -197,7 +205,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if ($deferBody && $id > 0) {
             if ($bodyJobStarted) {
-                $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه در پس‌زمینه (۱–۳ دقیقه) ترجمه می‌شود.';
+                if (!empty($bodyJobInline)) {
+                    $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه بلافاصله پس از ذخیره ترجمه می‌شود (۱–۳ دقیقه صبر کنید).';
+                } else {
+                    $msg .= ' عنوان و خلاصه ترجمه شد؛ بدنه در پس‌زمینه (۱–۳ دقیقه) ترجمه می‌شود.';
+                }
             } else {
                 $msg .= ' بدنه را دستی ترجمه کنید: php backend/jobs/translate_blog_post.php ' . $id;
             }

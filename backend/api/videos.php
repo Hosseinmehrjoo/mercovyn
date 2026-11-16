@@ -20,7 +20,9 @@ if (!ad_video_placement_valid($placement)) {
     ad_json(['ok' => true, 'items' => []]);
 }
 
+$limit = $placement === 'home_products' ? 1 : null;
+
 ad_json([
     'ok' => true,
-    'items' => ad_videos_list_public($lang, $placement),
+    'items' => ad_videos_list_public($lang, $placement, $limit),
 ]);

@@ -411,6 +411,13 @@
     var prevButton = carousel.querySelector('.prev');
     var currentIndex = 0;
     var isAnimating = false;
+    var single = items.length <= 1;
+
+    if (single) {
+      if (nextButton) nextButton.hidden = true;
+      if (prevButton) prevButton.hidden = true;
+      carousel.classList.add('is-single');
+    }
 
     function updateCarousel() {
       if (isAnimating) return;

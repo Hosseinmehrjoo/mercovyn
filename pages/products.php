@@ -13,6 +13,7 @@ $products = ad_service_list_active();
 $pageTitle = __("our_services") . ' | ' . __("brand");
 $metaDescription = __("services_subtitle");
 $currentPath = 'products';
+$loadMercovynVideos = true;
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -26,6 +27,12 @@ include __DIR__ . '/../includes/header.php';
             </ol>
         </div>
     </div>
+
+    <?php
+    $videoPlacement = 'home_products';
+    $videoSectionShowHeading = false;
+    include __DIR__ . '/../includes/partials/video-carousel-section.php';
+    ?>
 
     <section class="container-fluid products-archive products-section py-4">
         <div class="container py-4">

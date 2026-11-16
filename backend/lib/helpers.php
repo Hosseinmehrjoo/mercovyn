@@ -322,11 +322,75 @@ function ad_csrf_check(?string $token): bool
 }
 
 /**
+ * PHP CLI binary for background jobs (never php-fpm — PHP_BINARY under FPM points at FPM).
+ */
+function ad_php_cli_binary(): string
+{
+    foreach (
+        [
+            '/usr/bin/php',
+            '/usr/local/bin/php',
+            '/usr/bin/php8.5',
+            '/usr/bin/php8.4',
+            '/usr/bin/php8.3',
+            '/usr/bin/php8.2',
+        ] as $candidate
+    ) {
+        if (is_executable($candidate)) {
+            return $candidate;
+        }
+    }
+    if (
+        defined('PHP_BINARY')
+        && is_string(PHP_BINARY)
+        && PHP_BINARY !== ''
+        && is_executable(PHP_BINARY)
+        && stripos(basename(PHP_BINARY), 'fpm') === false
+    ) {
+        return PHP_BINARY;
+    }
+
+    return 'php';
+}
+
+function ad_exec_enabled(): bool
+{
+    if (!function_exists('exec')) {
+        return false;
+    }
+    $disabled = ini_get('disable_functions');
+    if (!is_string($disabled) || trim($disabled) === '') {
+        return true;
+    }
+    $list = array_map('trim', explode(',', strtolower($disabled)));
+
+    return !in_array('exec', $list, true);
+}
+
+/**
+ * Run work after the HTTP response is sent (FPM-friendly fallback when exec is unavailable).
+ */
+function ad_run_after_http_response(callable $callback): void
+{
+    register_shutdown_function(static function () use ($callback): void {
+        if (function_exists('fastcgi_finish_request')) {
+            @fastcgi_finish_request();
+        }
+        @set_time_limit(0);
+        try {
+            $callback();
+        } catch (Throwable $e) {
+            error_log('ad_run_after_http_response: ' . $e->getMessage());
+        }
+    });
+}
+
+/**
  * Run a PHP script under backend/ in the background (requires exec).
  */
 function ad_spawn_background_php(string $relativePath, array $argv = []): bool
 {
-    if (!function_exists('exec')) {
+    if (!ad_exec_enabled()) {
         return false;
     }
     $root = dirname(__DIR__, 2);
@@ -334,24 +398,17 @@ function ad_spawn_background_php(string $relativePath, array $argv = []): bool
     if (!is_file($script)) {
         return false;
     }
-    $phpBin = 'php';
-    if (defined('PHP_BINARY') && is_string(PHP_BINARY) && PHP_BINARY !== '' && is_executable(PHP_BINARY)) {
-        $phpBin = PHP_BINARY;
-    } else {
-        foreach (['/usr/bin/php', '/usr/local/bin/php'] as $candidate) {
-            if (is_executable($candidate)) {
-                $phpBin = $candidate;
-                break;
-            }
-        }
-    }
+    $phpBin = ad_php_cli_binary();
     $cmd = escapeshellarg($phpBin)
         . ' ' . escapeshellarg($script);
     foreach ($argv as $arg) {
         $cmd .= ' ' . escapeshellarg((string) $arg);
     }
     $cmd .= ' > /dev/null 2>&1 &';
-    @exec($cmd);
+    @exec($cmd, $unused, $exitCode);
+    if ($exitCode !== 0 && $exitCode !== null) {
+        return false;
+    }
 
     return true;
 }
