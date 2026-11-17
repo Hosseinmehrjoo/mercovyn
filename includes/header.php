@@ -165,6 +165,11 @@ foreach ($hreflangUrls as $lang => $url) {
 
     <!-- Navbar & Hero Start -->
     <div class="container-fluid nav-bar p-0">
+        <div class="navbar-mobile-lang d-lg-none border-bottom bg-white px-3 py-2">
+            <div class="d-flex justify-content-center justify-content-md-end">
+                <?php $langSwitcherVariant = 'mobile-header'; include __DIR__ . '/lang-switcher.php'; unset($langSwitcherVariant); ?>
+            </div>
+        </div>
         <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
             <a href="<?= url('') ?>" class="navbar-brand p-0 d-inline-flex align-items-center" aria-label="<?= htmlspecialchars(__('brand'), ENT_QUOTES, 'UTF-8') ?>">
                 <img src="<?= $logoUrl ?>" class="site-logo" alt="<?= htmlspecialchars(__('brand'), ENT_QUOTES, 'UTF-8') ?>" width="120" height="120" decoding="async" fetchpriority="high">
@@ -181,10 +186,6 @@ foreach ($hreflangUrls as $lang => $url) {
                     <a href="<?= url('contact') ?>" class="nav-item nav-link"><?= __("contact") ?></a>
                 </div>
                 <div class="d-lg-none navbar-mobile-tools w-100 pt-3 mt-2 border-top">
-                    <p class="small text-muted text-center mb-2"><?= __("language") ?></p>
-                    <div class="d-flex justify-content-center mb-3">
-                        <?php $langSwitcherVariant = 'navbar'; include __DIR__ . '/lang-switcher.php'; unset($langSwitcherVariant); ?>
-                    </div>
                     <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center px-1">
                         <button type="button" class="btn btn-primary border-secondary flex-sm-fill" data-bs-toggle="modal" data-bs-target="#searchModal">
                             <i class="fas fa-search me-2"></i><?= __("search") ?>

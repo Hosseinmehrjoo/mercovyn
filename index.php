@@ -5,8 +5,11 @@
  */
 
 require_once __DIR__ . '/router.php';
+require_once __DIR__ . '/backend/lib/geoip.php';
 
 enforceCanonicalRequest();
+ad_geo_handle_lang_picked_query();
+maybeRedirectGeoLanguage();
 
 $requestPath = trim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/', '/');
 $seoFile = basename($requestPath);

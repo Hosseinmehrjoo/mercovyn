@@ -1575,6 +1575,21 @@ html.motion-off .wow,
     color: #fff !important;
 }
 
+.language-switcher--mobile-header .language-switcher__btn {
+    padding: 0.2rem 0.45rem;
+    min-width: 2.35rem;
+    border-color: rgba(21, 50, 26, 0.18);
+    background: rgba(21, 50, 26, 0.05);
+}
+
+.language-switcher--mobile-header .language-switcher__code {
+    font-size: 0.7rem;
+}
+
+.navbar-mobile-lang {
+    border-color: rgba(21, 50, 26, 0.1) !important;
+}
+
 @media (max-width: 991.98px) {
     .nav-bar .navbar {
         padding-left: 1rem !important;

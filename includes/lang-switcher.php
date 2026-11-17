@@ -11,9 +11,28 @@ $currentPath = $currentPath ?? '';
 $hreflangUrls = getHreflangUrls($currentPath);
 
 $langSwitcherVariant = $langSwitcherVariant ?? 'topbar';
-$switcherRootClass = $langSwitcherVariant === 'navbar'
-    ? 'language-switcher language-switcher--navbar'
-    : 'language-switcher';
+$switcherRootClass = match ($langSwitcherVariant) {
+    'navbar' => 'language-switcher language-switcher--navbar',
+    'mobile-header' => 'language-switcher language-switcher--mobile-header',
+    default => 'language-switcher',
+};
+
+$appendLangPicked = static function (string $absoluteUrl): string {
+    $parts = parse_url($absoluteUrl);
+    if ($parts === false || empty($parts['scheme'])) {
+        return $absoluteUrl;
+    }
+    $query = [];
+    if (!empty($parts['query'])) {
+        parse_str($parts['query'], $query);
+    }
+    $query['lang_picked'] = '1';
+    $path = $parts['path'] ?? '/';
+    $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+    $q = http_build_query($query);
+
+    return ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $port . $path . '?' . $q;
+};
 
 $languageLabels = [
     'en' => ['label' => 'EN', 'name' => 'English', 'flag' => '🇺🇸'],
@@ -28,7 +47,7 @@ $languageLabels = [
         <?php foreach ($languageLabels as $code => $info): ?>
             <li>
                 <a class="language-switcher__btn<?= $code === $currentLang ? ' is-active' : '' ?>"
-                   href="<?= htmlspecialchars($hreflangUrls[$code] ?? '#', ENT_QUOTES, 'UTF-8') ?>"
+                   href="<?= htmlspecialchars($appendLangPicked($hreflangUrls[$code] ?? '#'), ENT_QUOTES, 'UTF-8') ?>"
                    hreflang="<?= htmlspecialchars($code, ENT_QUOTES, 'UTF-8') ?>"
                    lang="<?= htmlspecialchars($code, ENT_QUOTES, 'UTF-8') ?>"
                    title="<?= htmlspecialchars($info['name'], ENT_QUOTES, 'UTF-8') ?>"

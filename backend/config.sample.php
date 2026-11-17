@@ -33,6 +33,11 @@ return [
     // اختیاری؛ برای سهمیه بالاتر MyMemory
     'mymemory_email' => '',
 
+    // زبان پیش‌فرض از IP (روسیه→ru، ارمنستان→hy، کشورهای عرب→ar، بقیه/ناشناس→en)
+    'geoip_enabled' => true,
+    // اختیاری: نام هدر کشور از nginx/Cloudflare (مثال: CF-IPCountry یا X-Country-Code)
+    'geoip_country_header' => '',
+
     // محدودیت ورود (پس از چند تلاش ناموفق)
     'login_max_attempts' => 8,
     'login_lockout_seconds' => 900,
