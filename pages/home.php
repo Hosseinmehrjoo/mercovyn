@@ -134,6 +134,8 @@ include __DIR__ . '/../includes/header.php';
 
     <?php include __DIR__ . '/../includes/partials/custom-colors-section.php'; ?>
 
+    <?php include __DIR__ . '/../includes/partials/home-gallery-section.php'; ?>
+
     <!-- Features/Advantages Section -->
     <section class="container-fluid features-section py-5" style="background: #f8f9fa;">
         <div class="container py-5">
@@ -481,8 +483,6 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </section>
-
-    <?php include __DIR__ . '/../includes/partials/home-gallery-section.php'; ?>
 
 <?php
 include __DIR__ . '/../includes/footer.php';
