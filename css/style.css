@@ -761,6 +761,95 @@ html.motion-off .wow,
 /*** Navbar End ***/
 
 
+/*** Home hero — 800px, transparent navbar overlay ***/
+.home-hero-shell {
+    position: relative;
+    min-height: 800px;
+    background: linear-gradient(rgba(21, 50, 26, 0.82), rgba(21, 50, 26, 0.72)),
+        url(../assets/images/other/hero-bg.webp) center center / cover no-repeat;
+}
+
+.home-hero-shell .nav-bar--hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background: transparent;
+}
+
+.home-hero-shell .nav-bar--hero-overlay .navbar {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.home-hero-shell .nav-bar--hero-overlay .navbar-light .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.home-hero-shell .nav-bar--hero-overlay .navbar-light .navbar-nav .nav-link:hover,
+.home-hero-shell .nav-bar--hero-overlay .navbar-light .navbar-nav .nav-link.active {
+    color: var(--bs-secondary) !important;
+}
+
+.home-hero-shell .nav-bar--hero-overlay .navbar-toggler {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+.home-hero-shell .nav-bar--hero-overlay.sticky-top {
+    position: fixed;
+    top: 0;
+    background: #fff;
+    box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08) !important;
+}
+
+.home-hero-shell .nav-bar--hero-overlay.sticky-top .navbar {
+    background: #fff !important;
+}
+
+.home-hero-shell .nav-bar--hero-overlay.sticky-top .navbar-light .navbar-nav .nav-link {
+    color: var(--bs-primary) !important;
+    text-shadow: none;
+}
+
+.home-hero-shell .nav-bar--hero-overlay.sticky-top .navbar-toggler {
+    color: var(--bs-primary);
+    border-color: rgba(21, 50, 26, 0.25);
+}
+
+.home-hero-shell__body {
+    min-height: 800px;
+    display: flex;
+    align-items: center;
+    padding-top: 7.5rem;
+    padding-bottom: 2.5rem;
+}
+
+@media (max-width: 991.98px) {
+    .home-hero-shell__body {
+        padding-top: 9.5rem;
+        min-height: 800px;
+    }
+}
+
+.home-hero-shell .navbar-mobile-lang {
+    position: relative;
+    z-index: 2;
+}
+
+.home-hero-shell .btn-outline-primary {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.85);
+}
+
+.home-hero-shell .btn-outline-primary:hover {
+    color: var(--bs-primary);
+    background: #fff;
+    border-color: #fff;
+}
+
 /*** Single Page Hero Header Start ***/
 .bg-breadcrumb {
     background: linear-gradient(rgba(21, 50, 26, 0.88), rgba(21, 50, 26, 0.78)), url(../assets/images/other/hero-bg.webp);

@@ -41,30 +41,19 @@ $preloadHeroImage = 'assets/images/other/hero-bg.webp';
 $loadOwlCarousel = true;
 $loadCounterUp = false;
 $loadMercovynVideos = true;
+$overlayNavOnHero = true;
 
 include __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Header Start -->
-    <div class="container-fluid bg-breadcrumb">
-        <div class="container text-center py-5" style="max-width: 900px;">
-            <h3 class="text-white display-3 mb-4 wow fadeInDown" data-wow-delay="0.1s"><?= __("home_hero_title") ?></h3>
-            <ol class="breadcrumb justify-content-center text-white mb-0 wow fadeInDown" data-wow-delay="0.3s">
-                <li class="breadcrumb-item"><a href="<?= url('') ?>" class="text-white"><?= __("home") ?></a></li>
-                <li class="breadcrumb-item active text-secondary"><?= __("home") ?></li>
-            </ol>
-        </div>
-    </div>
-    <!-- Header End -->
-
-    <!-- Hero Section -->
-    <section class="container-fluid hero-section py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-        <div class="container py-5">
+    <!-- Hero Section (800px, navbar overlays via header) -->
+    <section class="home-hero-shell__body container-fluid hero-section py-4 py-lg-0">
+        <div class="container h-100 py-lg-4">
             <div class="row align-items-center">
                 <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
-                    <h1 class="display-4 mb-4"><?= __("hero_title") ?></h1>
-                    <p class="lead mb-2"><?= __("hero_subtitle") ?></p>
-                    <p class="text-muted mb-4"><?= __("global_export_tagline") ?></p>
+                    <h1 class="display-4 mb-4 text-white"><?= __("hero_title") ?></h1>
+                    <p class="lead mb-2 text-white"><?= __("hero_subtitle") ?></p>
+                    <p class="text-white-50 mb-4"><?= __("global_export_tagline") ?></p>
                     <div class="d-flex flex-wrap gap-3">
                         <a href="<?= url('contact') ?>" class="btn btn-primary btn-lg rounded-pill px-4"><?= __("get_quote") ?></a>
                         <a href="<?= url('products') ?>" class="btn btn-outline-primary btn-lg rounded-pill px-4"><?= __("our_services") ?></a>
@@ -101,6 +90,8 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </section>
+</div>
+<!-- /.home-hero-shell -->
 
     <?php
     $videoPlacement = 'home_products';

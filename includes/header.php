@@ -20,6 +20,7 @@ $pageDir = $currentLang === 'ar' ? 'rtl' : 'ltr';
 $ogLocales = ['en' => 'en_US', 'ru' => 'ru_RU', 'hy' => 'hy_AM', 'ar' => 'ar_SA'];
 $ogLocale = $ogLocales[$currentLang] ?? 'en_US';
 $loadMercovynVideos = $loadMercovynVideos ?? false;
+$overlayNavOnHero = !empty($overlayNavOnHero);
 
 // Default SEO values
 $pageTitle = $pageTitle ?? __("brand") . ' - ' . __("tagline");
@@ -164,8 +165,12 @@ foreach ($hreflangUrls as $lang => $url) {
     </div>
     <!-- Topbar End -->
 
+    <?php if ($overlayNavOnHero): ?>
+    <div class="home-hero-shell">
+    <?php endif; ?>
+
     <!-- Navbar & Hero Start -->
-    <div class="container-fluid nav-bar p-0">
+    <div class="container-fluid nav-bar p-0<?= $overlayNavOnHero ? ' nav-bar--hero-overlay' : '' ?>">
         <div class="navbar-mobile-lang d-lg-none border-bottom bg-white px-3 py-2">
             <div class="d-flex justify-content-center justify-content-md-end">
                 <?php $langSwitcherVariant = 'mobile-header'; include __DIR__ . '/lang-switcher.php'; unset($langSwitcherVariant); ?>
