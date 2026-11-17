@@ -2096,4 +2096,27 @@ html[dir="rtl"] .blog-card__cat {
     border-bottom: 2px solid rgba(186, 146, 59, 0.35);
 }
 
+/*** Home gallery ***/
+.home-gallery-thumb {
+    display: block;
+    background: #fff;
+    cursor: zoom-in;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-gallery-thumb:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+}
+
+.home-gallery-thumb__img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.home-gallery-section .section-title {
+    margin-bottom: 1.5rem !important;
+}
+
 /*** Responsive end ***/

@@ -482,5 +482,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
+    <?php include __DIR__ . '/../includes/partials/home-gallery-section.php'; ?>
+
 <?php
 include __DIR__ . '/../includes/footer.php';

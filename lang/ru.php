@@ -182,6 +182,11 @@ return [
     'portfolio_subtitle' => 'Наш продукт в поле, на заводе и в упаковке',
     'cta_title' => 'Готовы сделать заказ?',
     'cta_subtitle' => 'Свяжитесь с нами сегодня для получения цен, кастомных цветов и вариантов доставки.',
+    'home_gallery_subtitle' => 'С поля и с завода',
+    'home_gallery_title' => 'Фотогалерея',
+    'home_gallery_image_alt' => 'Фото Mercovyn',
+    'gallery_show_more' => 'Показать ещё',
+    'gallery_show_less' => 'Свернуть',
     'countries_subtitle' => 'Наша нить уже работает на фермах в шести странах и продолжает расширяться',
     
     // Blog/News

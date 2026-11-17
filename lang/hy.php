@@ -182,6 +182,11 @@ return [
     'portfolio_subtitle' => 'Տեսեք արտադրանքը դաշտում, գործարանում և փաթեթավորման մեջ',
     'cta_title' => 'Պատրա՞ստ եք պատվիրել',
     'cta_subtitle' => 'Կապվեք մեզ հետ այսօր՝ գներ, անհատական գույներ և առաքման տարբերակների համար։',
+    'home_gallery_subtitle' => 'Դաշտից և գործարանից',
+    'home_gallery_title' => 'Նկարների պատկերասրահ',
+    'home_gallery_image_alt' => 'Mercovyn լուսանկար',
+    'gallery_show_more' => 'Ցույց տալ ավելին',
+    'gallery_show_less' => 'Փակել',
     'countries_subtitle' => 'Մեր բինդերը արդեն աշխատում է վեց երկրների ֆերմաներում',
 
     // Blog/News

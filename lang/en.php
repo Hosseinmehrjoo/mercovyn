@@ -182,6 +182,11 @@ return [
     'portfolio_subtitle' => 'See our product in the field, factory, and packaging',
     'cta_title' => 'Ready to Place an Order?',
     'cta_subtitle' => 'Contact us today for pricing, custom colors, and delivery options.',
+    'home_gallery_subtitle' => 'From the field & factory',
+    'home_gallery_title' => 'Photo Gallery',
+    'home_gallery_image_alt' => 'Mercovyn photo',
+    'gallery_show_more' => 'Show more photos',
+    'gallery_show_less' => 'Show less',
     'countries_subtitle' => 'Global export from Armenia, Yerevan — serving farms and distributors worldwide.',
     
     // Blog/News
