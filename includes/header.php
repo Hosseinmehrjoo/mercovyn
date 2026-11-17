@@ -29,16 +29,18 @@ $ogImage = $ogImage ?? '';
 $currentPath = $currentPath ?? '';
 $logoUrl = '/img/mercovyn-logo.webp';
 if ($ogImage === '') {
-    $ogImage = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . $logoUrl;
+    $ogImage = getCanonicalSiteOrigin() . $logoUrl;
 }
 
 $hreflangPathByLang = $hreflangPathByLang ?? [];
 $hreflangUrls = getHreflangUrls($currentPath, $hreflangPathByLang);
+$canonicalUrl = $hreflangUrls[$currentLang] ?? buildCanonicalUrl(trim($langPrefix, '/'), $currentPath);
 $hreflangTags = '';
 foreach ($hreflangUrls as $lang => $url) {
     $rel = $lang === 'x-default' ? 'alternate' : 'alternate';
     $hreflang = $lang;
-    $hreflangTags .= "    <link rel=\"$rel\" hreflang=\"$hreflang\" href=\"$url\" />\n";
+    $hreflangTags .= '    <link rel="alternate" hreflang="' . htmlspecialchars($hreflang, ENT_QUOTES, 'UTF-8')
+        . '" href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . "\" />\n";
 }
 ?>
 <!DOCTYPE html>
@@ -54,7 +56,7 @@ foreach ($hreflangUrls as $lang => $url) {
     <meta content="<?= htmlspecialchars($metaDescription) ?>" name="description">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="<?= $hreflangUrls[$currentLang] ?? 'https://' . $_SERVER['HTTP_HOST'] . $langPrefix . '/' ?>" />
+    <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>" />
     
     <!-- Hreflang Tags for SEO -->
 <?= $hreflangTags ?>
@@ -63,7 +65,7 @@ foreach ($hreflangUrls as $lang => $url) {
     <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
     <meta property="og:description" content="<?= htmlspecialchars($metaDescription) ?>">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="<?= $hreflangUrls[$currentLang] ?? 'https://' . $_SERVER['HTTP_HOST'] . $langPrefix . '/' ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
     <?php if ($ogImage): ?>
     <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
     <?php endif; ?>
@@ -82,8 +84,8 @@ foreach ($hreflangUrls as $lang => $url) {
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
         'name' => __('brand'),
-        'url' => $hreflangUrls['en'] ?? ('https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . '/'),
-        'logo' => 'https://' . ($_SERVER['HTTP_HOST'] ?? 'mercovyn.com') . $logoUrl,
+        'url' => $hreflangUrls['en'] ?? (getCanonicalSiteOrigin() . '/'),
+        'logo' => getCanonicalSiteOrigin() . $logoUrl,
         'email' => 'mercovyn@gmail.com',
         'telephone' => '+37491551987',
         'address' => [

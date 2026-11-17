@@ -19,7 +19,7 @@ return [
     'site_name' => 'Mercovyn LLC',
     // آدرس عمومی سایت بدون اسلش پایانی (برای sitemap و robots)
     // مثال: https://ana-developer.ir
-    'site_url' => '',
+    'site_url' => 'https://www.mercovyn.com',
     'timezone' => 'Asia/Yerevan',
 
     // ترجمه خودکار محتوای CMS (انگلیسی → ru / hy / ar) هنگام ذخیره در پنل

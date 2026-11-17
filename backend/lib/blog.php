@@ -648,8 +648,17 @@ function ad_blog_post_categories(int $postId): array
  */
 function ad_blog_post_slug(array $post, string $lang = ''): string
 {
-    unset($lang);
-    return trim((string) ($post['slug'] ?? ''));
+    if ($lang === '') {
+        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
+    }
+    $base = trim((string) ($post['slug'] ?? ''));
+    if ($lang === 'en') {
+        return $base;
+    }
+    $key = 'slug_' . $lang;
+    $localized = trim((string) ($post[$key] ?? ''));
+
+    return $localized !== '' ? $localized : $base;
 }
 
 function ad_blog_localized_field(array $row, string $field, string $lang = ''): string

@@ -122,8 +122,17 @@ function ad_service_localized_field(array $row, string $field, string $lang = ''
 
 function ad_service_localized_slug(array $row, string $lang = ''): string
 {
-    unset($lang);
-    return trim((string) ($row['slug'] ?? ''));
+    if ($lang === '') {
+        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
+    }
+    $base = trim((string) ($row['slug'] ?? ''));
+    if ($lang === 'en') {
+        return $base;
+    }
+    $key = 'slug_' . $lang;
+    $localized = trim((string) ($row[$key] ?? ''));
+
+    return $localized !== '' ? $localized : $base;
 }
 
 function ad_service_public_url(array $row, string $lang = ''): string

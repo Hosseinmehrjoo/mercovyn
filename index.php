@@ -6,6 +6,8 @@
 
 require_once __DIR__ . '/router.php';
 
+enforceCanonicalRequest();
+
 $requestPath = trim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/', '/');
 $seoFile = basename($requestPath);
 if (in_array($seoFile, ['sitemap.xml', 'robots.txt', 'llms.txt'], true)) {

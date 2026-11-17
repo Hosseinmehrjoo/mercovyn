@@ -33,11 +33,10 @@ if ($product) {
     if ($ogImage !== '') {
         $ogImage = ad_public_upload_url($ogImage);
     }
-    $hreflangPathByLang = [
-        'en' => 'product/' . ad_service_localized_slug($product, 'en'),
-        'ru' => 'product/' . ad_service_localized_slug($product, 'ru'),
-        'hy' => 'product/' . ad_service_localized_slug($product, 'hy'),
-    ];
+    $hreflangPathByLang = [];
+    foreach (ad_supported_languages() as $langCode) {
+        $hreflangPathByLang[$langCode] = 'product/' . ad_service_localized_slug($product, $langCode);
+    }
     $schemaOrg = [
         '@context' => 'https://schema.org',
         '@type' => 'Product',

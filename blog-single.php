@@ -73,12 +73,10 @@ if ($post) {
     $ogImage = ad_blog_localized_field($post, 'cover');
     $currentPath = 'blog-single/' . ad_blog_post_slug($post, $currentLang);
     $postSlug = ad_blog_post_slug($post, $currentLang);
-    $hreflangPathByLang = [
-        'en' => 'blog-single/' . $postSlug,
-        'ru' => 'blog-single/' . $postSlug,
-        'hy' => 'blog-single/' . $postSlug,
-        'ar' => 'blog-single/' . $postSlug,
-    ];
+    $hreflangPathByLang = [];
+    foreach (ad_supported_languages() as $langCode) {
+        $hreflangPathByLang[$langCode] = 'blog-single/' . ad_blog_post_slug($post, $langCode);
+    }
     $schemaOrg = [
         '@context' => 'https://schema.org',
         '@type' => 'Article',

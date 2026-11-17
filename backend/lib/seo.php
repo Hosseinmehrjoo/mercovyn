@@ -10,15 +10,10 @@ function ad_seo_site_root(): string
 
 function ad_seo_site_base_url(): string
 {
-    $config = ad_config();
-    if (!empty($config['site_url'])) {
-        return rtrim((string) $config['site_url'], '/');
+    if (!function_exists('getCanonicalSiteOrigin')) {
+        require_once dirname(__DIR__, 2) . '/router.php';
     }
-    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || ((int) ($_SERVER['SERVER_PORT'] ?? 0) === 443);
-    $scheme = $https ? 'https' : 'http';
-    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
-    return $scheme . '://' . $host;
+    return getCanonicalSiteOrigin();
 }
 
 function ad_seo_absolute_url(string $pathOrUrl): string
@@ -406,7 +401,7 @@ function ad_seo_service_urls(): array
         require_once __DIR__ . '/services.php';
         ad_services_ensure_schema();
         $rows = ad_db()->query(
-            'SELECT title, title_ru, title_hy, slug, slug_ru, slug_hy, summary, updated_at, created_at
+            'SELECT title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar, summary, updated_at, created_at
              FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
         )->fetchAll();
     } catch (Throwable $e) {
@@ -417,12 +412,17 @@ function ad_seo_service_urls(): array
         $last = (string) ($row['updated_at'] ?? $row['created_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
         $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['summary'] ?? ''))) ?? '');
-        $slug = trim((string) ($row['slug'] ?? ''));
-        if ($slug === '') {
+        $baseSlug = trim((string) ($row['slug'] ?? ''));
+        if ($baseSlug === '') {
             continue;
         }
         foreach (ad_seo_langs() as $lang) {
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
+            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
+            $slug = trim((string) ($row[$slugKey] ?? ''));
+            if ($slug === '') {
+                $slug = $baseSlug;
+            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
                 $title = (string) ($row['title'] ?? $slug);
@@ -449,7 +449,7 @@ function ad_seo_blog_urls(): array
         require_once __DIR__ . '/blog.php';
         ad_blog_ensure_schema();
         $rows = ad_db()->query(
-            "SELECT title, title_ru, title_hy, slug, slug_ru, slug_hy, excerpt, published_at, updated_at
+            "SELECT title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar, excerpt, published_at, updated_at
              FROM blog_posts
              WHERE status = 'published'
              ORDER BY published_at DESC, id DESC"
@@ -462,12 +462,17 @@ function ad_seo_blog_urls(): array
         $last = (string) ($row['updated_at'] ?? $row['published_at'] ?? '');
         $lastmod = $last !== '' ? gmdate('Y-m-d', strtotime($last) ?: time()) : null;
         $excerpt = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($row['excerpt'] ?? ''))) ?? '');
-        $slug = trim((string) ($row['slug'] ?? ''));
-        if ($slug === '') {
+        $baseSlug = trim((string) ($row['slug'] ?? ''));
+        if ($baseSlug === '') {
             continue;
         }
         foreach (ad_seo_langs() as $lang) {
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
+            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
+            $slug = trim((string) ($row[$slugKey] ?? ''));
+            if ($slug === '') {
+                $slug = $baseSlug;
+            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
                 $title = (string) ($row['title'] ?? $slug);

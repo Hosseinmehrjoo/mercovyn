@@ -129,33 +129,145 @@ function url(string $path, string $lang = ''): string
 }
 
 /**
- * Get all language URLs for hreflang
+ * Canonical public origin (https + www). Used for canonical, hreflang, sitemap.
  */
+function getCanonicalSiteOrigin(): string
+{
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+    $default = 'https://www.mercovyn.com';
+    $configFile = __DIR__ . '/backend/config.php';
+    if (!is_file($configFile)) {
+        $cached = $default;
+        return $cached;
+    }
+    /** @var array<string, mixed> $config */
+    $config = require $configFile;
+    $url = trim((string) ($config['site_url'] ?? ''));
+    if ($url === '') {
+        $cached = $default;
+        return $cached;
+    }
+    $parts = parse_url($url);
+    if (!is_array($parts) || empty($parts['host'])) {
+        $cached = $default;
+        return $cached;
+    }
+    $scheme = strtolower((string) ($parts['scheme'] ?? 'https'));
+    if ($scheme !== 'https' && $scheme !== 'http') {
+        $scheme = 'https';
+    }
+    if ($scheme === 'http') {
+        $scheme = 'https';
+    }
+    $host = strtolower((string) $parts['host']);
+    if (!str_starts_with($host, 'www.')) {
+        $host = 'www.' . preg_replace('/^www\./', '', $host);
+    }
+    $cached = $scheme . '://' . $host;
+    return $cached;
+}
+
+/**
+ * Build one absolute canonical URL for a language path (no query string).
+ */
+function buildCanonicalUrl(string $langPrefixPath, string $pathWithoutLang = ''): string
+{
+    $origin = getCanonicalSiteOrigin();
+    $pathWithoutLang = trim($pathWithoutLang, '/');
+    $pathWithoutLang = preg_replace('/\.php$/', '', $pathWithoutLang);
+    $langPrefixPath = trim($langPrefixPath, '/');
+    if ($langPrefixPath === '' && $pathWithoutLang === '') {
+        return $origin . '/';
+    }
+    if ($langPrefixPath === '') {
+        return $origin . '/' . $pathWithoutLang . '/';
+    }
+    if ($pathWithoutLang === '') {
+        return $origin . '/' . $langPrefixPath . '/';
+    }
+
+    return $origin . '/' . $langPrefixPath . '/' . $pathWithoutLang . '/';
+}
+
+/**
+ * 301 to canonical host (www) and default English URL (/ not /en/) when needed.
+ */
+function enforceCanonicalRequest(): void
+{
+    if (PHP_SAPI === 'cli') {
+        return;
+    }
+    $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+    $path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+    $query = parse_url($requestUri, PHP_URL_QUERY);
+    $qs = $query !== null && $query !== '' ? '?' . $query : '';
+
+    $origin = getCanonicalSiteOrigin();
+    $canonicalHost = parse_url($origin, PHP_URL_HOST);
+    $requestHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+    $target = null;
+
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443')
+        || (strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https');
+    if ($canonicalHost && $requestHost === strtolower((string) $canonicalHost) && !$isHttps) {
+        $target = $origin . $path . $qs;
+    }
+
+    if ($canonicalHost && $requestHost !== '' && strcasecmp($requestHost, $canonicalHost) !== 0) {
+        $reqBare = preg_replace('/^www\./', '', $requestHost);
+        $canBare = preg_replace('/^www\./', '', (string) $canonicalHost);
+        if ($reqBare === $canBare) {
+            $target = $origin . $path . $qs;
+        }
+    }
+
+    if ($target === null && preg_match('#^/en(/.*)?$#', $path, $m)) {
+        $rest = $m[1] ?? '';
+        if ($rest === '' || $rest === '/') {
+            $newPath = '/';
+        } else {
+            $newPath = $rest;
+            if (!str_ends_with($newPath, '/')) {
+                $newPath .= '/';
+            }
+        }
+        $target = $origin . $newPath . $qs;
+    }
+
+    if ($target !== null) {
+        header('Location: ' . $target, true, 301);
+        exit;
+    }
+}
+
 /**
  * @param array<string, string> $pathByLang Optional full path per lang without leading slash (e.g. blog-single/foo)
+ * @return array<string, string> lang code => absolute URL
  */
 function getHreflangUrls(string $currentPath = '', array $pathByLang = []): array
 {
     $urls = [];
     $currentPath = ltrim($currentPath, '/');
     $currentPath = preg_replace('/\.php$/', '', $currentPath);
-    $host = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
     foreach (SUPPORTED_LANGUAGES as $lang) {
         $prefix = getLanguagePrefix($lang);
+        $prefixPart = $prefix === '' ? '' : trim($prefix, '/');
         if (isset($pathByLang[$lang]) && $pathByLang[$lang] !== '') {
-            $path = trim($pathByLang[$lang], '/');
-            $urls[$lang] = $host . $prefix . '/' . $path . '/';
+            $urls[$lang] = buildCanonicalUrl($prefixPart, $pathByLang[$lang]);
             continue;
         }
-        $path = $currentPath === '' ? '' : $currentPath . '/';
-        $urls[$lang] = $host . $prefix . '/' . $path;
+        $urls[$lang] = buildCanonicalUrl($prefixPart, $currentPath);
     }
 
     $defaultPath = isset($pathByLang['en']) && $pathByLang['en'] !== ''
-        ? trim($pathByLang['en'], '/') . '/'
-        : ($currentPath === '' ? '' : $currentPath . '/');
-    $urls['x-default'] = $host . '/' . $defaultPath;
+        ? $pathByLang['en']
+        : $currentPath;
+    $urls['x-default'] = buildCanonicalUrl('', $defaultPath);
 
     return $urls;
 }
