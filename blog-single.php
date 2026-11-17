@@ -66,9 +66,23 @@ if ($post) {
 }
 
 if ($post) {
-    $articleTitle = ad_blog_localized_field($post, 'title');
-    $pageTitle = ad_blog_localized_field($post, 'meta_title') ?: $articleTitle . ' | ' . __('brand');
-    $metaDescription = ad_blog_localized_field($post, 'meta_description') ?: ad_blog_localized_field($post, 'excerpt');
+    $post = ad_blog_ensure_locale_seo($post, $currentLang);
+    $articleTitle = ad_blog_locale_only($post, 'title', $currentLang);
+    if ($articleTitle === '') {
+        $articleTitle = trim((string) ($post['title'] ?? ''));
+    }
+    $metaTitle = ad_blog_locale_only($post, 'meta_title', $currentLang);
+    $pageTitle = $metaTitle !== '' ? $metaTitle : ($articleTitle !== '' ? $articleTitle . ' | ' . __('brand') : __('brand'));
+    $metaDescription = ad_blog_locale_only($post, 'meta_description', $currentLang);
+    if ($metaDescription === '') {
+        $metaDescription = ad_blog_locale_only($post, 'excerpt', $currentLang);
+    }
+    if ($metaDescription === '') {
+        $metaDescription = trim((string) ($post['meta_description'] ?? ''));
+    }
+    if ($metaDescription === '') {
+        $metaDescription = trim((string) ($post['excerpt'] ?? ''));
+    }
     $metaKeywords = ad_blog_localized_field($post, 'meta_keywords');
     $ogImage = ad_blog_localized_field($post, 'cover');
     $currentPath = 'blog-single/' . ad_blog_post_slug($post, $currentLang);

@@ -676,6 +676,84 @@ function ad_blog_localized_field(array $row, string $field, string $lang = ''): 
 }
 
 /**
+ * Locale column only — no English fallback. Empty string if that language was never stored.
+ */
+function ad_blog_locale_only(array $row, string $field, string $lang): string
+{
+    if ($lang === '' || $lang === 'en') {
+        return trim((string) ($row[$field] ?? ''));
+    }
+
+    return trim((string) ($row[$field . '_' . $lang] ?? ''));
+}
+
+/**
+ * Fill missing title / meta title / meta description / excerpt for one language and save them.
+ * Body HTML is not translated here.
+ *
+ * @param array<string, mixed> $post
+ * @return array<string, mixed>
+ */
+function ad_blog_ensure_locale_seo(array $post, string $lang): array
+{
+    if ($lang === '' || $lang === 'en' || !in_array($lang, ad_supported_languages(), true)) {
+        return $post;
+    }
+    $id = (int) ($post['id'] ?? 0);
+    if ($id < 1) {
+        return $post;
+    }
+    if (!function_exists('ad_translate_text')) {
+        require_once __DIR__ . '/translate.php';
+    }
+    if (!ad_translate_enabled()) {
+        return $post;
+    }
+
+    $map = [
+        'title' => trim((string) ($post['title'] ?? '')),
+        'meta_title' => trim((string) ($post['meta_title'] ?? '')),
+        'meta_description' => trim((string) ($post['meta_description'] ?? '')),
+        'excerpt' => trim((string) ($post['excerpt'] ?? '')),
+    ];
+    if ($map['meta_title'] === '') {
+        $map['meta_title'] = $map['title'];
+    }
+    if ($map['meta_description'] === '') {
+        $map['meta_description'] = $map['excerpt'];
+    }
+
+    $updates = [];
+    foreach ($map as $field => $source) {
+        $key = $field . '_' . $lang;
+        if (trim((string) ($post[$key] ?? '')) !== '' || $source === '') {
+            continue;
+        }
+        $translated = trim(ad_translate_text($source, $lang));
+        if ($translated === '' || $translated === $source) {
+            continue;
+        }
+        $post[$key] = $translated;
+        $updates[$key] = $translated;
+    }
+
+    if ($updates === []) {
+        return $post;
+    }
+
+    $sets = [];
+    $params = [];
+    foreach ($updates as $column => $value) {
+        $sets[] = '`' . $column . '` = ?';
+        $params[] = $value;
+    }
+    $params[] = $id;
+    ad_db()->prepare('UPDATE blog_posts SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($params);
+
+    return $post;
+}
+
+/**
  * True when localized HTML body is missing or still identical to English source.
  */
 function ad_blog_locale_content_missing(array $row, string $locale): bool
