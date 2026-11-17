@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $placement = trim((string) ($_POST['placement'] ?? ''));
         if (!ad_video_placement_valid($placement)) {
-            throw new RuntimeException('انتخاب جایگاه نمایش ویدیو الزامی است (صفحه اصلی یا درباره ما).');
+            throw new RuntimeException('انتخاب جایگاه نمایش ویدیو الزامی است.');
         }
 
         @set_time_limit(120);
@@ -158,7 +158,7 @@ require __DIR__ . '/_layout_top.php';
 .subtitle-block h3{margin:0 0 8px;font-size:13px}
 </style>
 <h1>ویدیوهای صفحه اصلی</h1>
-<p class="muted">دو جایگاه نمایش دارید: <strong>صفحه اصلی</strong> (کاروسل، بلافاصله زیر Our Advantages) و <strong>درباره ما</strong> (بلافاصله زیر سکشن اصلی). انتخاب جایگاه برای هر ویدیو اجباری است. زیرنویس SRT برای en / ru / hy (در سایت به VTT تبدیل می‌شود).</p>
+<p class="muted">جایگاه‌ها: <strong>صفحه اصلی</strong> (کاروسل زیر Our Advantages)، <strong>درباره ما</strong>، و <strong>ویدیو هیرو</strong> (پس‌زمینهٔ هیرو؛ بی‌صدا، تکرار و پخش خودکار). اگر چند ویدیوی هیرو فعال باشد، اولین مورد بر اساس ترتیب نمایش پخش می‌شود.</p>
 <p class="muted"><strong>مهم:</strong> فایل ویدیو را فقط با «بارگذاری ویدیو» بفرستید؛ دکمه «افزودن» فقط اطلاعات را ذخیره می‌کند.</p>
 
 <div class="card">

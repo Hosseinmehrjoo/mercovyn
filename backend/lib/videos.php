@@ -54,6 +54,7 @@ function ad_video_placement_options(): array
     return [
         'home' => 'صفحه اصلی (کاروسل — زیر Our Advantages)',
         'about' => 'درباره ما (زیر سکشن اصلی)',
+        'hero' => 'ویدیو هیرو (پس‌زمینه هیرو، پخش خودکار)',
     ];
 }
 

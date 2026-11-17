@@ -165,8 +165,27 @@ foreach ($hreflangUrls as $lang => $url) {
     </div>
     <!-- Topbar End -->
 
+    <?php
+    $heroBgVideo = null;
+    if ($overlayNavOnHero) {
+        require_once __DIR__ . '/../backend/lib/videos.php';
+        try {
+            $heroList = ad_videos_list_public($currentLang, 'hero', 1);
+            $heroBgVideo = $heroList[0] ?? null;
+        } catch (Throwable $e) {
+            $heroBgVideo = null;
+        }
+    }
+    ?>
     <?php if ($overlayNavOnHero): ?>
-    <div class="home-hero-shell">
+    <div class="home-hero-shell<?= $heroBgVideo ? ' home-hero-shell--video' : '' ?>">
+        <?php if ($heroBgVideo): ?>
+        <video class="home-hero-shell__video" autoplay muted loop playsinline
+               <?php if (!empty($heroBgVideo['poster_url'])): ?>poster="<?= htmlspecialchars((string) $heroBgVideo['poster_url'], ENT_QUOTES, 'UTF-8') ?>"<?php endif; ?>
+               aria-hidden="true">
+            <source src="<?= htmlspecialchars((string) $heroBgVideo['video_url'], ENT_QUOTES, 'UTF-8') ?>" type="video/mp4">
+        </video>
+        <?php endif; ?>
     <?php endif; ?>
 
     <!-- Navbar & Hero Start -->
