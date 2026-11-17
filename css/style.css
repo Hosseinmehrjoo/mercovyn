@@ -794,6 +794,40 @@ html.motion-off .wow,
     z-index: 2;
 }
 
+.hero-stats-bar {
+    background: #fff;
+    border-bottom: 1px solid rgba(21, 50, 26, 0.08);
+}
+
+.hero-stats-bar__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.hero-stats-bar__item {
+    flex: 1 1 160px;
+    max-width: 280px;
+    text-align: center;
+    padding: 0.75rem 1.25rem;
+}
+
+.hero-stats-bar__item + .hero-stats-bar__item {
+    border-inline-start: 1px solid rgba(21, 50, 26, 0.12);
+}
+
+@media (max-width: 767.98px) {
+    .hero-stats-bar__item {
+        flex: 1 1 45%;
+        max-width: none;
+    }
+
+    .hero-stats-bar__item:nth-child(odd) {
+        border-inline-start: 0;
+    }
+}
+
 .home-hero-shell .nav-bar--hero-overlay {
     position: absolute;
     top: 0;

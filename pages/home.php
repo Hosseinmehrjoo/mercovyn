@@ -49,42 +49,14 @@ include __DIR__ . '/../includes/header.php';
     <!-- Hero Section (800px, navbar overlays via header) -->
     <section class="home-hero-shell__body container-fluid hero-section py-4 py-lg-0">
         <div class="container h-100 py-lg-4">
-            <div class="row align-items-center">
-                <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
+            <div class="row justify-content-center">
+                <div class="col-lg-9 col-xl-8 text-center wow fadeInUp" data-wow-delay="0.1s">
                     <h1 class="display-4 mb-4 text-white"><?= __("hero_title") ?></h1>
                     <p class="lead mb-2 text-white"><?= __("hero_subtitle") ?></p>
                     <p class="text-white-50 mb-4"><?= __("global_export_tagline") ?></p>
-                    <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex flex-wrap gap-3 justify-content-center">
                         <a href="<?= url('contact') ?>" class="btn btn-primary btn-lg rounded-pill px-4"><?= __("get_quote") ?></a>
                         <a href="<?= url('products') ?>" class="btn btn-outline-primary btn-lg rounded-pill px-4"><?= __("our_services") ?></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 wow fadeInRight" data-wow-delay="0.3s">
-                    <div class="hero-stats row g-3 text-center">
-                        <div class="col-6">
-                            <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1 fs-3">6–6.5</h2>
-                                <p class="mb-0 text-muted small"><?= __("hero_stat_spool_label") ?></p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1">PP</h2>
-                                <p class="mb-0 text-muted small"><?= __("hero_stat_pp_label") ?></p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1 counter" data-target="800">800</h2>
-                                <p class="mb-0 text-muted"><?= __("team_members") ?></p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="bg-white p-4 rounded shadow-sm">
-                                <h2 class="text-primary mb-1 counter" data-target="70">70</h2>
-                                <p class="mb-0 text-muted"><?= __("awards_won") ?></p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -92,6 +64,29 @@ include __DIR__ . '/../includes/header.php';
     </section>
 </div>
 <!-- /.home-hero-shell -->
+
+    <section class="hero-stats-bar py-4">
+        <div class="container">
+            <div class="hero-stats-bar__row">
+                <div class="hero-stats-bar__item">
+                    <h2 class="text-primary mb-1 fs-3">6–6.5</h2>
+                    <p class="mb-0 text-muted small"><?= __("hero_stat_spool_label") ?></p>
+                </div>
+                <div class="hero-stats-bar__item">
+                    <h2 class="text-primary mb-1">PP</h2>
+                    <p class="mb-0 text-muted small"><?= __("hero_stat_pp_label") ?></p>
+                </div>
+                <div class="hero-stats-bar__item">
+                    <h2 class="text-primary mb-1">800</h2>
+                    <p class="mb-0 text-muted"><?= __("team_members") ?></p>
+                </div>
+                <div class="hero-stats-bar__item">
+                    <h2 class="text-primary mb-1">70</h2>
+                    <p class="mb-0 text-muted"><?= __("awards_won") ?></p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <?php
     $videoPlacement = 'home_products';
