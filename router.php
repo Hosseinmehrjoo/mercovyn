@@ -25,12 +25,12 @@ function ad_security_headers(): void
 {
     $csp = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://use.fontawesome.com https://cdn.ckeditor.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://use.fontawesome.com https://cdn.ckeditor.com https://www.clarity.ms",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com https://cdn.jsdelivr.net https://cdn.ckeditor.com",
         "font-src 'self' data: https://fonts.gstatic.com https://use.fontawesome.com",
         "img-src 'self' data: https:",
         "media-src 'self' https: blob: data:",
-        "connect-src 'self' https://wa.me",
+        "connect-src 'self' https://wa.me https://www.clarity.ms https://c.clarity.ms https://q.clarity.ms",
         "frame-src https://www.google.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
