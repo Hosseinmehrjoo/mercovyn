@@ -183,6 +183,9 @@ function ad_geo_lang_for_country(string $countryCode): ?string
     if ($cc === 'AM') {
         return 'hy';
     }
+    if ($cc === 'GE') {
+        return 'ka';
+    }
     if (in_array($cc, AD_GEO_ARAB_COUNTRY_CODES, true)) {
         return 'ar';
     }
@@ -278,7 +281,7 @@ function maybeRedirectGeoLanguage(): void
     }
     if (!ad_geo_is_default_language_path()) {
         $first = explode('/', trim($pathOnly, '/'))[0] ?? '';
-        if (in_array($first, ['ru', 'hy', 'ar'], true)) {
+        if (in_array($first, ['ru', 'hy', 'ar', 'ka'], true)) {
             ad_geo_set_manual_choice(true);
         }
 

@@ -22,17 +22,17 @@ if ($slug !== '') {
         $db = ad_db();
         $stmt = $db->prepare(
             'SELECT id, title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, published_at,
-                    title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
-                    meta_title_ru, meta_title_hy, meta_title_ar,
-                    meta_description_ru, meta_description_hy, meta_description_ar,
-                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
-                    excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
+                    title_ru, title_hy, title_ar, title_ka, slug_ru, slug_hy, slug_ar, slug_ka,
+                    meta_title_ru, meta_title_hy, meta_title_ar, meta_title_ka,
+                    meta_description_ru, meta_description_hy, meta_description_ar, meta_description_ka,
+                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar, meta_keywords_ka,
+                    excerpt_ru, excerpt_hy, excerpt_ar, excerpt_ka, content_ru, content_hy, content_ar, content_ka
              FROM blog_posts
              WHERE status = "published"
-               AND (slug = ? OR slug_ru = ? OR slug_hy = ? OR slug_ar = ?)
+               AND (slug = ? OR slug_ru = ? OR slug_hy = ? OR slug_ar = ? OR slug_ka = ?)
              LIMIT 1'
         );
-        $stmt->execute([$slug, $slug, $slug, $slug]);
+        $stmt->execute([$slug, $slug, $slug, $slug, $slug]);
         $row = $stmt->fetch();
         if ($row) {
             $post = ad_blog_normalize_post($row);
@@ -47,11 +47,11 @@ if ($post) {
         $db = ad_db();
         $stmt = $db->prepare(
             'SELECT id, title, slug, meta_title, meta_description, meta_keywords, excerpt, content, cover, published_at,
-                    title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
-                    meta_title_ru, meta_title_hy, meta_title_ar,
-                    meta_description_ru, meta_description_hy, meta_description_ar,
-                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
-                    excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
+                    title_ru, title_hy, title_ar, title_ka, slug_ru, slug_hy, slug_ar, slug_ka,
+                    meta_title_ru, meta_title_hy, meta_title_ar, meta_title_ka,
+                    meta_description_ru, meta_description_hy, meta_description_ar, meta_description_ka,
+                    meta_keywords_ru, meta_keywords_hy, meta_keywords_ar, meta_keywords_ka,
+                    excerpt_ru, excerpt_hy, excerpt_ar, excerpt_ka, content_ru, content_hy, content_ar, content_ka
              FROM blog_posts
              WHERE status = "published" AND id != ?
              ORDER BY published_at DESC, id DESC

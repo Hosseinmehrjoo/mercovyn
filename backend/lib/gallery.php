@@ -24,6 +24,10 @@ function ad_gallery_ensure_schema(): void
           KEY `idx_gallery_active_sort` (`is_active`, `sort_order`, `id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+    $col = ad_db()->query("SHOW COLUMNS FROM site_gallery_images LIKE 'title_ka'")->fetch();
+    if (!$col) {
+        ad_db()->exec("ALTER TABLE site_gallery_images ADD COLUMN title_ka VARCHAR(255) NOT NULL DEFAULT '' AFTER title_ar");
+    }
     $done = true;
 }
 

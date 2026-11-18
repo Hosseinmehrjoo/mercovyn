@@ -401,7 +401,7 @@ function ad_seo_service_urls(): array
         require_once __DIR__ . '/services.php';
         ad_services_ensure_schema();
         $rows = ad_db()->query(
-            'SELECT title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar, summary, updated_at, created_at
+            'SELECT title, title_ru, title_hy, title_ar, title_ka, slug, slug_ru, slug_hy, slug_ar, slug_ka, summary, updated_at, created_at
              FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
         )->fetchAll();
     } catch (Throwable $e) {
@@ -449,7 +449,7 @@ function ad_seo_blog_urls(): array
         require_once __DIR__ . '/blog.php';
         ad_blog_ensure_schema();
         $rows = ad_db()->query(
-            "SELECT title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar, excerpt, published_at, updated_at
+            "SELECT title, title_ru, title_hy, title_ar, title_ka, slug, slug_ru, slug_hy, slug_ar, slug_ka, excerpt, published_at, updated_at
              FROM blog_posts
              WHERE status = 'published'
              ORDER BY published_at DESC, id DESC"

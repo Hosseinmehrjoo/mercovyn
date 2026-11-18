@@ -45,6 +45,12 @@ function ad_videos_ensure_schema(): void
             "ALTER TABLE site_videos ADD COLUMN title_ar VARCHAR(255) NOT NULL DEFAULT '' AFTER title_hy"
         );
     }
+    $titleKa = $db->query("SHOW COLUMNS FROM site_videos LIKE 'title_ka'")->fetch();
+    if (!$titleKa) {
+        $db->exec(
+            "ALTER TABLE site_videos ADD COLUMN title_ka VARCHAR(255) NOT NULL DEFAULT '' AFTER title_ar"
+        );
+    }
     $done = true;
 }
 
@@ -138,6 +144,12 @@ function ad_video_localized_title(array $row, string $lang): string
     }
     if ($lang === 'ar') {
         $t = trim((string) ($row['title_ar'] ?? ''));
+        if ($t !== '') {
+            return $t;
+        }
+    }
+    if ($lang === 'ka') {
+        $t = trim((string) ($row['title_ka'] ?? ''));
         if ($t !== '') {
             return $t;
         }

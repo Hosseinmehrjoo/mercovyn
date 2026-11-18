@@ -204,6 +204,7 @@ require __DIR__ . '/_layout_top.php';
             'ru' => 'روسی (RU)',
             'hy' => 'ارمنی (HY)',
             'ar' => 'عربی (AR)',
+            'ka' => 'گرجی (KA)',
         ];
         foreach ($blogLocalePanels as $locale => $localeLabel):
             ?>

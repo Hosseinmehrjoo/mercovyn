@@ -7,7 +7,7 @@ function ad_supported_languages(): array
         return SUPPORTED_LANGUAGES;
     }
 
-    return ['en', 'ru', 'hy', 'ar'];
+    return ['en', 'ru', 'hy', 'ar', 'ka'];
 }
 
 function ad_json(array $payload, int $status = 200): void

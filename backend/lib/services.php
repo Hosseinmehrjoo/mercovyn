@@ -61,6 +61,10 @@ function ad_services_ensure_schema(): void
         'summary_ar' => "TEXT NULL",
         'content_ar' => "MEDIUMTEXT NULL",
         'slug_ar' => "VARCHAR(200) NOT NULL DEFAULT ''",
+        'title_ka' => "VARCHAR(180) NOT NULL DEFAULT ''",
+        'summary_ka' => "TEXT NULL",
+        'content_ka' => "MEDIUMTEXT NULL",
+        'slug_ka' => "VARCHAR(200) NOT NULL DEFAULT ''",
     ];
     foreach ($langCols as $col => $def) {
         if (!in_array($col, $cols, true)) {
@@ -83,10 +87,10 @@ function ad_service_find_by_slug(string $slug): ?array
     $stmt = ad_db()->prepare(
         'SELECT * FROM services
          WHERE is_active = 1
-           AND (slug = ? OR slug_ru = ? OR slug_hy = ? OR slug_ar = ?)
+           AND (slug = ? OR slug_ru = ? OR slug_hy = ? OR slug_ar = ? OR slug_ka = ?)
          LIMIT 1'
     );
-    $stmt->execute([$slug, $slug, $slug, $slug]);
+    $stmt->execute([$slug, $slug, $slug, $slug, $slug]);
     $row = $stmt->fetch();
     return $row ? ad_service_normalize_public_row($row) : null;
 }
@@ -97,8 +101,8 @@ function ad_service_find_by_slug(string $slug): ?array
 function ad_service_list_active(int $limit = 0): array
 {
     ad_services_ensure_schema();
-    $sql = 'SELECT id, title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar,
-                   summary, summary_ru, summary_hy, summary_ar, content, content_ru, content_hy, content_ar,
+    $sql = 'SELECT id, title, title_ru, title_hy, title_ar, title_ka, slug, slug_ru, slug_hy, slug_ar, slug_ka,
+                   summary, summary_ru, summary_hy, summary_ar, summary_ka, content, content_ru, content_hy, content_ar, content_ka,
                    cover, sort_order, is_active
             FROM services WHERE is_active = 1 ORDER BY sort_order ASC, id ASC';
     if ($limit > 0) {

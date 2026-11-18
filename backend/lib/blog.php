@@ -72,6 +72,13 @@ function ad_blog_ensure_schema(): void
             'meta_keywords_ar' => "VARCHAR(500) NOT NULL DEFAULT ''",
             'excerpt_ar' => 'TEXT NULL',
             'content_ar' => 'MEDIUMTEXT NULL',
+            'title_ka' => "VARCHAR(200) NOT NULL DEFAULT ''",
+            'slug_ka' => "VARCHAR(220) NOT NULL DEFAULT ''",
+            'meta_title_ka' => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'meta_description_ka' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'meta_keywords_ka' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'excerpt_ka' => 'TEXT NULL',
+            'content_ka' => 'MEDIUMTEXT NULL',
         ];
         foreach ($blogLangCols as $col => $def) {
             if (!in_array($col, $cols, true)) {
@@ -350,23 +357,23 @@ function ad_blog_save_post_from_input(array $input, bool $autosave = false): arr
             'UPDATE blog_posts SET
                 title=?, slug=?, meta_title=?, meta_description=?, meta_keywords=?,
                 excerpt=?, content=?, cover=?, status=?, published_at=?,
-                title_ru=?, title_hy=?, title_ar=?, slug_ru=?, slug_hy=?, slug_ar=?,
-                meta_title_ru=?, meta_title_hy=?, meta_title_ar=?,
-                meta_description_ru=?, meta_description_hy=?, meta_description_ar=?,
-                meta_keywords_ru=?, meta_keywords_hy=?, meta_keywords_ar=?,
-                excerpt_ru=?, excerpt_hy=?, excerpt_ar=?, content_ru=?, content_hy=?, content_ar=?
+                title_ru=?, title_hy=?, title_ar=?, title_ka=?, slug_ru=?, slug_hy=?, slug_ar=?, slug_ka=?,
+                meta_title_ru=?, meta_title_hy=?, meta_title_ar=?, meta_title_ka=?,
+                meta_description_ru=?, meta_description_hy=?, meta_description_ar=?, meta_description_ka=?,
+                meta_keywords_ru=?, meta_keywords_hy=?, meta_keywords_ar=?, meta_keywords_ka=?,
+                excerpt_ru=?, excerpt_hy=?, excerpt_ar=?, excerpt_ka=?, content_ru=?, content_hy=?, content_ar=?, content_ka=?
              WHERE id=?'
         );
         $stmt->execute([
             $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
             $excerpt, $content, $cover, $status, $publishedAt,
-            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
-            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
-            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
-            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
-            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
-            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
-            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
+            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'], $localized['title_ka'],
+            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'], $localized['slug_ka'],
+            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'], $localized['meta_title_ka'],
+            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'], $localized['meta_description_ka'],
+            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'], $localized['meta_keywords_ka'],
+            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'], $localized['excerpt_ka'],
+            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'], $localized['content_ka'],
             $id,
         ]);
         ad_blog_post_set_categories($id, $postedCats);
@@ -375,23 +382,23 @@ function ad_blog_save_post_from_input(array $input, bool $autosave = false): arr
             'INSERT INTO blog_posts (
                 title, slug, meta_title, meta_description, meta_keywords,
                 excerpt, content, cover, status, published_at,
-                title_ru, title_hy, title_ar, slug_ru, slug_hy, slug_ar,
-                meta_title_ru, meta_title_hy, meta_title_ar,
-                meta_description_ru, meta_description_hy, meta_description_ar,
-                meta_keywords_ru, meta_keywords_hy, meta_keywords_ar,
-                excerpt_ru, excerpt_hy, excerpt_ar, content_ru, content_hy, content_ar
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                title_ru, title_hy, title_ar, title_ka, slug_ru, slug_hy, slug_ar, slug_ka,
+                meta_title_ru, meta_title_hy, meta_title_ar, meta_title_ka,
+                meta_description_ru, meta_description_hy, meta_description_ar, meta_description_ka,
+                meta_keywords_ru, meta_keywords_hy, meta_keywords_ar, meta_keywords_ka,
+                excerpt_ru, excerpt_hy, excerpt_ar, excerpt_ka, content_ru, content_hy, content_ar, content_ka
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         );
         $stmt->execute([
             $title, $slug, $metaTitle, $metaDescription, $metaKeywords,
             $excerpt, $content, $cover, $status, $publishedAt,
-            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'],
-            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'],
-            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'],
-            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'],
-            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'],
-            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'],
-            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'],
+            $localized['title_ru'], $localized['title_hy'], $localized['title_ar'], $localized['title_ka'],
+            $localized['slug_ru'], $localized['slug_hy'], $localized['slug_ar'], $localized['slug_ka'],
+            $localized['meta_title_ru'], $localized['meta_title_hy'], $localized['meta_title_ar'], $localized['meta_title_ka'],
+            $localized['meta_description_ru'], $localized['meta_description_hy'], $localized['meta_description_ar'], $localized['meta_description_ka'],
+            $localized['meta_keywords_ru'], $localized['meta_keywords_hy'], $localized['meta_keywords_ar'], $localized['meta_keywords_ka'],
+            $localized['excerpt_ru'], $localized['excerpt_hy'], $localized['excerpt_ar'], $localized['excerpt_ka'],
+            $localized['content_ru'], $localized['content_hy'], $localized['content_ar'], $localized['content_ka'],
         ]);
         $id = (int) ad_db()->lastInsertId();
         ad_blog_post_set_categories($id, $postedCats);
@@ -789,6 +796,7 @@ function ad_blog_format_date(?string $dateStr, string $lang = ''): string
         'ru' => ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         'hy' => ['Հուն', 'Փետ', 'Մար', 'Ապր', 'Մայ', 'Հուն', 'Հուլ', 'Օգս', 'Սեպ', 'Հոկ', 'Նոյ', 'Դեկ'],
         'ar' => ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+        'ka' => ['იან', 'თებ', 'მარ', 'აპრ', 'მაი', 'ივნ', 'ივლ', 'აგვ', 'სექ', 'ოქტ', 'ნოე', 'დეკ'],
     ];
     $langMonths = $months[$lang] ?? $months['en'];
     $m = (int) $dt->format('m') - 1;

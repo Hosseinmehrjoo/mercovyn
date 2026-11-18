@@ -17,7 +17,7 @@ $langInfo = getLanguageInfo();
 $currentLang = $langInfo['current'];
 $langPrefix = $langInfo['prefix'];
 $pageDir = $currentLang === 'ar' ? 'rtl' : 'ltr';
-$ogLocales = ['en' => 'en_US', 'ru' => 'ru_RU', 'hy' => 'hy_AM', 'ar' => 'ar_SA'];
+$ogLocales = ['en' => 'en_US', 'ru' => 'ru_RU', 'hy' => 'hy_AM', 'ar' => 'ar_SA', 'ka' => 'ka_GE'];
 $ogLocale = $ogLocales[$currentLang] ?? 'en_US';
 $loadMercovynVideos = $loadMercovynVideos ?? false;
 $overlayNavOnHero = !empty($overlayNavOnHero);

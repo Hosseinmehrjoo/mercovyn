@@ -78,15 +78,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $titleRu = $localized['title_ru'];
         $titleHy = $localized['title_hy'];
         $titleAr = $localized['title_ar'];
+        $titleKa = $localized['title_ka'];
         $summaryRu = $localized['summary_ru'];
         $summaryHy = $localized['summary_hy'];
         $summaryAr = $localized['summary_ar'];
         $contentRu = $localized['content_ru'];
         $contentHy = $localized['content_hy'];
         $contentAr = $localized['content_ar'];
+        $summaryKa = $localized['summary_ka'];
+        $contentKa = $localized['content_ka'];
         $slugRu = $slug;
         $slugHy = $slug;
         $slugAr = $slug;
+        $slugKa = $slug;
 
         if (!empty($_FILES['cover']['name'])) {
             $uploaded = ad_media_upload($_FILES['cover'], 'services', $coverAlt);
@@ -99,25 +103,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($id > 0) {
             $stmt = $db->prepare(
-                'UPDATE services SET title=?, title_ru=?, title_hy=?, title_ar=?, slug=?, slug_ru=?, slug_hy=?, slug_ar=?,
-                    summary=?, summary_ru=?, summary_hy=?, summary_ar=?, content=?, content_ru=?, content_hy=?, content_ar=?,
+                'UPDATE services SET title=?, title_ru=?, title_hy=?, title_ar=?, title_ka=?, slug=?, slug_ru=?, slug_hy=?, slug_ar=?, slug_ka=?,
+                    summary=?, summary_ru=?, summary_hy=?, summary_ar=?, summary_ka=?, content=?, content_ru=?, content_hy=?, content_ar=?, content_ka=?,
                     cover=?, sort_order=?, is_active=? WHERE id=?'
             );
             $stmt->execute([
-                $title, $titleRu, $titleHy, $titleAr, $slug, $slugRu, $slugHy, $slugAr,
-                $summary, $summaryRu, $summaryHy, $summaryAr, $content, $contentRu, $contentHy, $contentAr,
+                $title, $titleRu, $titleHy, $titleAr, $titleKa, $slug, $slugRu, $slugHy, $slugAr, $slugKa,
+                $summary, $summaryRu, $summaryHy, $summaryAr, $summaryKa, $content, $contentRu, $contentHy, $contentAr, $contentKa,
                 $cover, $sort, $active, $id,
             ]);
             $msg = 'محصول به‌روزرسانی شد.';
         } else {
             $stmt = $db->prepare(
-                'INSERT INTO services (title, title_ru, title_hy, title_ar, slug, slug_ru, slug_hy, slug_ar,
-                    summary, summary_ru, summary_hy, summary_ar, content, content_ru, content_hy, content_ar, cover, sort_order, is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                'INSERT INTO services (title, title_ru, title_hy, title_ar, title_ka, slug, slug_ru, slug_hy, slug_ar, slug_ka,
+                    summary, summary_ru, summary_hy, summary_ar, summary_ka, content, content_ru, content_hy, content_ar, content_ka, cover, sort_order, is_active)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->execute([
-                $title, $titleRu, $titleHy, $titleAr, $slug, $slugRu, $slugHy, $slugAr,
-                $summary, $summaryRu, $summaryHy, $summaryAr, $content, $contentRu, $contentHy, $contentAr,
+                $title, $titleRu, $titleHy, $titleAr, $titleKa, $slug, $slugRu, $slugHy, $slugAr, $slugKa,
+                $summary, $summaryRu, $summaryHy, $summaryAr, $summaryKa, $content, $contentRu, $contentHy, $contentAr, $contentKa,
                 $cover, $sort, $active,
             ]);
             $msg = 'محصول افزوده شد.';
