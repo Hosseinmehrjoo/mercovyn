@@ -12,6 +12,9 @@
 # کوکی/نشست توسعه (curl و مرورگر)
 cookies.txt
 
+# ابزار لوکال (PHP قابل‌حمل و کتابخانه‌های موقت) — روی سرور لازم نیست
+/.tools/
+
 # راه‌اندازی SSH و pull ماشین‌محور — روی لوکال/سرور نگه دارید، در GitHub نرود
 deploy/github-ssh-local.sh
 deploy/github-ssh-server.sh
