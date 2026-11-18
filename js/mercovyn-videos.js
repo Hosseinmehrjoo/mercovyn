@@ -531,6 +531,44 @@
       .then(function (data) { return (data && data.items) || []; });
   }
 
+  function bindFloaterFlee(section) {
+    if (!section || section.getAttribute('data-floater-flee') === '1') return;
+    if (!window.matchMedia('(min-width: 1200px)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var host = section.querySelector('.video-floaters');
+    if (!host) return;
+    section.setAttribute('data-floater-flee', '1');
+    var radius = 240;
+    var maxPush = 110;
+    var place = function (event) {
+      var hostRect = host.getBoundingClientRect();
+      section.querySelectorAll('.video-floater').forEach(function (node) {
+        if (node.offsetParent === null) return;
+        var cx = hostRect.left + node.offsetLeft + node.offsetWidth / 2;
+        var cy = hostRect.top + node.offsetTop + node.offsetHeight / 2;
+        var dx = cx - event.clientX;
+        var dy = cy - event.clientY;
+        var dist = Math.hypot(dx, dy);
+        if (dist >= radius || dist < 0.01) {
+          node.style.setProperty('--mx', '0px');
+          node.style.setProperty('--my', '0px');
+          return;
+        }
+        var force = (1 - dist / radius) * maxPush;
+        node.style.setProperty('--mx', (dx / dist * force).toFixed(1) + 'px');
+        node.style.setProperty('--my', (dy / dist * force).toFixed(1) + 'px');
+      });
+    };
+    var reset = function () {
+      section.querySelectorAll('.video-floater').forEach(function (node) {
+        node.style.setProperty('--mx', '0px');
+        node.style.setProperty('--my', '0px');
+      });
+    };
+    section.addEventListener('mousemove', place);
+    section.addEventListener('mouseleave', reset);
+  }
+
   function revealVideoFloaters(section) {
     if (!section || section.classList.contains('is-floaters-in')) return;
     var start = function () {
@@ -566,6 +604,7 @@
       section.removeAttribute('aria-hidden');
       initVideoCarousel(carousel, items);
       revealVideoFloaters(section);
+      bindFloaterFlee(section);
     }).catch(function () {
       section.hidden = true;
       section.setAttribute('aria-hidden', 'true');

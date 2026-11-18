@@ -40,8 +40,10 @@ $sectionExtraClass = $videoPlacement === 'home_products' ? ' mercovyn-videos-sec
     <div class="video-floaters" aria-hidden="true">
         <?php foreach ($videoFloaters as $floater): ?>
             <div class="video-floater<?= $floater['far'] ? ' video-floater--far' : '' ?>"
-                 style="--x:<?= htmlspecialchars($floater['x'], ENT_QUOTES, 'UTF-8') ?>;--y:<?= htmlspecialchars($floater['y'], ENT_QUOTES, 'UTF-8') ?>;--s:<?= htmlspecialchars($floater['s'], ENT_QUOTES, 'UTF-8') ?>;--r:<?= htmlspecialchars($floater['r'], ENT_QUOTES, 'UTF-8') ?>;--d:<?= htmlspecialchars($floater['d'], ENT_QUOTES, 'UTF-8') ?>;--in:<?= htmlspecialchars($floater['in'], ENT_QUOTES, 'UTF-8') ?>">
-                <img class="video-floater__img" src="<?= htmlspecialchars($floater['src'], ENT_QUOTES, 'UTF-8') ?>" alt="" width="200" height="200" decoding="async">
+                 style="--x:<?= htmlspecialchars($floater['x'], ENT_QUOTES, 'UTF-8') ?>;--y:<?= htmlspecialchars($floater['y'], ENT_QUOTES, 'UTF-8') ?>;--s:<?= htmlspecialchars($floater['s'], ENT_QUOTES, 'UTF-8') ?>;--r:<?= htmlspecialchars($floater['r'], ENT_QUOTES, 'UTF-8') ?>;--d:<?= htmlspecialchars($floater['d'], ENT_QUOTES, 'UTF-8') ?>;--in:<?= htmlspecialchars($floater['in'], ENT_QUOTES, 'UTF-8') ?>;--mx:0px;--my:0px">
+                <div class="video-floater__bob">
+                    <img class="video-floater__img" src="<?= htmlspecialchars($floater['src'], ENT_QUOTES, 'UTF-8') ?>" alt="" width="200" height="200" decoding="async">
+                </div>
             </div>
         <?php endforeach; ?>
     </div>

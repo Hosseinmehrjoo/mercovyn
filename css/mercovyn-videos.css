@@ -273,6 +273,10 @@
     top: var(--y);
     width: var(--s);
     margin-left: var(--x);
+    transform: translate(var(--mx), var(--my));
+    transition: transform 0.45s cubic-bezier(.16, .84, .32, 1);
+  }
+  .video-floater__bob {
     animation: videoFloaterBob 6s ease-in-out var(--d) infinite;
   }
   .video-floater__img {
@@ -312,7 +316,10 @@
   50% { transform: translateY(-12px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .video-floater,
+  .video-floater {
+    transition: none;
+  }
+  .video-floater__bob,
   .video-floater__img {
     animation: none !important;
   }
