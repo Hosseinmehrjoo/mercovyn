@@ -531,6 +531,25 @@
       .then(function (data) { return (data && data.items) || []; });
   }
 
+  function revealVideoFloaters(section) {
+    if (!section || section.classList.contains('is-floaters-in')) return;
+    var start = function () {
+      section.classList.add('is-floaters-in');
+    };
+    if (!('IntersectionObserver' in window)) {
+      start();
+      return;
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        start();
+        observer.disconnect();
+      });
+    }, { threshold: 0.35 });
+    observer.observe(section);
+  }
+
   function loadVideoSection(section) {
     if (!section) return;
     var placement = section.getAttribute('data-video-placement') || 'home';
@@ -546,6 +565,7 @@
       section.hidden = false;
       section.removeAttribute('aria-hidden');
       initVideoCarousel(carousel, items);
+      revealVideoFloaters(section);
     }).catch(function () {
       section.hidden = true;
       section.setAttribute('aria-hidden', 'true');
