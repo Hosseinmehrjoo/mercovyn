@@ -677,9 +677,9 @@ function ad_blog_localized_field(array $row, string $field, string $lang = ''): 
     $key = $field . $suffix;
     $value = $row[$key] ?? null;
     if ($value === '' || $value === null) {
-        return (string) ($row[$field] ?? '');
+        return ad_public_copy((string) ($row[$field] ?? ''), $lang);
     }
-    return (string) $value;
+    return ad_public_copy((string) $value, $lang);
 }
 
 /**

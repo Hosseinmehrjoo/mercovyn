@@ -52,9 +52,20 @@ if ($product) {
     $ogImage = '';
 }
 
+if (!$product) {
+    http_response_code(404);
+}
+
 include __DIR__ . '/../includes/header.php';
 
 $contactUrl = url('contact');
+$productKey = strtolower(trim((string) ($product['slug'] ?? '')));
+if ($productKey === 'rose') {
+    $productKey = 'red';
+}
+if (in_array($productKey, ['red', 'black', 'blue'], true)) {
+    $contactUrl .= '?product=' . rawurlencode($productKey);
+}
 $whatsapp = __('whatsapp_link');
 ?>
 

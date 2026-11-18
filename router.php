@@ -126,8 +126,12 @@ function url(string $path, string $lang = ''): string
     if ($path === '' || $path === 'index') {
         return $prefix . '/';
     }
-    
-    return $prefix . '/' . $path . '/';
+
+    $parts = array_map(static function (string $segment): string {
+        return rawurlencode(rawurldecode($segment));
+    }, explode('/', $path));
+
+    return $prefix . '/' . implode('/', $parts) . '/';
 }
 
 /**

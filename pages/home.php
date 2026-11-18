@@ -100,7 +100,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="sub-style">
                     <h5 class="sub-title text-primary px-3"><?= __("service_categories") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4"><?= __("enabling_immigration") ?></h1>
+                <h2 class="display-5 mb-4"><?= __("enabling_immigration") ?></h2>
                 <p class="mb-0"><?= __("services_subtitle") ?></p>
             </div>
             <?php if ($services === []): ?>
@@ -129,7 +129,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="sub-style">
                     <h5 class="sub-title text-primary px-3"><?= __("why_choose_us") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4"><?= __("our_features") ?></h1>
+                <h2 class="display-5 mb-4"><?= __("our_features") ?></h2>
                 <p class="mb-0"><?= __("features_subtitle") ?></p>
             </div>
             <div class="row g-4 justify-content-center text-center">
@@ -191,7 +191,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="sub-style">
                     <h5 class="sub-title text-primary px-3"><?= __("meet_team") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4"><?= __("our_team") ?></h1>
+                <h2 class="display-5 mb-4"><?= __("our_team") ?></h2>
                 <p class="mb-0"><?= __("team_subtitle") ?></p>
             </div>
             <div class="row g-4">
@@ -235,7 +235,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="sub-style">
                     <h5 class="sub-title text-primary px-3"><?= __("case_studies") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4"><?= __("portfolio") ?></h1>
+                <h2 class="display-5 mb-4"><?= __("portfolio") ?></h2>
                 <p class="mb-0"><?= __("portfolio_subtitle") ?></p>
             </div>
             <div class="row g-4">
@@ -293,52 +293,51 @@ include __DIR__ . '/../includes/header.php';
         <div class="container py-5">
             <div class="section-title text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="sub-style">
-                    <h5 class="sub-title text-primary px-3">Specifications</h5>
+                    <h5 class="sub-title text-primary px-3"><?= __("spec_kicker") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4">Built to a Standard, Not a Guess</h1>
-                <p class="mb-0">Everything buyers need at a glance: material, spool size, strength, coverage and resistance.</p>
+                <h2 class="display-5 mb-4"><?= __("spec_title") ?></h2>
+                <p class="mb-0"><?= __("spec_lead") ?></p>
             </div>
             <div class="row g-4 justify-content-center">
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-cube fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_material") ?></h5>
-                        <p class="text-muted small">UV-stabilized, weather & rot resistant</p>
+                        <p class="text-muted small"><?= __("spec_material_note") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.2s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-weight fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_spool_weight") ?></h5>
-                        <p class="text-muted small">Per spool</p>
+                        <p class="text-muted small"><?= __("spec_weight_note") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-dumbbell fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_breaking_strength") ?></h5>
-                        <p class="text-muted small">Knot & tensile</p>
+                        <p class="text-muted small"><?= __("spec_strength_note") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.4s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-seedling fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_coverage") ?></h5>
-                        <p class="text-muted small">Bales per pair of spools*</p>
+                        <p class="text-muted small"><?= __("spec_coverage_note") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.5s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-palette fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_colors") ?></h5>
-                        <p class="text-muted small">Made to order</p>
+                        <p class="text-muted small"><?= __("spec_colors_note") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.6s">
                     <div class="text-center p-4 bg-white rounded shadow-sm h-100">
                         <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
                         <h5><?= __("product_resistance") ?></h5>
-                        <p class="text-muted small">No taste or odor — rodent-neutral</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.7s">
@@ -356,7 +355,7 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </div>
-            <p class="text-muted small text-center mt-3">* Approximate — depends on bale size and density.</p>
+            <p class="text-muted small text-center mt-3"><?= __("spec_approx_note") ?></p>
         </div>
     </section>
 
@@ -365,52 +364,52 @@ include __DIR__ . '/../includes/header.php';
         <div class="container py-5">
             <div class="section-title text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="sub-style">
-                    <h5 class="sub-title text-primary px-3">Export Timeline</h5>
+                    <h5 class="sub-title text-primary px-3"><?= __("timeline_kicker") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4">Already Tying Bales in Six Countries</h1>
-                <p class="mb-0">Twelve years of steady export relationships, one country at a time — and Armenia is the newest thread.</p>
+                <h2 class="display-5 mb-4"><?= __("timeline_title") ?></h2>
+                <p class="mb-0"><?= __("timeline_lead") ?></p>
             </div>
             <div class="row g-4 justify-content-center">
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="bg-white p-4 rounded shadow-sm h-100 text-center">
                         <h2 class="text-primary mb-1">2014</h2>
                         <h5 class="mb-2"><?= __("export_georgia") ?></h5>
-                        <p class="text-muted small">Long-standing supply relationships across the Caucasus market.</p>
+                        <p class="text-muted small"><?= __("about_export_georgia_desc") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.2s">
                     <div class="bg-white p-4 rounded shadow-sm h-100 text-center">
                         <h2 class="text-primary mb-1">2016</h2>
                         <h5 class="mb-2"><?= __("export_turkmenistan") ?></h5>
-                        <p class="text-muted small">Trusted supply for agricultural buyers and distribution partners.</p>
+                        <p class="text-muted small"><?= __("about_export_turkmenistan_desc") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
                     <div class="bg-white p-4 rounded shadow-sm h-100 text-center">
                         <h2 class="text-primary mb-1">2018</h2>
                         <h5 class="mb-2"><?= __("export_iraq") ?></h5>
-                        <p class="text-muted small">Serving practical, high-demand market needs with durable twine.</p>
+                        <p class="text-muted small"><?= __("about_export_iraq_desc") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.4s">
                     <div class="bg-white p-4 rounded shadow-sm h-100 text-center">
                         <h2 class="text-primary mb-1">2021</h2>
                         <h5 class="mb-2"><?= __("export_uzbekistan") ?></h5>
-                        <p class="text-muted small">Expansion into Central Asian buyers needing consistent quality.</p>
+                        <p class="text-muted small"><?= __("about_export_uzbekistan_desc") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
                     <div class="bg-white p-4 rounded shadow-sm h-100 text-center">
                         <h2 class="text-primary mb-1">2023</h2>
                         <h5 class="mb-2"><?= __("export_tajikistan") ?></h5>
-                        <p class="text-muted small">Continued regional growth through stable export relationships.</p>
+                        <p class="text-muted small"><?= __("about_export_tajikistan_desc") ?></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.6s">
                     <div class="bg-primary p-4 rounded shadow-sm h-100 text-center text-white">
                         <h2 class="text-white mb-1">2024</h2>
                         <h5 class="mb-2"><?= __("export_armenia") ?></h5>
-                        <p class="text-white-50 small">A new local base in Yerevan with the same proven production standards.</p>
+                        <p class="text-white-50 small"><?= __("about_export_armenia_desc") ?></p>
                     </div>
                 </div>
             </div>
@@ -424,32 +423,32 @@ include __DIR__ . '/../includes/header.php';
                 <div class="sub-style">
                     <h5 class="sub-title text-primary px-3"><?= __("what_clients_say") ?></h5>
                 </div>
-                <h1 class="display-5 mb-4"><?= __("testimonials") ?></h1>
+                <h2 class="display-5 mb-4"><?= __("testimonials") ?></h2>
             </div>
             <div class="owl-carousel testimonial-carousel owl-theme" data-autoplay="true" data-loop="true" data-items="1" data-dots="true" data-nav="false">
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
                         <img src="<?= root_asset('img/testimonial-1.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
-                    <p class="fs-5 text-muted mb-4">"Mercovyn's baler twine is the most consistent we've used. Runs clean through our presses, no snags, no breaks. Reliable supply every season."</p>
-                    <h5 class="mb-1">Armen Petrosyan</h5>
-                    <p class="text-primary mb-0">Farm Owner - Armavir Region</p>
+                    <p class="fs-5 text-muted mb-4">“<?= __("testimonial_1_quote") ?>”</p>
+                    <h5 class="mb-1"><?= __("testimonial_1_name") ?></h5>
+                    <p class="text-primary mb-0"><?= __("testimonial_1_role") ?></p>
                 </div>
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
                         <img src="<?= root_asset('img/testimonial-2.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
-                    <p class="fs-5 text-muted mb-4">"We've been distributing Mercovyn twine for 3 years. Quality is steady, packaging is export-ready, and the team communicates clearly. A solid partner."</p>
-                    <h5 class="mb-1">Dmitri Volkov</h5>
-                    <p class="text-primary mb-0">Distributor - Georgia</p>
+                    <p class="fs-5 text-muted mb-4">“<?= __("testimonial_2_quote") ?>”</p>
+                    <h5 class="mb-1"><?= __("testimonial_2_name") ?></h5>
+                    <p class="text-primary mb-0"><?= __("testimonial_2_role") ?></p>
                 </div>
                 <div class="testimonial-item text-center p-4">
                     <div class="testimonial-img mb-4">
                         <img src="<?= root_asset('img/testimonial-3.jpg') ?>" class="img-fluid rounded-circle mx-auto" style="width: 80px; height: 80px;" alt="Client">
                     </div>
-                    <p class="fs-5 text-muted mb-4">"Custom color order came out exactly as requested. The rose twine is highly visible in the field — our operators love it. Will order again."</p>
-                    <h5 class="mb-1">Bahrom Nazarov</h5>
-                    <p class="text-primary mb-0">Agricultural Manager - Uzbekistan</p>
+                    <p class="fs-5 text-muted mb-4">“<?= __("testimonial_3_quote") ?>”</p>
+                    <h5 class="mb-1"><?= __("testimonial_3_name") ?></h5>
+                    <p class="text-primary mb-0"><?= __("testimonial_3_role") ?></p>
                 </div>
             </div>
         </div>

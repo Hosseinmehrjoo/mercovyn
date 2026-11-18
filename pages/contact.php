@@ -89,8 +89,20 @@ include __DIR__ . '/../includes/header.php';
                     <div class="sub-style">
                         <h5 class="sub-title text-primary pe-3"><?= __("send_message") ?></h5>
                     </div>
-                    <h1 class="display-5 mb-4"><?= __("get_quote_question") ?? 'Get a Quote or Ask a Question' ?></h1>
+                    <h2 class="display-5 mb-4"><?= __("get_quote_question") ?? 'Get a Quote or Ask a Question' ?></h2>
                     <p class="mb-3"><?= __("contact_form_desc") ?? 'Fill out the form below and we will get back to you shortly.' ?></p>
+                    <?php
+                    $productPrefill = strtolower(trim((string) ($_GET['product'] ?? '')));
+                    if ($productPrefill === 'rose') {
+                        $productPrefill = 'red';
+                    }
+                    $productOptions = [
+                        'red' => __('product_red'),
+                        'black' => __('product_black'),
+                        'blue' => __('product_blue'),
+                        'custom' => __('product_custom'),
+                    ];
+                    ?>
                     <form id="contactForm" novalidate>
                         <div class="row g-4">
                             <div class="col-lg-12 col-xl-6">
@@ -115,9 +127,9 @@ include __DIR__ . '/../includes/header.php';
                                 <div class="form-floating">
                                     <select class="form-control" id="product" name="product">
                                         <option value=""><?= __("select_product") ?></option>
-                                        <option value="black"><?= __("product_black") ?? 'Black Baler Twine' ?></option>
-                                        <option value="rose"><?= __("product_rose") ?? 'Rose Baler Twine' ?></option>
-                                        <option value="custom"><?= __("product_custom") ?? 'Custom Color' ?></option>
+                                        <?php foreach ($productOptions as $productValue => $productLabel): ?>
+                                            <option value="<?= htmlspecialchars($productValue, ENT_QUOTES, 'UTF-8') ?>"<?= $productPrefill === $productValue ? ' selected' : '' ?>><?= htmlspecialchars($productLabel, ENT_QUOTES, 'UTF-8') ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <label for="product"><?= __("product_interest") ?></label>
                                 </div>
@@ -148,7 +160,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="sub-style">
                         <h5 class="sub-title text-primary px-3"><?= __("company_details") ?></h5>
                     </div>
-                    <h1 class="display-5 mb-4"><?= __("company_name") ?></h1>
+                    <h2 class="display-5 mb-4"><?= __("company_name") ?></h2>
                     <p class="mb-0"><?= __("company_name_am") ?> — <?= __("company_tagline") ?? 'Manufacturer and importer of baler twine in Armenia' ?></p>
                 </div>
                 <div class="row g-4 justify-content-center">

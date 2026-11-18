@@ -121,6 +121,10 @@ if ($post) {
     $shareUrlEnc = rawurlencode($shareUrl);
 }
 
+if (!$post) {
+    http_response_code(404);
+}
+
 include __DIR__ . '/includes/header.php';
 ?>
 

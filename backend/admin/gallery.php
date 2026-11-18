@@ -59,14 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $english = ['title' => $title];
                 $localized = ad_auto_translate_record($english, ['title'], null, ['title']);
                 $stmt = $db->prepare(
-                    'INSERT INTO site_gallery_images (title, title_ru, title_hy, title_ar, image_url, sort_order, is_active)
-                     VALUES (?,?,?,?,?,?,?)'
+                    'INSERT INTO site_gallery_images (title, title_ru, title_hy, title_ar, title_ka, image_url, sort_order, is_active)
+                     VALUES (?,?,?,?,?,?,?,?)'
                 );
                 $stmt->execute([
                     $title,
                     (string) ($localized['title_ru'] ?? ''),
                     (string) ($localized['title_hy'] ?? ''),
                     (string) ($localized['title_ar'] ?? ''),
+                    (string) ($localized['title_ka'] ?? ''),
                     $imageUrl,
                     $sortBase + $added,
                     $active,
@@ -108,22 +109,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $titleRu = (string) ($localized['title_ru'] ?? '');
         $titleHy = (string) ($localized['title_hy'] ?? '');
         $titleAr = (string) ($localized['title_ar'] ?? '');
+        $titleKa = (string) ($localized['title_ka'] ?? '');
 
         if ($id > 0) {
             $stmt = $db->prepare(
-                'UPDATE site_gallery_images SET title=?, title_ru=?, title_hy=?, title_ar=?, image_url=?, sort_order=?, is_active=? WHERE id=?'
+                'UPDATE site_gallery_images SET title=?, title_ru=?, title_hy=?, title_ar=?, title_ka=?, image_url=?, sort_order=?, is_active=? WHERE id=?'
             );
-            $stmt->execute([$title, $titleRu, $titleHy, $titleAr, $imageUrl, $sort, $active, $id]);
+            $stmt->execute([$title, $titleRu, $titleHy, $titleAr, $titleKa, $imageUrl, $sort, $active, $id]);
             ad_flash_set('ok', 'تصویر به‌روزرسانی شد.');
             header('Location: gallery.php?edit=' . $id);
             exit;
         }
 
         $stmt = $db->prepare(
-            'INSERT INTO site_gallery_images (title, title_ru, title_hy, title_ar, image_url, sort_order, is_active)
-             VALUES (?,?,?,?,?,?,?)'
+            'INSERT INTO site_gallery_images (title, title_ru, title_hy, title_ar, title_ka, image_url, sort_order, is_active)
+             VALUES (?,?,?,?,?,?,?,?)'
         );
-        $stmt->execute([$title, $titleRu, $titleHy, $titleAr, $imageUrl, $sort, $active]);
+        $stmt->execute([$title, $titleRu, $titleHy, $titleAr, $titleKa, $imageUrl, $sort, $active]);
         ad_flash_set('ok', 'تصویر افزوده شد.');
     } catch (Throwable $e) {
         ad_flash_set('err', $e->getMessage());

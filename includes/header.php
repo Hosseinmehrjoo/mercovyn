@@ -154,8 +154,6 @@ foreach ($hreflangUrls as $lang => $url) {
             </div>
             <div class="col-lg-4 text-center text-lg-end">
                 <div class="d-inline-flex align-items-center" style="height: 45px;">
-                    <a href="#" class="text-muted me-2"><?= __("help") ?></a><small> / </small>
-                    <a href="#" class="text-muted mx-2"><?= __("support") ?></a><small> / </small>
                     <a href="<?= url('contact') ?>" class="text-muted ms-2"><?= __("contact") ?></a>
                     <span class="text-muted mx-2 d-none d-xl-inline" aria-hidden="true">|</span>
                     <?php include __DIR__ . '/lang-switcher.php'; ?>

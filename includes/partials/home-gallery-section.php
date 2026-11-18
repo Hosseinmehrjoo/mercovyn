@@ -31,7 +31,7 @@ $hasMore = $total > $galleryInitialVisible;
                 <?php
                 $src = ad_public_upload_url((string) ($item['image_url'] ?? ''));
                 $altRaw = ad_gallery_localized_title($item, $currentLang ?? getCurrentLanguage());
-                if ($altRaw === '') {
+                if ($altRaw === '' || preg_match('/^\d+$/u', $altRaw)) {
                     $altRaw = __('home_gallery_image_alt');
                 }
                 $alt = htmlspecialchars($altRaw, ENT_QUOTES, 'UTF-8');

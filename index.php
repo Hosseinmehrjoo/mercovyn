@@ -72,7 +72,9 @@ $path = parse_url($requestUri, PHP_URL_PATH) ?? '/';
 $path = trim($path, '/');
 
 // Remove language prefix from path
-$segments = explode('/', $path);
+$segments = array_map(static function (string $segment): string {
+    return rawurldecode($segment);
+}, explode('/', $path));
 if (in_array($segments[0] ?? '', SUPPORTED_LANGUAGES, true)) {
     array_shift($segments);
 }

@@ -74,6 +74,49 @@ function ad_slugify(string $text): string
     return mb_substr($text, 0, 200, 'UTF-8');
 }
 
+/**
+ * Fix known bad public wording without rewriting business claims.
+ */
+function ad_public_copy(string $text, string $lang = ''): string
+{
+    if ($text === '') {
+        return '';
+    }
+    if ($lang === '') {
+        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
+    }
+    $map = [
+        'en' => [
+            'Premium Packaging Twine' => 'Premium PP Baler Twine',
+            'Packaging Twine' => 'Baler Twine',
+        ],
+        'ru' => [
+            'красная шпагатка' => 'красный шпагат',
+            'Красная шпагатка' => 'Красный шпагат',
+            'шпагатка' => 'шпагат',
+            'Шпагатка' => 'Шпагат',
+            'она выделяется' => 'он выделяется',
+            'Она выделяется' => 'Он выделяется',
+        ],
+        'hy' => [
+            'Արկղակապման' => 'Հակակապման',
+            'արկղակապման' => 'հակակապման',
+            'Դդմի պարանը' => 'Հակակապման թելը',
+            'դդմի պարանը' => 'հակակապման թելը',
+            'Դդմի պարան' => 'հակակապման թել',
+            'դդմի պարան' => 'հակակապման թել',
+            'Դեղնակապի պարան' => 'Հակակապման թել',
+            'դեղնակապի պարան' => 'հակակապման թել',
+        ],
+        'ar' => [
+            'خيوط تغليف فاخرة' => 'خيط ربط البالات',
+            'خيوط التغليف' => 'خيط ربط البالات',
+            'خيوط تغليف' => 'خيط ربط البالات',
+        ],
+    ];
+    return strtr($text, $map[$lang] ?? []);
+}
+
 function ad_upload_image(array $file, string $subdir = ''): string
 {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {

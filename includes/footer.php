@@ -100,6 +100,8 @@ $loadMercovynVideos = $loadMercovynVideos ?? false;
         en: <?= json_encode(__('video_sub_lang_en'), JSON_UNESCAPED_UNICODE) ?>,
         ru: <?= json_encode(__('video_sub_lang_ru'), JSON_UNESCAPED_UNICODE) ?>,
         hy: <?= json_encode(__('video_sub_lang_hy'), JSON_UNESCAPED_UNICODE) ?>,
+        ar: <?= json_encode(__('video_sub_lang_ar'), JSON_UNESCAPED_UNICODE) ?>,
+        ka: <?= json_encode(__('video_sub_lang_ka'), JSON_UNESCAPED_UNICODE) ?>,
         off: <?= json_encode(__('video_sub_off'), JSON_UNESCAPED_UNICODE) ?>
       };
     </script>

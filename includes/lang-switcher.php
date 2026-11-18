@@ -38,7 +38,7 @@ $languageLabels = [
     'en' => ['label' => 'EN', 'name' => 'English', 'flag' => '🇺🇸'],
     'ru' => ['label' => 'RU', 'name' => 'Русский', 'flag' => '🇷🇺'],
     'hy' => ['label' => 'HY', 'name' => 'Հայերեն', 'flag' => '🇦🇲'],
-    'ar' => ['label' => 'AR', 'name' => 'العربية', 'flag' => '🇸🇦'],
+    'ar' => ['label' => 'AR', 'name' => 'العربية', 'flag' => ''],
     'ka' => ['label' => 'KA', 'name' => 'ქართული', 'flag' => '🇬🇪'],
 ];
 ?>
@@ -53,7 +53,9 @@ $languageLabels = [
                    lang="<?= htmlspecialchars($code, ENT_QUOTES, 'UTF-8') ?>"
                    title="<?= htmlspecialchars($info['name'], ENT_QUOTES, 'UTF-8') ?>"
                    <?php if ($code === $currentLang): ?>aria-current="true"<?php endif; ?>>
+                    <?php if ($info['flag'] !== ''): ?>
                     <span class="language-switcher__flag" aria-hidden="true"><?= $info['flag'] ?></span>
+                    <?php endif; ?>
                     <span class="language-switcher__code"><?= htmlspecialchars($info['label'], ENT_QUOTES, 'UTF-8') ?></span>
                 </a>
             </li>
