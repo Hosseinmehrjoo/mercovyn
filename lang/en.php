@@ -118,6 +118,7 @@ return [
     'video_sub_lang_ru' => 'Russian',
     'video_sub_lang_hy' => 'Armenian',
     'video_sub_lang_ar' => 'Arabic',
+    'video_sub_lang_ka' => 'Georgian',
     
     // Countries/Export
     'popular_countries' => 'Export Markets',
