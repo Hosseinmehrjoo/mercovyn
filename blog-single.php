@@ -36,6 +36,11 @@ if ($slug !== '') {
         $row = $stmt->fetch();
         if ($row) {
             $post = ad_blog_normalize_post($row);
+            $canonicalSlug = trim((string) ($row['slug'] ?? ''));
+            if ($canonicalSlug !== '' && $slug !== '' && $slug !== $canonicalSlug) {
+                header('Location: ' . url('blog-single/' . $canonicalSlug, getCurrentLanguage()), true, 301);
+                exit;
+            }
         }
     } catch (Throwable $e) {
         error_log('Blog single error: ' . $e->getMessage());
@@ -85,11 +90,12 @@ if ($post) {
     }
     $metaKeywords = ad_blog_localized_field($post, 'meta_keywords');
     $ogImage = ad_blog_localized_field($post, 'cover');
-    $currentPath = 'blog-single/' . ad_blog_post_slug($post, $currentLang);
-    $postSlug = ad_blog_post_slug($post, $currentLang);
+    $postSlug = ad_blog_post_slug($post);
+    $blogPath = 'blog-single/' . $postSlug;
+    $currentPath = $blogPath;
     $hreflangPathByLang = [];
     foreach (ad_supported_languages() as $langCode) {
-        $hreflangPathByLang[$langCode] = 'blog-single/' . ad_blog_post_slug($post, $langCode);
+        $hreflangPathByLang[$langCode] = $blogPath;
     }
     $schemaOrg = [
         '@context' => 'https://schema.org',

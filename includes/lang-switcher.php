@@ -8,7 +8,10 @@ require_once __DIR__ . '/../router.php';
 $langInfo = getLanguageInfo();
 $currentLang = $langInfo['current'];
 $currentPath = $currentPath ?? '';
-$hreflangUrls = getHreflangUrls($currentPath);
+$hreflangPathByLang = $hreflangPathByLang ?? [];
+if (!isset($hreflangUrls) || !is_array($hreflangUrls)) {
+    $hreflangUrls = getHreflangUrls($currentPath, $hreflangPathByLang);
+}
 
 $langSwitcherVariant = $langSwitcherVariant ?? 'topbar';
 $switcherRootClass = match ($langSwitcherVariant) {
