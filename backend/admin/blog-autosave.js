@@ -7,10 +7,10 @@
   var STATUS_ID = "blog-autosave-status";
   var EDITOR_IDS = ["blog-content", "blog-content-ru", "blog-content-hy", "blog-content-ar"];
   var STORAGE_PREFIX = "mercovyn_blog_draft_v1:";
+  var STORAGE_OFF_KEY = "mercovyn_blog_autosave_off_v1";
 
   var timer = null;
   var inFlight = false;
-  var manualSubmit = false;
   var lastFingerprint = "";
 
   function getForm() {
@@ -26,6 +26,38 @@
     if (!el) return;
     el.textContent = text;
     el.style.color = isErr ? "var(--wp-danger, #d63638)" : "var(--wp-muted, #646970)";
+  }
+
+  function currentPostId() {
+    var form = getForm();
+    if (!form) return 0;
+    var idInput = form.querySelector('input[name="id"]');
+    return parseInt(String(idInput && idInput.value ? idInput.value : "0"), 10) || 0;
+  }
+
+  function getAutosaveOffIds() {
+    try {
+      var raw = sessionStorage.getItem(STORAGE_OFF_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function isAutosaveOff(postId) {
+    if (postId < 1) return false;
+    return getAutosaveOffIds().indexOf(postId) !== -1;
+  }
+
+  function markAutosaveOff(postId) {
+    if (postId < 1) return;
+    var ids = getAutosaveOffIds();
+    if (ids.indexOf(postId) === -1) {
+      ids.push(postId);
+      sessionStorage.setItem(STORAGE_OFF_KEY, JSON.stringify(ids));
+    }
   }
 
   function syncEditors() {
@@ -59,6 +91,15 @@
     return STORAGE_PREFIX + (postId > 0 ? String(postId) : "new");
   }
 
+  function clearLocalDraft(postId) {
+    try {
+      localStorage.removeItem(storageKey(postId));
+      if (postId > 0) {
+        localStorage.removeItem(storageKey(0));
+      }
+    } catch (e) {}
+  }
+
   function saveLocalBackup(fd) {
     try {
       var id = parseInt(String(fd.get("id") || "0"), 10) || 0;
@@ -75,7 +116,8 @@
   function autosave() {
     var form = getForm();
     var modal = document.getElementById(MODAL_ID);
-    if (!form || !modal || modal.hidden || manualSubmit || inFlight) return;
+    if (!form || !modal || modal.hidden || inFlight) return;
+    if (isAutosaveOff(currentPostId())) return;
 
     var fd = collectFormData();
     if (!fd) return;
@@ -151,11 +193,12 @@
   }
 
   function offerLocalRestore() {
+    var postId = currentPostId();
+    if (isAutosaveOff(postId)) return;
+
     var form = getForm();
     if (!form) return;
-    var idEl = form.querySelector('input[name="id"]');
-    var id = parseInt(String(idEl && idEl.value ? idEl.value : "0"), 10) || 0;
-    var key = storageKey(id);
+    var key = storageKey(postId);
     var raw;
     try {
       raw = localStorage.getItem(key);
@@ -172,21 +215,44 @@
     if (!data || (!data.title && !data.content)) return;
     if (!window.confirm("یک پیش‌نویس ذخیره‌شده در مرورگر پیدا شد. بازیابی شود؟")) return;
 
-    Object.keys(data).forEach(function (key) {
-      if (key.indexOf("__") === 0) return;
-      var el = form.querySelector('[name="' + key.replace(/"/g, '\\"') + '"]');
+    Object.keys(data).forEach(function (keyName) {
+      if (keyName.indexOf("__") === 0) return;
+      var el = form.querySelector('[name="' + keyName.replace(/"/g, '\\"') + '"]');
       if (!el) return;
       if (el.type === "checkbox") {
-        el.checked = data[key] === el.value || data[key] === true || data[key] === "on";
+        el.checked = data[keyName] === el.value || data[keyName] === true || data[keyName] === "on";
       } else {
-        el.value = data[key];
+        el.value = data[keyName];
       }
     });
-    setStatus("پیش‌نویس محلی بازیابی شد — یک بار «ذخیره» یا صبر برای ذخیره خودکار.", false);
+    setStatus("پیش‌نویس محلی بازیابی شد — یک بار «ذخیره» بزنید.", false);
     if (window.MercovynBlogCkeBoot) window.MercovynBlogCkeBoot();
   }
 
+  function applySavedQueryFlag() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get("saved") !== "1") return;
+      var editId = parseInt(params.get("edit") || "0", 10) || 0;
+      if (editId < 1) return;
+      markAutosaveOff(editId);
+      clearLocalDraft(editId);
+      if (window.history && window.history.replaceState) {
+        params.delete("saved");
+        var qs = params.toString();
+        var next = window.location.pathname + (qs ? "?" + qs : "") + window.location.hash;
+        window.history.replaceState(null, "", next);
+      }
+    } catch (e) {}
+  }
+
   function onModalOpen() {
+    var postId = currentPostId();
+    if (isAutosaveOff(postId)) {
+      stopTimer();
+      setStatus("ذخیره خودکار برای این نوشته غیرفعال است (پس از «ذخیره»).", false);
+      return;
+    }
     setStatus("ذخیره خودکار هر " + Math.round(INTERVAL_MS / 1000) + " ثانیه (پیش‌نویس)", false);
     startTimer();
     window.setTimeout(offerLocalRestore, 400);
@@ -212,13 +278,16 @@
   var form = getForm();
   if (form) {
     form.addEventListener("submit", function () {
-      manualSubmit = true;
+      var postId = currentPostId();
+      markAutosaveOff(postId);
+      clearLocalDraft(postId);
       stopTimer();
       syncEditors();
     });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    applySavedQueryFlag();
     var modal = document.getElementById(MODAL_ID);
     if (modal && !modal.hidden) onModalOpen();
   });

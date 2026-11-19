@@ -418,17 +418,12 @@ function ad_seo_service_urls(): array
         }
         foreach (ad_seo_langs() as $lang) {
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
-            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
-            $slug = trim((string) ($row[$slugKey] ?? ''));
-            if ($slug === '') {
-                $slug = $baseSlug;
-            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
-                $title = (string) ($row['title'] ?? $slug);
+                $title = (string) ($row['title'] ?? $baseSlug);
             }
             $out[] = [
-                'loc' => ad_seo_absolute_url(ad_seo_lang_path('product/' . rawurlencode($slug), $lang)),
+                'loc' => ad_seo_absolute_url(ad_seo_lang_path('product/' . rawurlencode($baseSlug), $lang)),
                 'lastmod' => $lastmod,
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
@@ -468,17 +463,12 @@ function ad_seo_blog_urls(): array
         }
         foreach (ad_seo_langs() as $lang) {
             $titleKey = $lang === 'en' ? 'title' : 'title_' . $lang;
-            $slugKey = $lang === 'en' ? 'slug' : 'slug_' . $lang;
-            $slug = trim((string) ($row[$slugKey] ?? ''));
-            if ($slug === '') {
-                $slug = $baseSlug;
-            }
             $title = trim((string) ($row[$titleKey] ?? ''));
             if ($title === '') {
-                $title = (string) ($row['title'] ?? $slug);
+                $title = (string) ($row['title'] ?? $baseSlug);
             }
             $out[] = [
-                'loc' => ad_seo_absolute_url(ad_seo_lang_path('blog-single/' . rawurlencode($slug), $lang)),
+                'loc' => ad_seo_absolute_url(ad_seo_lang_path('blog-single/' . rawurlencode($baseSlug), $lang)),
                 'lastmod' => $lastmod,
                 'changefreq' => 'weekly',
                 'priority' => '0.7',
@@ -609,7 +599,7 @@ function ad_seo_build_llms_txt(): string
         '',
         'Site: ' . $base,
         'Sitemap: ' . ad_seo_absolute_url('sitemap.xml'),
-        'Contact: mercovyn@gmail.com',
+        'Contact: info@mercovyn.com',
         '',
         '## Main pages',
     ];

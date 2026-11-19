@@ -463,7 +463,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <a href="tel:+37491551987" class="btn btn-primary btn-lg border-secondary rounded-pill py-3 px-5"><i class="fas fa-phone-alt me-2"></i><?= __("phone_number") ?></a>
                     <a href="<?= __("whatsapp_link") ?>" target="_blank" class="btn btn-outline-light btn-lg rounded-pill py-3 px-5"><i class="fab fa-whatsapp me-2"></i>WhatsApp</a>
-                    <a href="mailto:mercovyn@gmail.com" class="btn btn-outline-light btn-lg rounded-pill py-3 px-5"><i class="fas fa-envelope me-2"></i>Email</a>
+                    <a href="mailto:<?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?>" class="btn btn-outline-light btn-lg rounded-pill py-3 px-5"><i class="fas fa-envelope me-2"></i>Email</a>
                 </div>
             </div>
         </div>

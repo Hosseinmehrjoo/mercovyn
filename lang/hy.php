@@ -221,7 +221,7 @@ return [
     'company_name_am' => 'ՄԵՐԿՈՎԻՆ ՍՊԸ',
     'address' => 'Հայաստան — Երևան',
     'phone_number' => '+374 91 551 987',
-    'email_address' => 'mercovyn@gmail.com',
+    'email_address' => 'info@mercovyn.com',
     'whatsapp_link' => 'https://wa.me/37491551987',
     'telegram_link' => 'https://t.me/mercovyn',
     'fab_contact_open' => 'Բացել կապի տարբերակները',

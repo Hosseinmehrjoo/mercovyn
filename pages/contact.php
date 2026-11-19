@@ -68,7 +68,7 @@ include __DIR__ . '/../includes/header.php';
                                     <h5 class="mb-3"><?= __("email") ?></h5>
                                     <div class="mb-3">
                                         <h6 class="mb-0"><?= __("write_us") ?></h6>
-                                        <a href="mailto:mercovyn@gmail.com" class="fs-5 text-primary"><?= __("email_address") ?></a>
+                                        <a href="mailto:<?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?>" class="fs-5 text-primary"><?= __("email_address") ?></a>
                                     </div>
                                 </div>
                             </div>
@@ -205,7 +205,7 @@ include __DIR__ . '/../includes/header.php';
                             </div>
                             <div class="office-content d-flex flex-column">
                                 <h4 class="mb-2"><?= __("email") ?></h4>
-                                <a href="mailto:mercovyn@gmail.com" class="text-muted fs-5 mb-2"><?= __("email_address") ?></a>
+                                <a href="mailto:<?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?>" class="text-muted fs-5 mb-2"><?= __("email_address") ?></a>
                             </div>
                         </div>
                     </div>

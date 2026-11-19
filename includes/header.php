@@ -87,7 +87,7 @@ foreach ($hreflangUrls as $lang => $url) {
         'name' => __('brand'),
         'url' => $hreflangUrls['en'] ?? (getCanonicalSiteOrigin() . '/'),
         'logo' => getCanonicalSiteOrigin() . $logoUrl,
-        'email' => 'mercovyn@gmail.com',
+        'email' => __('email_address'),
         'telephone' => '+37491551987',
         'address' => [
             '@type' => 'PostalAddress',
@@ -139,7 +139,7 @@ foreach ($hreflangUrls as $lang => $url) {
         <div class="row gx-0 align-items-center">
             <div class="col-lg-5 text-center text-lg-start mb-lg-0">
                 <div class="d-flex">
-                    <a href="mailto:mercovyn@gmail.com" class="text-muted me-4"><i class="fas fa-envelope text-secondary me-2"></i>mercovyn@gmail.com</a>
+                    <a href="mailto:<?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?>" class="text-muted me-4"><i class="fas fa-envelope text-secondary me-2"></i><?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?></a>
                     <a href="tel:+37491551987" class="text-muted me-0"><i class="fas fa-phone-alt text-secondary me-2"></i>+374 91 551 987</a>
                 </div>
             </div>

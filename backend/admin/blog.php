@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: blog.php' . ($failId > 0 ? '?edit=' . $failId : '?new=1'));
         exit;
     }
-    header('Location: blog.php');
+    header('Location: blog.php?edit=' . $id . '&saved=1');
     exit;
 }
 
@@ -471,5 +471,5 @@ require __DIR__ . '/_layout_top.php';
   }
 })();
 </script>
-<script src="blog-autosave.js?ver=20261116autosave" defer></script>
+<script src="blog-autosave.js?ver=20261120nosave" defer></script>
 <?php require __DIR__ . '/_layout_bottom.php'; ?>

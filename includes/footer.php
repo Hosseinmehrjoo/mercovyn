@@ -59,7 +59,7 @@ $loadMercovynVideos = $loadMercovynVideos ?? false;
                     <h4 class="text-white mb-4"><?= __("contact_info") ?></h4>
                     <p class="text-white mb-3"><i class="fas fa-map-marker-alt me-2"></i><?= __("address") ?></p>
                     <p class="text-white mb-3"><i class="fas fa-phone-alt me-2"></i><a href="tel:+37491551987" class="text-white"><?= __("phone_number") ?></a></p>
-                    <p class="text-white mb-3"><i class="fas fa-envelope me-2"></i><a href="mailto:mercovyn@gmail.com" class="text-white"><?= __("email_address") ?></a></p>
+                    <p class="text-white mb-3"><i class="fas fa-envelope me-2"></i><a href="mailto:<?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?>" class="text-white"><?= htmlspecialchars(__('email_address'), ENT_QUOTES, 'UTF-8') ?></a></p>
                     <p class="text-white mb-0"><i class="fab fa-whatsapp me-2"></i><a href="<?= __("whatsapp_link") ?>" class="text-white" target="_blank">WhatsApp</a></p>
                 </div>
             </div>

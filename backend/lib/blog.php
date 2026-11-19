@@ -93,7 +93,7 @@ function ad_blog_ensure_schema(): void
 /** @return list<string> */
 function ad_blog_locale_form_fields(): array
 {
-    return ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
+    return ['title', 'excerpt', 'content', 'meta_title', 'meta_description', 'meta_keywords'];
 }
 
 /**
@@ -167,20 +167,25 @@ function ad_blog_merge_locale_fields(array $auto, array $manual, ?array $existin
         $merged[$contentKey] = array_key_exists($contentKey, $manual)
             ? (string) $manual[$contentKey]
             : (string) ($existing[$contentKey] ?? '');
-
-        $slugKey = 'slug_' . $locale;
-        $slugMan = trim((string) ($manual[$slugKey] ?? ''));
-        if ($slugMan !== '') {
-            $merged[$slugKey] = ad_slugify($slugMan);
-        } else {
-            $titleLoc = trim((string) ($merged['title_' . $locale] ?? ''));
-            $merged[$slugKey] = $titleLoc !== ''
-                ? ad_slugify($titleLoc)
-                : ad_slugify((string) ($existing['slug'] ?? $existing['title'] ?? ''));
-        }
     }
 
     return $merged;
+}
+
+/**
+ * Locale slug_* columns mirror the canonical English slug (never derived from translated titles).
+ *
+ * @param array<string, string> $localized
+ * @return array<string, string>
+ */
+function ad_blog_sync_locale_slugs(array $localized, string $canonicalSlug): array
+{
+    $canonicalSlug = ad_slugify($canonicalSlug);
+    foreach (ad_translate_locales() as $locale) {
+        $localized['slug_' . $locale] = $canonicalSlug;
+    }
+
+    return $localized;
 }
 
 function ad_blog_unique_slug(string $base, int $ignoreId = 0): string
@@ -333,15 +338,6 @@ function ad_blog_save_post_from_input(array $input, bool $autosave = false): arr
 
     if ($autosave) {
         $localized = ad_blog_localized_for_autosave($existing, $input);
-        foreach (ad_translate_locales() as $locale) {
-            $slugKey = 'slug_' . $locale;
-            if (trim((string) ($localized[$slugKey] ?? '')) === '') {
-                $titleLoc = trim((string) ($localized['title_' . $locale] ?? ''));
-                $localized[$slugKey] = $titleLoc !== ''
-                    ? ad_blog_unique_slug(ad_slugify($titleLoc), $id)
-                    : $slug;
-            }
-        }
     } else {
         $localized = ad_blog_build_localized_fields($english, $existing);
         $localized = ad_blog_merge_locale_fields(
@@ -350,6 +346,7 @@ function ad_blog_save_post_from_input(array $input, bool $autosave = false): arr
             $existing
         );
     }
+    $localized = ad_blog_sync_locale_slugs($localized, $slug);
 
     $created = false;
     if ($id > 0) {
@@ -655,17 +652,9 @@ function ad_blog_post_categories(int $postId): array
  */
 function ad_blog_post_slug(array $post, string $lang = ''): string
 {
-    if ($lang === '') {
-        $lang = function_exists('getCurrentLanguage') ? getCurrentLanguage() : 'en';
-    }
-    $base = trim((string) ($post['slug'] ?? ''));
-    if ($lang === 'en') {
-        return $base;
-    }
-    $key = 'slug_' . $lang;
-    $localized = trim((string) ($post[$key] ?? ''));
+    unset($lang);
 
-    return $localized !== '' ? $localized : $base;
+    return trim((string) ($post['slug'] ?? ''));
 }
 
 function ad_blog_localized_field(array $row, string $field, string $lang = ''): string
