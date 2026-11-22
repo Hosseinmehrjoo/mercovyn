@@ -6,6 +6,7 @@ require_once __DIR__ . '/backend/lib/db.php';
 require_once __DIR__ . '/backend/lib/helpers.php';
 require_once __DIR__ . '/backend/lib/media.php';
 require_once __DIR__ . '/backend/lib/blog.php';
+require_once __DIR__ . '/backend/lib/seo.php';
 require_once __DIR__ . '/router.php';
 
 $currentLang = getCurrentLanguage();
@@ -37,6 +38,13 @@ try {
 $pageTitle = __('latest_articles') . ' | ' . __('brand');
 $metaDescription = __('blog_meta_desc');
 $currentPath = 'blog';
+
+$schemaLdNodes = [
+    ad_seo_schema_breadcrumb([
+        ['name' => __('home'), 'path' => ''],
+        ['name' => __('blog')],
+    ], $currentPath),
+];
 
 include __DIR__ . '/includes/header.php';
 ?>

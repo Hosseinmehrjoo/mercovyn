@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../backend/lib/db.php';
 require_once __DIR__ . '/../backend/lib/helpers.php';
 require_once __DIR__ . '/../backend/lib/services.php';
+require_once __DIR__ . '/../backend/lib/seo.php';
 require_once __DIR__ . '/../router.php';
 
 $currentLang = getCurrentLanguage();
@@ -37,13 +38,20 @@ if ($product) {
     foreach (ad_supported_languages() as $langCode) {
         $hreflangPathByLang[$langCode] = 'product/' . ad_service_localized_slug($product, $langCode);
     }
-    $schemaOrg = [
-        '@context' => 'https://schema.org',
-        '@type' => 'Product',
-        'name' => $title,
-        'description' => ad_service_localized_field($product, 'summary'),
-        'image' => $ogImage !== '' ? $ogImage : null,
-        'brand' => ['@type' => 'Brand', 'name' => __('brand')],
+    $productUrl = ad_seo_page_url($currentPath);
+    $schemaLdNodes = [
+        ad_seo_schema_product([
+            'name' => $title,
+            'description' => ad_service_localized_field($product, 'summary'),
+            'image' => $ogImage,
+            'sku' => ad_service_localized_slug($product),
+            'url' => $productUrl,
+        ]),
+        ad_seo_schema_breadcrumb([
+            ['name' => __('home'), 'path' => ''],
+            ['name' => __('services'), 'path' => 'products'],
+            ['name' => $title],
+        ], $currentPath),
     ];
 } else {
     $pageTitle = __("page_not_found") . ' | ' . __("brand");

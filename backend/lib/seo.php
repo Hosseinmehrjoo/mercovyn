@@ -682,3 +682,181 @@ function ad_seo_on_content_change(): void
         // non-fatal
     }
 }
+
+function ad_seo_organization_id(): string
+{
+    return rtrim(ad_seo_site_base_url(), '/') . '/#organization';
+}
+
+/**
+ * @param array<int, mixed> $data
+ * @return array<int, mixed>
+ */
+function ad_seo_schema_clean(array $data): array
+{
+    $out = [];
+    foreach ($data as $key => $value) {
+        if ($value === null || $value === '') {
+            continue;
+        }
+        if (is_array($value)) {
+            $value = ad_seo_schema_clean($value);
+            if ($value === []) {
+                continue;
+            }
+        }
+        $out[$key] = $value;
+    }
+
+    return $out;
+}
+
+/**
+ * @param array<int, array<string, mixed>> $nodes
+ * @return array<string, mixed>
+ */
+function ad_seo_json_ld_document(array $nodes): array
+{
+    $nodes = array_values(array_filter($nodes));
+    if ($nodes === []) {
+        return [];
+    }
+    if (count($nodes) === 1) {
+        return ad_seo_schema_clean(array_merge(['@context' => 'https://schema.org'], $nodes[0]));
+    }
+
+    return ad_seo_schema_clean([
+        '@context' => 'https://schema.org',
+        '@graph' => $nodes,
+    ]);
+}
+
+function ad_seo_page_url(string $routePath = '', ?string $lang = null): string
+{
+    if (!function_exists('url')) {
+        require_once dirname(__DIR__, 2) . '/router.php';
+    }
+    $lang = $lang ?? getCurrentLanguage();
+
+    return ad_seo_absolute_url(url($routePath, $lang));
+}
+
+function ad_seo_schema_organization(): array
+{
+    $logoPath = '/img/mercovyn-logo.webp';
+
+    return ad_seo_schema_clean([
+        '@type' => 'Organization',
+        '@id' => ad_seo_organization_id(),
+        'name' => __('brand'),
+        'url' => ad_seo_site_base_url() . '/',
+        'logo' => [
+            '@type' => 'ImageObject',
+            'url' => ad_seo_absolute_url($logoPath),
+        ],
+        'email' => __('email_address'),
+        'telephone' => '+37491551987',
+        'address' => [
+            '@type' => 'PostalAddress',
+            'addressLocality' => 'Yerevan',
+            'addressCountry' => 'AM',
+        ],
+    ]);
+}
+
+function ad_seo_schema_website(): array
+{
+    return ad_seo_schema_clean([
+        '@type' => 'WebSite',
+        '@id' => rtrim(ad_seo_site_base_url(), '/') . '/#website',
+        'name' => __('brand'),
+        'url' => ad_seo_site_base_url() . '/',
+        'publisher' => ['@id' => ad_seo_organization_id()],
+        'inLanguage' => defined('SUPPORTED_LANGUAGES') ? SUPPORTED_LANGUAGES : ['en', 'ru', 'hy', 'ar', 'ka'],
+    ]);
+}
+
+/**
+ * @param list<array{name: string, path?: string}> $crumbs path = route segment for url(); omit on last item to use $currentPath
+ */
+function ad_seo_schema_breadcrumb(array $crumbs, string $currentPath = ''): array
+{
+    $items = [];
+    $pos = 1;
+    foreach ($crumbs as $i => $crumb) {
+        $name = trim((string) ($crumb['name'] ?? ''));
+        if ($name === '') {
+            continue;
+        }
+        $path = array_key_exists('path', $crumb) ? (string) $crumb['path'] : '';
+        if ($path === '' && $i === array_key_last($crumbs) && $currentPath !== '') {
+            $path = $currentPath;
+        }
+        $item = [
+            '@type' => 'ListItem',
+            'position' => $pos++,
+            'name' => $name,
+        ];
+        if ($path !== '') {
+            $item['item'] = ad_seo_page_url($path);
+        }
+        $items[] = $item;
+    }
+
+    return ad_seo_schema_clean([
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $items,
+    ]);
+}
+
+/**
+ * @param array{headline?: string, description?: string, image?: string, datePublished?: string, inLanguage?: string, url?: string} $opts
+ */
+function ad_seo_schema_article(array $opts): array
+{
+    $canonical = trim((string) ($opts['url'] ?? ''));
+
+    $schema = [
+        '@type' => 'Article',
+        'headline' => $opts['headline'] ?? '',
+        'description' => $opts['description'] ?? '',
+        'datePublished' => $opts['datePublished'] ?? '',
+        'author' => ['@id' => ad_seo_organization_id()],
+        'publisher' => ['@id' => ad_seo_organization_id()],
+        'inLanguage' => $opts['inLanguage'] ?? 'en',
+    ];
+    if ($canonical !== '') {
+        $schema['url'] = $canonical;
+        $schema['mainEntityOfPage'] = ['@type' => 'WebPage', '@id' => $canonical];
+    }
+    $image = trim((string) ($opts['image'] ?? ''));
+    if ($image !== '') {
+        $schema['image'] = ad_seo_absolute_url($image);
+    }
+
+    return ad_seo_schema_clean($schema);
+}
+
+/**
+ * @param array{name?: string, description?: string, image?: string, sku?: string, url?: string} $opts
+ */
+function ad_seo_schema_product(array $opts): array
+{
+    $canonical = trim((string) ($opts['url'] ?? ''));
+    $schema = [
+        '@type' => 'Product',
+        'name' => $opts['name'] ?? '',
+        'description' => $opts['description'] ?? '',
+        'sku' => $opts['sku'] ?? '',
+        'brand' => ['@type' => 'Brand', 'name' => __('brand')],
+    ];
+    if ($canonical !== '') {
+        $schema['url'] = $canonical;
+    }
+    $image = trim((string) ($opts['image'] ?? ''));
+    if ($image !== '') {
+        $schema['image'] = ad_seo_absolute_url($image);
+    }
+
+    return ad_seo_schema_clean($schema);
+}

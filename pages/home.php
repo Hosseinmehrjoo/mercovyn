@@ -43,6 +43,9 @@ $loadCounterUp = false;
 $loadMercovynVideos = true;
 $overlayNavOnHero = true;
 
+require_once __DIR__ . '/../backend/lib/seo.php';
+$schemaLdNodes = [ad_seo_schema_website()];
+
 include __DIR__ . '/../includes/header.php';
 ?>
 

@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../backend/lib/db.php';
 require_once __DIR__ . '/../backend/lib/helpers.php';
 require_once __DIR__ . '/../backend/lib/services.php';
+require_once __DIR__ . '/../backend/lib/seo.php';
 require_once __DIR__ . '/../router.php';
 
 $currentLang = getCurrentLanguage();
@@ -14,6 +15,13 @@ $pageTitle = __("our_services") . ' | ' . __("brand");
 $metaDescription = __("services_subtitle");
 $currentPath = 'products';
 $loadMercovynVideos = true;
+
+$schemaLdNodes = [
+    ad_seo_schema_breadcrumb([
+        ['name' => __('home'), 'path' => ''],
+        ['name' => __('services')],
+    ], $currentPath),
+];
 
 include __DIR__ . '/../includes/header.php';
 ?>

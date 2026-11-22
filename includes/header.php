@@ -81,22 +81,15 @@ foreach ($hreflangUrls as $lang => $url) {
     <?php endif; ?>
 
     <?php
-    $schemaOrg = $schemaOrg ?? [
-        '@context' => 'https://schema.org',
-        '@type' => 'Organization',
-        'name' => __('brand'),
-        'url' => $hreflangUrls['en'] ?? (getCanonicalSiteOrigin() . '/'),
-        'logo' => getCanonicalSiteOrigin() . $logoUrl,
-        'email' => __('email_address'),
-        'telephone' => '+37491551987',
-        'address' => [
-            '@type' => 'PostalAddress',
-            'addressLocality' => 'Yerevan',
-            'addressCountry' => 'AM',
-        ],
-    ];
-    if (!empty($schemaOrg)): ?>
-    <script type="application/ld+json"><?= json_encode($schemaOrg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+    require_once __DIR__ . '/../backend/lib/seo.php';
+    $schemaLdNodes = $schemaLdNodes ?? [];
+    if (!empty($schemaOrg)) {
+        $schemaLdNodes[] = $schemaOrg;
+        unset($schemaOrg);
+    }
+    $schemaJsonLd = ad_seo_json_ld_document(array_merge([ad_seo_schema_organization()], $schemaLdNodes));
+    if ($schemaJsonLd !== []): ?>
+    <script type="application/ld+json"><?= json_encode($schemaJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endif; ?>
     
     <!-- Preload Critical Resources -->

@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../backend/lib/db.php';
 require_once __DIR__ . '/../backend/lib/helpers.php';
 require_once __DIR__ . '/../backend/lib/media.php';
+require_once __DIR__ . '/../backend/lib/seo.php';
 require_once __DIR__ . '/../router.php';
 
 $currentLang = getCurrentLanguage();
@@ -13,6 +14,13 @@ $langInfo = getLanguageInfo();
 $pageTitle = __("contact") . ' | ' . __("brand");
 $metaDescription = __("meta_description_default");
 $currentPath = 'contact';
+
+$schemaLdNodes = [
+    ad_seo_schema_breadcrumb([
+        ['name' => __('home'), 'path' => ''],
+        ['name' => __('contact')],
+    ], $currentPath),
+];
 
 include __DIR__ . '/../includes/header.php';
 ?>

@@ -6,6 +6,7 @@ require_once __DIR__ . '/backend/lib/db.php';
 require_once __DIR__ . '/backend/lib/helpers.php';
 require_once __DIR__ . '/backend/lib/media.php';
 require_once __DIR__ . '/backend/lib/blog.php';
+require_once __DIR__ . '/backend/lib/seo.php';
 require_once __DIR__ . '/router.php';
 
 $currentLang = getCurrentLanguage();
@@ -97,15 +98,21 @@ if ($post) {
     foreach (ad_supported_languages() as $langCode) {
         $hreflangPathByLang[$langCode] = $blogPath;
     }
-    $schemaOrg = [
-        '@context' => 'https://schema.org',
-        '@type' => 'Article',
-        'headline' => $articleTitle,
-        'datePublished' => $post['published_at'] ?? '',
-        'image' => $ogImage !== '' ? $ogImage : null,
-        'author' => ['@type' => 'Organization', 'name' => __('brand')],
-        'publisher' => ['@type' => 'Organization', 'name' => __('brand')],
-        'inLanguage' => $currentLang,
+    $articleUrl = ad_seo_page_url($blogPath);
+    $schemaLdNodes = [
+        ad_seo_schema_article([
+            'headline' => $articleTitle,
+            'description' => $metaDescription,
+            'datePublished' => $post['published_at'] ?? '',
+            'image' => $ogImage,
+            'inLanguage' => $currentLang,
+            'url' => $articleUrl,
+        ]),
+        ad_seo_schema_breadcrumb([
+            ['name' => __('home'), 'path' => ''],
+            ['name' => __('blog'), 'path' => 'blog'],
+            ['name' => $articleTitle],
+        ], $blogPath),
     ];
 } else {
     $articleTitle = '';
