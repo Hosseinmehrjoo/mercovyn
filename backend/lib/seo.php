@@ -783,23 +783,29 @@ function ad_seo_schema_breadcrumb(array $crumbs, string $currentPath = ''): arra
 {
     $items = [];
     $pos = 1;
+
     foreach ($crumbs as $i => $crumb) {
         $name = trim((string) ($crumb['name'] ?? ''));
+
         if ($name === '') {
             continue;
         }
-        $path = array_key_exists('path', $crumb) ? (string) $crumb['path'] : '';
+
+        $path = array_key_exists('path', $crumb)
+            ? (string) $crumb['path']
+            : '';
+
         if ($path === '' && $i === array_key_last($crumbs) && $currentPath !== '') {
             $path = $currentPath;
         }
+
         $item = [
             '@type' => 'ListItem',
             'position' => $pos++,
             'name' => $name,
+            'item' => ad_seo_page_url($path),
         ];
-        if ($path !== '') {
-            $item['item'] = ad_seo_page_url($path);
-        }
+
         $items[] = $item;
     }
 
