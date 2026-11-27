@@ -121,6 +121,9 @@ foreach ($hreflangUrls as $lang => $url) {
     <noscript><link rel="stylesheet" href="<?= htmlspecialchars(asset_url('css/mercovyn-videos.css'), ENT_QUOTES, 'UTF-8') ?>"></noscript>
     <?php endif; ?>
     <?php include __DIR__ . '/clarity.php'; ?>
+    <script type="text/javascript">
+      !function(){var i="iFcpnn",d=document,g=d.createElement("script"),s="https://www.goftino.com/widget/"+i,l=localStorage.getItem("goftino_"+i);g.type="text/javascript",g.async=!0,g.src=l?s+"?o="+l:s;d.getElementsByTagName("head")[0].appendChild(g);}();
+    </script>
 </head>
 
 <body>
